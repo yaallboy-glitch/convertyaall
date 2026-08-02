@@ -183,7 +183,11 @@ async function boot(){
     status.innerText = "Memuat mesin FFmpeg (~30MB)...";
     appendLog("[ConvertYaAll] loading ffmpeg-core...");
     logWrap.style.display = 'block';
-    const base = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
+    // PENTING: harus pakai folder /dist/esm (bukan /dist/umd) untuk core.
+    // Library FFmpeg secara internal pakai dynamic import() buat ambil core,
+    // dan import() itu butuh format ES Module (ada `export`), sedangkan build
+    // UMD cuma bikin variabel global biasa tanpa `export` — makanya gagal.
+    const base = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm";
 
     // Diagnosa manual: library FFmpeg sering "menelan" error asli dan cuma
     // kasih pesan generik "failed to import ffmpeg-core.js". Jadi kita cek
