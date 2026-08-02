@@ -313,8 +313,7 @@ btn.addEventListener('click', async ()=>{
     appendLog("[ConvertYaAll] menjalankan ffmpeg dengan preset SPEED 2.3X · AMPLIFY -4DB ...");
     await withTimeout(ffmpeg.exec([
       '-i', inp,
-      '-filter:a', 'atempo=2.0,atempo=1.15,volume=-4dB',
-      '-ar', '48000',
+      '-filter:a', 'asetrate=44100*2.3,aresample=48000,volume=-4dB',
       '-c:a', 'libvorbis',
       '-q:a','6',
       out
