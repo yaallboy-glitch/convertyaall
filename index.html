@@ -187,7 +187,14 @@ async function boot(){
 
     await withTimeout(ffmpeg.load({
       coreURL: await toBlobURL(`${base}/ffmpeg-core.js`, "text/javascript"),
-      wasmURL: await toBlobURL(`${base}/ffmpeg-core.wasm`, "application/wasm")
+      wasmURL: await toBlobURL(`${base}/ffmpeg-core.wasm`, "application/wasm"),
+      // Library ffmpeg.js sendiri bikin Worker tambahan dari file chunk ini.
+      // Kalau dibiarkan pakai URL unpkg langsung, browser menolak (cross-origin
+      // Worker construction). Solusinya sama seperti core: ubah dulu jadi blob URL.
+      classWorkerURL: await toBlobURL(
+        "https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js",
+        "text/javascript"
+      ),
     }), 25000, "Load FFmpeg");
 
     loaded = true;
