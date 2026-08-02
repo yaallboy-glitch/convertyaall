@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ConvertYaAll</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#1a1d24; --accent:#ff4444;
+    --main:#fff; --muted:#8b8d91; --border:#2a2e36; --ok:#3ecf8e; --warn:#ffb703;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif}
+  body{background:var(--bg);color:var(--main);display:flex;flex-direction:column;align-items:center;padding:18px}
+  .wrap{max-width:520px;width:100%}
+  .top{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);margin-bottom:22px}
+  .brand{font-size:22px;font-weight:800;letter-spacing:.5px}
+  .brand span{color:var(--accent)}
+  h1{font-size:21px;text-align:center;margin-bottom:14px;line-height:1.3}
+  .preset{background:rgba(255,68,68,.1);border:1px solid var(--accent);color:var(--accent);
+    padding:11px;border-radius:8px;text-align:center;font-size:12px;font-weight:700;margin-bottom:18px;letter-spacing:.5px}
+
+  /* Banner peringatan in-app browser (WhatsApp/Instagram/dll) */
+  .warn-banner{
+    display:none; background:rgba(255,183,3,.12); border:1px solid var(--warn); color:var(--warn);
+    padding:12px; border-radius:8px; font-size:12.5px; line-height:1.5; margin-bottom:16px;
+  }
+  .warn-banner b{display:block;margin-bottom:4px;font-size:13px}
+  .warn-banner code{background:#000;padding:1px 5px;border-radius:4px}
+
+  .steps{display:flex;justify-content:space-between;background:var(--card);border:1px solid var(--border);
+    border-radius:10px;padding:13px;margin-bottom:18px;font-size:11px;color:var(--muted)}
+  .steps div{flex:1;text-align:center;position:relative}
+  .steps div:not(:last-child)::after{content:"→";position:absolute;right:-2px;top:0;opacity:.4}
+  .steps b{color:var(--main);display:block;font-size:12px;margin-bottom:3px}
+  .box{border:2px dashed var(--border);border-radius:12px;padding:40px 18px;background:var(--card);
+    text-align:center;cursor:pointer;transition:.2s}
+  .box:active{border-color:var(--accent);background:#181b22}
+  .box .ic{font-size:40px;margin-bottom:10px}
+  .box h3{font-size:15px;margin-bottom:5px;word-break:break-all}
+  .box p{color:var(--muted);font-size:12px}
+  .btn{background:var(--accent);color:#fff;border:none;padding:15px;width:100%;font-size:15px;
+    font-weight:700;border-radius:8px;margin-top:12px;cursor:pointer;text-decoration:none;display:block;text-align:center}
+  .btn:disabled{background:#555;color:#aaa}
+  .btn-dl{background:var(--ok);margin-top:8px}
+
+  .prog-wrap{margin-top:14px;display:none}
+  .prog-bar{height:8px;background:var(--border);border-radius:6px;overflow:hidden}
+  .prog-fill{height:100%;width:0;background:var(--accent);transition:width .2s}
+  .prog-txt{text-align:center;font-size:12px;color:var(--muted);margin-top:6px}
+
+  .log-wrap{margin-top:14px;display:none}
+  .log-title{font-size:12px;color:var(--muted);margin-bottom:6px;letter-spacing:.5px}
+  .log{background:#000;border:1px solid var(--border);border-radius:8px;
+    height:180px;overflow-y:auto;padding:10px;font-family:monospace;font-size:11px;line-height:1.5;color:#9be29b}
+  .log::-webkit-scrollbar{width:5px}
+  .log::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+  #status{margin-top:12px;color:var(--muted);font-size:13px;min-height:18px;text-align:center}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">Convert<span>YaAll</span></div>
+  </div>
+
+  <h1>ConvertYaAll — Bypass Audio</h1>
+  <div class="preset">PRESET: SPEED 2.3X · AMPLIFY -4 DB</div>
+
+  <!-- Muncul otomatis kalau dibuka di in-app browser (WhatsApp/Instagram/dll) -->
+  <div class="warn-banner" id="warnBanner">
+    <b>⚠ Terdeteksi dibuka di browser dalam-aplikasi</b>
+    Halaman ini butuh fitur Web Worker/WebAssembly yang sering <b>diblokir</b> oleh browser bawaan WhatsApp/Instagram/dll — itu sebabnya loading & download bisa diam saja tanpa proses.
+    Ketuk menu titik-tiga di pojok kanan atas, lalu pilih <b>"Buka di Chrome"</b> / <b>"Buka di browser"</b>.
+  </div>
+
+  <div class="steps">
+    <div><b>Step 1</b>Upload audio</div>
+    <div><b>Step 2</b>Encoder process</div>
+    <div><b>Step 3</b>Download OGG</div>
+  </div>
+
+  <div class="box" id="box">
+    <div class="ic">🎵</div>
+    <h3>Upload Audio</h3>
+    <p>Ketuk untuk pilih file audio</p>
+    <input type="file" id="file" accept="audio/*" class="hidden">
+  </div>
+
+  <button class="btn" id="btn" disabled>Proses Audio</button>
+  <div id="status">Menyiapkan mesin...</div>
+
+  <div class="prog-wrap" id="progWrap">
+    <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+    <div class="prog-txt" id="progTxt">0%</div>
+  </div>
+
+  <div class="log-wrap" id="logWrap">
+    <div class="log-title">FFMPEG LOG (proses encoder):</div>
+    <div class="log" id="log"></div>
+  </div>
+
+  <a class="btn btn-dl hidden" id="dlBtn" href="#">⬇ Download OGG</a>
+</div>
+
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
+<script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
+<script>
+const { FFmpeg } = FFmpegWASM;
+const { toBlobURL, fetchFile } = FFmpegUtil;
+const ffmpeg = new FFmpeg();
+let loaded = false;
+let resultURL = null;
+let resultName = "";
+
+const box = document.getElementById('box');
+const file = document.getElementById('file');
+const btn = document.getElementById('btn');
+const status = document.getElementById('status');
+const logEl = document.getElementById('log');
+const logWrap = document.getElementById('logWrap');
+const progWrap = document.getElementById('progWrap');
+const progFill = document.getElementById('progFill');
+const progTxt = document.getElementById('progTxt');
+const dlBtn = document.getElementById('dlBtn');
+const warnBanner = document.getElementById('warnBanner');
+let picked = null;
+
+// ================= 1) DETEKSI IN-APP BROWSER =================
+// Ini penyebab paling umum "loading/download diam saja tanpa proses":
+// WhatsApp, Instagram, Facebook, TikTok, Line, dll punya browser bawaan
+// (WebView) yang sering membatasi/memblokir Worker & WebAssembly TANPA
+// memunculkan error apa pun ke halaman — jadi kelihatan seperti nge-hang.
+function detectInAppBrowser() {
+  const ua = navigator.userAgent || '';
+  const patterns = ['WhatsApp', 'Instagram', 'FBAN', 'FBAV', 'Line/', 'MicroMessenger', 'TikTok'];
+  return patterns.some(p => ua.includes(p));
+}
+if (detectInAppBrowser()) {
+  warnBanner.style.display = 'block';
+}
+
+// ================= 2) CEK DUKUNGAN WORKER & WEBASSEMBLY =================
+function checkEnvSupport() {
+  if (typeof Worker === 'undefined') return 'Browser ini tidak mendukung Web Worker.';
+  if (typeof WebAssembly === 'undefined') return 'Browser ini tidak mendukung WebAssembly.';
+  return null;
+}
+const envError = checkEnvSupport();
+if (envError) {
+  status.innerText = envError + ' Coba buka di Chrome/Safari versi terbaru.';
+  warnBanner.style.display = 'block';
+  warnBanner.querySelector('b').innerText = '⚠ Browser tidak didukung';
+}
+
+// ================= 3) LOG & PROGRESS REALTIME =================
+ffmpeg.on('log', ({ type, message }) => {
+  appendLog(message);
+});
+ffmpeg.on('progress', ({ progress }) => {
+  let p = Math.max(0, Math.min(1, progress)) * 100;
+  progFill.style.width = p.toFixed(1) + "%";
+  progTxt.innerText = p.toFixed(1) + "%  ·  sedang encode...";
+});
+
+function appendLog(msg){
+  logEl.innerText += msg + "\n";
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+// helper: kasih batas waktu ke sebuah promise, biar nggak gantung diam-diam
+function withTimeout(promise, ms, label) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error(`${label} timeout setelah ${ms/1000}s — kemungkinan Worker/WASM diblokir oleh browser ini`)), ms))
+  ]);
+}
+
+// ================= 4) LOAD FFMPEG (dengan timeout & error jelas) =================
+async function boot(){
+  if (envError) return; // sudah ditampilkan pesannya di atas, jangan lanjut
+  try{
+    status.innerText = "Memuat mesin FFmpeg (~30MB)...";
+    appendLog("[ConvertYaAll] loading ffmpeg-core...");
+    logWrap.style.display = 'block';
+    const base = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
+
+    await withTimeout(ffmpeg.load({
+      coreURL: await toBlobURL(`${base}/ffmpeg-core.js`, "text/javascript"),
+      wasmURL: await toBlobURL(`${base}/ffmpeg-core.wasm`, "application/wasm")
+    }), 25000, "Load FFmpeg");
+
+    loaded = true;
+    appendLog("[ConvertYaAll] mesin siap ✓");
+    status.innerText = "Mesin siap. Silakan upload audio.";
+  }catch(e){
+    console.error(e);
+    appendLog("[ERROR] gagal load: " + e.message);
+    status.innerText = "Gagal memuat mesin — " + e.message;
+    warnBanner.style.display = 'block';
+  }
+}
+boot();
+
+box.addEventListener('click', ()=> file.click());
+file.addEventListener('change', e=>{
+  picked = e.target.files[0];
+  if(picked){
+    box.querySelector('h3').innerText = "✅ " + picked.name;
+    box.querySelector('p').innerText = (picked.size/1024/1024).toFixed(2) + " MB";
+    btn.disabled = false;
+    status.innerText = loaded ? "File siap. Tekan tombol Proses Audio." : "File dipilih, tapi mesin belum siap — tunggu status di atas.";
+    dlBtn.classList.add('hidden');
+    progFill.style.width = "0%";
+    progTxt.innerText = "0%";
+  }
+});
+
+btn.addEventListener('click', async ()=>{
+  if(!picked) return;
+  if(!loaded){
+    status.innerText = "Mesin belum siap — cek pesan di atas (kemungkinan browser ini memblokir Worker/WASM).";
+    warnBanner.style.display = 'block';
+    return;
+  }
+  btn.disabled = true;
+  dlBtn.classList.add('hidden');
+  logEl.innerText = "";
+  logWrap.style.display = "block";
+  progWrap.style.display = "block";
+  progFill.style.width = "0%";
+  status.innerText = "Memproses... ikuti log di bawah";
+
+  try{
+    const ext = picked.name.substring(picked.name.lastIndexOf('.'));
+    const inp = "in"+ext, out = "out.ogg";
+
+    appendLog("[ConvertYaAll] menulis file input ke memori...");
+    await ffmpeg.writeFile(inp, await fetchFile(picked));
+
+    appendLog("[ConvertYaAll] menjalankan ffmpeg dengan preset SPEED 2.3X · AMPLIFY -4DB ...");
+    await withTimeout(ffmpeg.exec([
+      '-i', inp,
+      '-filter:a', 'atempo=2.0,atempo=1.15,volume=-4dB',
+      '-c:a', 'libvorbis',
+      '-q:a','4',
+      out
+    ]), 60000, "Proses encode");
+
+    appendLog("[ConvertYaAll] membaca hasil & menyiapkan download...");
+    const data = await ffmpeg.readFile(out);
+    const blob = new Blob([data.buffer], {type:'audio/ogg'});
+
+    if(resultURL) URL.revokeObjectURL(resultURL);
+    resultURL = URL.createObjectURL(blob);
+    resultName = picked.name.replace(/\.[^/.]+$/,"") + "_convertyaall.ogg";
+
+    dlBtn.href = resultURL;
+    dlBtn.download = resultName;
+    dlBtn.classList.remove('hidden');
+
+    await ffmpeg.deleteFile(inp).catch(()=>{});
+    await ffmpeg.deleteFile(out).catch(()=>{});
+
+    progFill.style.width = "100%";
+    progTxt.innerText = "100% selesai ✓";
+    status.innerText = "Selesai! Ketuk tombol hijau di bawah untuk download.";
+    appendLog("[ConvertYaAll] SELESAI ✓ — file siap diunduh.");
+  }catch(err){
+    console.error(err);
+    appendLog("[ERROR] " + (err.message || err));
+    status.innerText = "Error saat memproses: " + (err.message || err);
+  }finally{
+    btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
