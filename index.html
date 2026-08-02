@@ -185,6 +185,13 @@ async function boot(){
     logWrap.style.display = 'block';
     const base = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
 
+    // Diagnosa manual: library FFmpeg sering "menelan" error asli dan cuma
+    // kasih pesan generik "failed to import ffmpeg-core.js". Jadi kita cek
+    // sendiri dulu apakah file-file ini beneran bisa diambil & isinya benar.
+    await diagnoseFile(`${base}/ffmpeg-core.js`, 'ffmpeg-core.js');
+    await diagnoseFile(`${base}/ffmpeg-core.wasm`, 'ffmpeg-core.wasm');
+    await diagnoseFile("https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js", '814.ffmpeg.js');
+
     await withTimeout(ffmpeg.load({
       coreURL: await toBlobURL(`${base}/ffmpeg-core.js`, "text/javascript"),
       wasmURL: await toBlobURL(`${base}/ffmpeg-core.wasm`, "application/wasm"),
@@ -224,6 +231,33 @@ function describeError(e){
     return String(e);
   }catch(_){
     return String(e);
+  }
+}
+
+// Cek langsung apakah sebuah file bisa diambil & isinya masuk akal
+// (bukan halaman error/HTML yang menyamar). Hasilnya ditulis ke log.
+async function diagnoseFile(url, label){
+  try{
+    const res = await fetch(url);
+    const ct = res.headers.get('content-type') || '(tidak ada)';
+    appendLog(`[DEBUG] ${label} → status ${res.status}, content-type: ${ct}`);
+    if (!res.ok) {
+      appendLog(`[DEBUG] ${label} GAGAL diambil (status bukan 200)`);
+      return;
+    }
+    if (label.endsWith('.wasm')) {
+      const buf = await res.clone().arrayBuffer();
+      appendLog(`[DEBUG] ${label} ukuran: ${(buf.byteLength/1024/1024).toFixed(2)} MB`);
+    } else {
+      const text = await res.clone().text();
+      const awal = text.slice(0, 100).replace(/\n/g, ' ');
+      appendLog(`[DEBUG] ${label} awal isi: ${awal}`);
+      if (text.trim().startsWith('<')) {
+        appendLog(`[DEBUG] ⚠ ${label} keliatannya HTML, bukan JavaScript (kemungkinan halaman error dari server)`);
+      }
+    }
+  }catch(err){
+    appendLog(`[DEBUG] ${label} GAGAL fetch: ${describeError(err)}`);
   }
 }
 
