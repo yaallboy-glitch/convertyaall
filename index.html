@@ -202,12 +202,39 @@ async function boot(){
     status.innerText = "Mesin siap. Silakan upload audio.";
   }catch(e){
     console.error(e);
-    appendLog("[ERROR] gagal load: " + e.message);
-    status.innerText = "Gagal memuat mesin — " + e.message;
+    const detail = describeError(e);
+    appendLog("[ERROR] gagal load: " + detail);
+    status.innerText = "Gagal memuat mesin — " + detail;
     warnBanner.style.display = 'block';
   }
 }
 boot();
+
+// Ambil pesan error sedetail mungkin dari berbagai bentuk objek error
+// (Error biasa, ErrorEvent dari Worker, string, atau objek polos)
+function describeError(e){
+  try{
+    if (!e) return 'tidak ada detail (error kosong)';
+    if (typeof e === 'string') return e;
+    if (e.message) return e.message + (e.filename ? ` (di ${e.filename}:${e.lineno||'?'})` : '');
+    if (e.reason) return describeError(e.reason);
+    if (e.error) return describeError(e.error);
+    const s = JSON.stringify(e, Object.getOwnPropertyNames(e));
+    if (s && s !== '{}') return s;
+    return String(e);
+  }catch(_){
+    return String(e);
+  }
+}
+
+// Tangkap error tak terduga dari Worker/proses async yang tidak lewat try/catch biasa,
+// supaya tetap kelihatan di log (bukan cuma "undefined" atau diam saja)
+window.addEventListener('error', ev => {
+  appendLog('[WINDOW ERROR] ' + describeError(ev));
+});
+window.addEventListener('unhandledrejection', ev => {
+  appendLog('[UNHANDLED REJECTION] ' + describeError(ev.reason));
+});
 
 box.addEventListener('click', ()=> file.click());
 file.addEventListener('change', e=>{
@@ -275,8 +302,9 @@ btn.addEventListener('click', async ()=>{
     appendLog("[ConvertYaAll] SELESAI ✓ — file siap diunduh.");
   }catch(err){
     console.error(err);
-    appendLog("[ERROR] " + (err.message || err));
-    status.innerText = "Error saat memproses: " + (err.message || err);
+    const detail = describeError(err);
+    appendLog("[ERROR] " + detail);
+    status.innerText = "Error saat memproses: " + detail;
   }finally{
     btn.disabled = false;
   }
