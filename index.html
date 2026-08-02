@@ -314,8 +314,9 @@ btn.addEventListener('click', async ()=>{
     await withTimeout(ffmpeg.exec([
       '-i', inp,
       '-filter:a', 'atempo=2.0,atempo=1.15,volume=-4dB',
+      '-ar', '48000',
       '-c:a', 'libvorbis',
-      '-q:a','4',
+      '-q:a','6',
       out
     ]), 60000, "Proses encode");
 
