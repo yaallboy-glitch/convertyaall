@@ -22,9 +22,7 @@
   .preset-picker{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
   .preset-btn{background:var(--card);border:1px solid var(--border);color:var(--main);
     border-radius:8px;padding:10px 6px;font-size:13px;font-weight:700;cursor:pointer;text-align:center}
-  .preset-btn span{display:block;font-size:11px;font-weight:400;color:var(--muted);margin-top:2px}
   .preset-btn.active{border-color:var(--accent);background:rgba(255,68,68,.1);color:var(--accent)}
-  .preset-btn.active span{color:var(--accent)}
 
   /* Banner peringatan in-app browser (WhatsApp/Instagram/dll) */
   .warn-banner{
@@ -45,29 +43,31 @@
   .box .ic{font-size:40px;margin-bottom:10px}
   .box h3{font-size:15px;margin-bottom:5px;word-break:break-all}
   .box p{color:var(--muted);font-size:12px}
+
+  /* ===== List lagu ===== */
+  .file-list{margin-top:14px;display:none;flex-direction:column;gap:8px}
+  .file-item{display:flex;align-items:center;gap:10px;background:var(--card);
+    border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+  .file-item .fi-icon{font-size:18px;flex-shrink:0}
+  .file-item .fi-info{flex:1;min-width:0}
+  .file-item .fi-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .file-item .fi-status{font-size:11px;color:var(--muted);margin-top:2px}
+  .file-item.done .fi-status{color:var(--ok)}
+  .file-item.error .fi-status{color:var(--accent)}
+  .fi-dl{background:var(--ok);color:#0f1115;font-weight:800;font-size:11px;
+    border-radius:6px;padding:7px 10px;text-decoration:none;flex-shrink:0}
+
   .btn{background:var(--accent);color:#fff;border:none;padding:15px;width:100%;font-size:15px;
     font-weight:700;border-radius:8px;margin-top:12px;cursor:pointer;text-decoration:none;display:block;text-align:center}
   .btn:disabled{background:#555;color:#aaa}
-  .btn-dl{background:var(--ok);margin-top:8px}
 
   .prog-wrap{margin-top:14px;display:none}
   .prog-bar{height:8px;background:var(--border);border-radius:6px;overflow:hidden}
   .prog-fill{height:100%;width:0;background:var(--accent);transition:width .2s}
   .prog-txt{text-align:center;font-size:12px;color:var(--muted);margin-top:6px}
 
-  .log-wrap{margin-top:14px;display:none}
-  .log-title{font-size:12px;color:var(--muted);margin-bottom:6px;letter-spacing:.5px}
-  .log{background:#000;border:1px solid var(--border);border-radius:8px;
-    height:180px;overflow-y:auto;padding:10px;font-family:monospace;font-size:11px;line-height:1.5;color:#9be29b}
-  .log::-webkit-scrollbar{width:5px}
-  .log::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
   #status{margin-top:12px;color:var(--muted);font-size:13px;min-height:18px;text-align:center}
   .hidden{display:none}
-  .debug-toggle{
-    text-align:center; font-size:11px; color:var(--muted); text-decoration:underline;
-    margin-top:14px; cursor:pointer; opacity:.7;
-  }
-  .debug-toggle:active{opacity:1}
 </style>
 </head>
 <body>
@@ -101,10 +101,12 @@
 
   <div class="box" id="box">
     <div class="ic">🎵</div>
-    <h3>Upload Lagu</h3>
-    <p>Ketuk untuk pilih lagu dari perangkat Anda</p>
-    <input type="file" id="file" accept="audio/*" class="hidden">
+    <h3 id="boxTitle">Upload Lagu</h3>
+    <p id="boxSub">Ketuk untuk pilih satu atau beberapa lagu sekaligus</p>
+    <input type="file" id="file" accept="audio/*" multiple class="hidden">
   </div>
+
+  <div class="file-list" id="fileList"></div>
 
   <button class="btn" id="btn" disabled>Edit Lagu</button>
   <div id="status">Menyiapkan editor lagu...</div>
@@ -113,8 +115,6 @@
     <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
     <div class="prog-txt" id="progTxt">0%</div>
   </div>
-
-  <a class="btn btn-dl hidden" id="dlBtn" href="#">⬇ Download Lagu</a>
 </div>
 
 <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
@@ -124,23 +124,24 @@ const { FFmpeg } = FFmpegWASM;
 const { toBlobURL, fetchFile } = FFmpegUtil;
 const ffmpeg = new FFmpeg();
 let loaded = false;
-let resultURL = null;
-let resultName = "";
 
 const box = document.getElementById('box');
+const boxTitle = document.getElementById('boxTitle');
+const boxSub = document.getElementById('boxSub');
 const file = document.getElementById('file');
+const fileListEl = document.getElementById('fileList');
 const btn = document.getElementById('btn');
 const status = document.getElementById('status');
 const progWrap = document.getElementById('progWrap');
 const progFill = document.getElementById('progFill');
 const progTxt = document.getElementById('progTxt');
-const dlBtn = document.getElementById('dlBtn');
 const warnBanner = document.getElementById('warnBanner');
 const presetLabel = document.getElementById('presetLabel');
-let picked = null;
+
+// Setiap lagu yang dipilih disimpan sebagai objek: { file, status, url, name }
+let items = [];
 
 // ================= PRESET =================
-// speed & amplify ngikutin pola: speed +0.2, dB -2 tiap preset
 const presets = [
   { speed: 2.3, db: 0, resample: 48000 },
   { speed: 2.5, db: 0, resample: 48000 },
@@ -161,8 +162,6 @@ document.querySelectorAll('.preset-btn').forEach(b => {
   });
 });
 updatePresetLabel();
-
-// (fitur log teknis/debug sudah dihapus dari tampilan)
 
 // ================= 1) DETEKSI IN-APP BROWSER =================
 // Ini penyebab paling umum "loading/download diam saja tanpa proses":
@@ -191,21 +190,17 @@ if (envError) {
   warnBanner.querySelector('b').innerText = '⚠ Browser tidak didukung';
 }
 
-// ================= 3) LOG & PROGRESS REALTIME =================
-ffmpeg.on('log', ({ type, message }) => {
-  appendLog(message);
-});
-ffmpeg.on('progress', ({ progress }) => {
-  let p = Math.max(0, Math.min(1, progress)) * 100;
-  progFill.style.width = p.toFixed(1) + "%";
-  progTxt.innerText = p.toFixed(1) + "%  ·  sedang encode...";
-});
-
+// ================= 3) LOG (ke console saja, tidak tampil di UI) & PROGRESS =================
 function appendLog(msg){
   console.log("[ConvertYaAll]", msg);
 }
+ffmpeg.on('log', ({ message }) => appendLog(message));
+ffmpeg.on('progress', ({ progress }) => {
+  let p = Math.max(0, Math.min(1, progress)) * 100;
+  progFill.style.width = p.toFixed(1) + "%";
+  progTxt.innerText = p.toFixed(1) + "%";
+});
 
-// helper: kasih batas waktu ke sebuah promise, biar nggak gantung diam-diam
 function withTimeout(promise, ms, label) {
   return Promise.race([
     promise,
@@ -213,52 +208,6 @@ function withTimeout(promise, ms, label) {
   ]);
 }
 
-// ================= 4) LOAD FFMPEG (dengan timeout & error jelas) =================
-async function boot(){
-  if (envError) return; // sudah ditampilkan pesannya di atas, jangan lanjut
-  try{
-    status.innerText = "Menyiapkan editor lagu...";
-    appendLog("[ConvertYaAll] loading ffmpeg-core...");
-    // PENTING: harus pakai folder /dist/esm (bukan /dist/umd) untuk core.
-    // Library FFmpeg secara internal pakai dynamic import() buat ambil core,
-    // dan import() itu butuh format ES Module (ada `export`), sedangkan build
-    // UMD cuma bikin variabel global biasa tanpa `export` — makanya gagal.
-    const base = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm";
-
-    // Diagnosa manual: library FFmpeg sering "menelan" error asli dan cuma
-    // kasih pesan generik "failed to import ffmpeg-core.js". Jadi kita cek
-    // sendiri dulu apakah file-file ini beneran bisa diambil & isinya benar.
-    await diagnoseFile(`${base}/ffmpeg-core.js`, 'ffmpeg-core.js');
-    await diagnoseFile(`${base}/ffmpeg-core.wasm`, 'ffmpeg-core.wasm');
-    await diagnoseFile("https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js", '814.ffmpeg.js');
-
-    await withTimeout(ffmpeg.load({
-      coreURL: await toBlobURL(`${base}/ffmpeg-core.js`, "text/javascript"),
-      wasmURL: await toBlobURL(`${base}/ffmpeg-core.wasm`, "application/wasm"),
-      // Library ffmpeg.js sendiri bikin Worker tambahan dari file chunk ini.
-      // Kalau dibiarkan pakai URL unpkg langsung, browser menolak (cross-origin
-      // Worker construction). Solusinya sama seperti core: ubah dulu jadi blob URL.
-      classWorkerURL: await toBlobURL(
-        "https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js",
-        "text/javascript"
-      ),
-    }), 25000, "Load FFmpeg");
-
-    loaded = true;
-    appendLog("[ConvertYaAll] mesin siap ✓");
-    status.innerText = "Editor siap. Silakan upload lagu Anda.";
-  }catch(e){
-    console.error(e);
-    const detail = describeError(e);
-    appendLog("[ERROR] gagal load: " + detail);
-    status.innerText = "Editor gagal disiapkan — " + detail;
-    warnBanner.style.display = 'block';
-  }
-}
-boot();
-
-// Ambil pesan error sedetail mungkin dari berbagai bentuk objek error
-// (Error biasa, ErrorEvent dari Worker, string, atau objek polos)
 function describeError(e){
   try{
     if (!e) return 'tidak ada detail (error kosong)';
@@ -274,115 +223,167 @@ function describeError(e){
   }
 }
 
-// Cek langsung apakah sebuah file bisa diambil & isinya masuk akal
-// (bukan halaman error/HTML yang menyamar). Hasilnya ditulis ke log.
 async function diagnoseFile(url, label){
   try{
     const res = await fetch(url);
     const ct = res.headers.get('content-type') || '(tidak ada)';
-    appendLog(`[DEBUG] ${label} → status ${res.status}, content-type: ${ct}`);
-    if (!res.ok) {
-      appendLog(`[DEBUG] ${label} GAGAL diambil (status bukan 200)`);
-      return;
-    }
+    appendLog(`${label} → status ${res.status}, content-type: ${ct}`);
+    if (!res.ok) { appendLog(`${label} GAGAL diambil (status bukan 200)`); return; }
     if (label.endsWith('.wasm')) {
       const buf = await res.clone().arrayBuffer();
-      appendLog(`[DEBUG] ${label} ukuran: ${(buf.byteLength/1024/1024).toFixed(2)} MB`);
+      appendLog(`${label} ukuran: ${(buf.byteLength/1024/1024).toFixed(2)} MB`);
     } else {
       const text = await res.clone().text();
-      const awal = text.slice(0, 100).replace(/\n/g, ' ');
-      appendLog(`[DEBUG] ${label} awal isi: ${awal}`);
-      if (text.trim().startsWith('<')) {
-        appendLog(`[DEBUG] ⚠ ${label} keliatannya HTML, bukan JavaScript (kemungkinan halaman error dari server)`);
-      }
+      if (text.trim().startsWith('<')) appendLog(`⚠ ${label} keliatannya HTML, bukan JavaScript`);
     }
   }catch(err){
-    appendLog(`[DEBUG] ${label} GAGAL fetch: ${describeError(err)}`);
+    appendLog(`${label} GAGAL fetch: ${describeError(err)}`);
   }
 }
 
-// Tangkap error tak terduga dari Worker/proses async yang tidak lewat try/catch biasa,
-// supaya tetap kelihatan di log (bukan cuma "undefined" atau diam saja)
-window.addEventListener('error', ev => {
-  appendLog('[WINDOW ERROR] ' + describeError(ev));
-});
-window.addEventListener('unhandledrejection', ev => {
-  appendLog('[UNHANDLED REJECTION] ' + describeError(ev.reason));
-});
+window.addEventListener('error', ev => appendLog('[WINDOW ERROR] ' + describeError(ev)));
+window.addEventListener('unhandledrejection', ev => appendLog('[UNHANDLED REJECTION] ' + describeError(ev.reason)));
 
-box.addEventListener('click', ()=> file.click());
-file.addEventListener('change', e=>{
-  picked = e.target.files[0];
-  if(picked){
-    box.querySelector('h3').innerText = "✅ " + picked.name;
-    box.querySelector('p').innerText = (picked.size/1024/1024).toFixed(2) + " MB";
-    btn.disabled = false;
-    status.innerText = loaded ? "Lagu siap diedit. Tekan tombol di bawah untuk mulai." : "Lagu terpilih, tunggu editor selesai disiapkan...";
-    dlBtn.classList.add('hidden');
-    progFill.style.width = "0%";
-    progTxt.innerText = "0%";
+// ================= 4) LOAD FFMPEG =================
+async function boot(){
+  if (envError) return;
+  try{
+    status.innerText = "Menyiapkan editor lagu...";
+    const base = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm";
+
+    await diagnoseFile(`${base}/ffmpeg-core.js`, 'ffmpeg-core.js');
+    await diagnoseFile(`${base}/ffmpeg-core.wasm`, 'ffmpeg-core.wasm');
+    await diagnoseFile("https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js", '814.ffmpeg.js');
+
+    await withTimeout(ffmpeg.load({
+      coreURL: await toBlobURL(`${base}/ffmpeg-core.js`, "text/javascript"),
+      wasmURL: await toBlobURL(`${base}/ffmpeg-core.wasm`, "application/wasm"),
+      classWorkerURL: await toBlobURL(
+        "https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js",
+        "text/javascript"
+      ),
+    }), 25000, "Load FFmpeg");
+
+    loaded = true;
+    status.innerText = items.length ? "Lagu siap diedit. Tekan tombol di bawah untuk mulai." : "Editor siap. Silakan upload lagu Anda.";
+  }catch(e){
+    console.error(e);
+    const detail = describeError(e);
+    status.innerText = "Editor gagal disiapkan — " + detail;
+    warnBanner.style.display = 'block';
   }
+}
+boot();
+
+// ================= UPLOAD & LIST LAGU =================
+box.addEventListener('click', ()=> file.click());
+
+file.addEventListener('change', e=>{
+  const picked = Array.from(e.target.files || []);
+  if (!picked.length) return;
+
+  items = picked.map(f => ({
+    file: f,
+    name: f.name,
+    status: 'pending', // pending | processing | done | error
+    url: null,
+    dlName: null,
+  }));
+
+  boxTitle.innerText = "✅ " + items.length + (items.length > 1 ? " lagu dipilih" : " lagu dipilih");
+  boxSub.innerText = "Ketuk lagi untuk mengganti pilihan lagu";
+  btn.disabled = false;
+  status.innerText = loaded ? "Lagu siap diedit. Tekan tombol di bawah untuk mulai." : "Lagu terpilih, tunggu editor selesai disiapkan...";
+  renderList();
 });
 
+function renderList(){
+  fileListEl.style.display = items.length ? 'flex' : 'none';
+  fileListEl.innerHTML = items.map((it, idx) => {
+    let icon = '🎵', statusText = 'Menunggu diproses', extra = '';
+    if (it.status === 'processing'){ icon = '⏳'; statusText = 'Sedang diedit...'; }
+    if (it.status === 'done'){
+      icon = '✅'; statusText = 'Selesai';
+      extra = `<a class="fi-dl" href="${it.url}" download="${it.dlName}">Download</a>`;
+    }
+    if (it.status === 'error'){ icon = '⚠️'; statusText = 'Gagal diproses'; }
+    return `
+      <div class="file-item ${it.status}" data-idx="${idx}">
+        <div class="fi-icon">${icon}</div>
+        <div class="fi-info">
+          <div class="fi-name">${it.name}</div>
+          <div class="fi-status">${statusText}</div>
+        </div>
+        ${extra}
+      </div>`;
+  }).join('');
+}
+
+// ================= PROSES SEMUA LAGU =================
 btn.addEventListener('click', async ()=>{
-  if(!picked) return;
+  if(!items.length) return;
   if(!loaded){
     status.innerText = "Editor belum siap, mohon tunggu sebentar lagi.";
     warnBanner.style.display = 'block';
     return;
   }
+
   btn.disabled = true;
-  dlBtn.classList.add('hidden');
   progWrap.style.display = "block";
-  progFill.style.width = "0%";
-  status.innerText = "Mengedit lagu Anda dengan hasil terbaik...";
 
-  try{
-    const ext = picked.name.substring(picked.name.lastIndexOf('.'));
-    const inp = "in"+ext, out = "out.ogg";
-    const p = presets[activePreset];
+  const p = presets[activePreset];
+  const total = items.length;
 
-    appendLog("[ConvertYaAll] menulis file input ke memori...");
-    await ffmpeg.writeFile(inp, await fetchFile(picked));
+  for (let i = 0; i < total; i++){
+    const it = items[i];
+    if (it.status === 'done') continue; // sudah pernah selesai, lewati
 
-    appendLog(`[ConvertYaAll] menjalankan ffmpeg dengan preset SPEED ${p.speed}X · AMPLIFY ${p.db}DB ...`);
-    // asetrate = mempercepat SEKALIGUS menaikkan pitch proporsional (efek nightcore),
-    // baru di-resample balik ke 48000Hz supaya bisa diputar normal di semua device.
-    await withTimeout(ffmpeg.exec([
-      '-i', inp,
-      '-filter:a', `asetrate=44100*${p.speed},aresample=${p.resample},volume=${p.db}dB`,
-      '-c:a', 'libvorbis',
-      '-q:a','6',
-      out
-    ]), 60000, "Proses encode");
+    it.status = 'processing';
+    renderList();
+    status.innerText = total > 1
+      ? `Mengedit lagu ${i+1} dari ${total}: ${it.name}`
+      : `Mengedit lagu Anda dengan hasil terbaik...`;
+    progFill.style.width = "0%";
+    progTxt.innerText = "0%";
 
-    appendLog("[ConvertYaAll] membaca hasil & menyiapkan download...");
-    const data = await ffmpeg.readFile(out);
-    const blob = new Blob([data.buffer], {type:'audio/ogg'});
+    try{
+      const ext = it.file.name.substring(it.file.name.lastIndexOf('.'));
+      const inp = `in_${i}${ext}`, out = `out_${i}.ogg`;
 
-    if(resultURL) URL.revokeObjectURL(resultURL);
-    resultURL = URL.createObjectURL(blob);
-    resultName = picked.name.replace(/\.[^/.]+$/,"") + `_preset${activePreset+1}_convertyaall.ogg`;
+      await ffmpeg.writeFile(inp, await fetchFile(it.file));
 
-    dlBtn.href = resultURL;
-    dlBtn.download = resultName;
-    dlBtn.classList.remove('hidden');
+      await withTimeout(ffmpeg.exec([
+        '-i', inp,
+        '-filter:a', `asetrate=44100*${p.speed},aresample=${p.resample},volume=${p.db}dB`,
+        '-c:a', 'libvorbis',
+        '-q:a','6',
+        out
+      ]), 60000, "Proses encode");
 
-    await ffmpeg.deleteFile(inp).catch(()=>{});
-    await ffmpeg.deleteFile(out).catch(()=>{});
+      const data = await ffmpeg.readFile(out);
+      const blob = new Blob([data.buffer], {type:'audio/ogg'});
+      it.url = URL.createObjectURL(blob);
+      it.dlName = it.name.replace(/\.[^/.]+$/,"") + `_preset${activePreset+1}_convertyaall.ogg`;
+      it.status = 'done';
 
-    progFill.style.width = "100%";
-    progTxt.innerText = "100% selesai ✓";
-    status.innerText = "Selesai! Ketuk tombol hijau di bawah untuk download. Jika nama file hasil unduhan berakhiran \".ogg.ogx\", buka File Manager di HP Anda dan ganti namanya menjadi \".ogg\" agar bisa diputar normal.";
-    appendLog("[ConvertYaAll] SELESAI ✓ — file siap diunduh.");
-  }catch(err){
-    console.error(err);
-    const detail = describeError(err);
-    appendLog("[ERROR] " + detail);
-    status.innerText = "Terjadi kendala saat mengedit lagu: " + detail;
-  }finally{
-    btn.disabled = false;
+      await ffmpeg.deleteFile(inp).catch(()=>{});
+      await ffmpeg.deleteFile(out).catch(()=>{});
+    }catch(err){
+      console.error(err);
+      appendLog("[ERROR] " + describeError(err));
+      it.status = 'error';
+    }
+
+    renderList();
   }
+
+  progFill.style.width = "100%";
+  progTxt.innerText = "100% selesai ✓";
+  const doneCount = items.filter(it => it.status === 'done').length;
+  status.innerText = doneCount
+    ? `Selesai! ${doneCount} dari ${total} lagu siap diunduh. Jika nama file hasil unduhan berakhiran ".ogg.ogx", buka File Manager di HP Anda dan ganti namanya menjadi ".ogg" agar bisa diputar normal.`
+    : "Semua lagu gagal diproses, silakan coba lagi.";
+  btn.disabled = false;
 });
 </script>
 </body>
