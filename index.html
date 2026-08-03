@@ -17,7 +17,14 @@
   .brand span{color:var(--accent)}
   h1{font-size:21px;text-align:center;margin-bottom:14px;line-height:1.3}
   .preset{background:rgba(255,68,68,.1);border:1px solid var(--accent);color:var(--accent);
-    padding:11px;border-radius:8px;text-align:center;font-size:12px;font-weight:700;margin-bottom:18px;letter-spacing:.5px}
+    padding:11px;border-radius:8px;text-align:center;font-size:12px;font-weight:700;margin-bottom:14px;letter-spacing:.5px}
+
+  .preset-picker{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
+  .preset-btn{background:var(--card);border:1px solid var(--border);color:var(--main);
+    border-radius:8px;padding:10px 6px;font-size:13px;font-weight:700;cursor:pointer;text-align:center}
+  .preset-btn span{display:block;font-size:11px;font-weight:400;color:var(--muted);margin-top:2px}
+  .preset-btn.active{border-color:var(--accent);background:rgba(255,68,68,.1);color:var(--accent)}
+  .preset-btn.active span{color:var(--accent)}
 
   /* Banner peringatan in-app browser (WhatsApp/Instagram/dll) */
   .warn-banner{
@@ -56,6 +63,11 @@
   .log::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
   #status{margin-top:12px;color:var(--muted);font-size:13px;min-height:18px;text-align:center}
   .hidden{display:none}
+  .debug-toggle{
+    text-align:center; font-size:11px; color:var(--muted); text-decoration:underline;
+    margin-top:14px; cursor:pointer; opacity:.7;
+  }
+  .debug-toggle:active{opacity:1}
 </style>
 </head>
 <body>
@@ -65,7 +77,14 @@
   </div>
 
   <h1>ConvertYaAll — Bypass Audio</h1>
-  <div class="preset">PRESET: SPEED 2.3X · AMPLIFY -4 DB</div>
+  <div class="preset" id="presetLabel">PRESET: SPEED 2.3X · AMPLIFY -4 DB</div>
+
+  <div class="preset-picker" id="presetPicker">
+    <button class="preset-btn active" data-i="0">Preset 1<span>2.3x · -4dB</span></button>
+    <button class="preset-btn" data-i="1">Preset 2<span>2.5x · -6dB</span></button>
+    <button class="preset-btn" data-i="2">Preset 3<span>2.7x · -8dB</span></button>
+    <button class="preset-btn" data-i="3">Preset 4<span>2.9x · -10dB</span></button>
+  </div>
 
   <!-- Muncul otomatis kalau dibuka di in-app browser (WhatsApp/Instagram/dll) -->
   <div class="warn-banner" id="warnBanner">
@@ -100,6 +119,8 @@
     <div class="log" id="log"></div>
   </div>
 
+  <div class="debug-toggle" id="debugToggle">Tampilkan log teknis</div>
+
   <a class="btn btn-dl hidden" id="dlBtn" href="#">⬇ Download OGG</a>
 </div>
 
@@ -119,12 +140,46 @@ const btn = document.getElementById('btn');
 const status = document.getElementById('status');
 const logEl = document.getElementById('log');
 const logWrap = document.getElementById('logWrap');
+const debugToggle = document.getElementById('debugToggle');
 const progWrap = document.getElementById('progWrap');
 const progFill = document.getElementById('progFill');
 const progTxt = document.getElementById('progTxt');
 const dlBtn = document.getElementById('dlBtn');
 const warnBanner = document.getElementById('warnBanner');
+const presetLabel = document.getElementById('presetLabel');
 let picked = null;
+
+// ================= PRESET =================
+// speed & amplify ngikutin pola: speed +0.2, dB -2 tiap preset
+const presets = [
+  { speed: 2.3, db: -4 },
+  { speed: 2.5, db: -6 },
+  { speed: 2.7, db: -8 },
+  { speed: 2.9, db: -10 },
+];
+let activePreset = 0;
+
+function updatePresetLabel(){
+  const p = presets[activePreset];
+  presetLabel.textContent = `PRESET: SPEED ${p.speed}X · AMPLIFY ${p.db} DB`;
+}
+document.querySelectorAll('.preset-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.preset-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    activePreset = parseInt(b.dataset.i, 10);
+    updatePresetLabel();
+  });
+});
+updatePresetLabel();
+
+// Log/debug disembunyikan default; tombol kecil ini buat buka-tutup manual
+// kalau nanti perlu troubleshooting lagi.
+debugToggle.addEventListener('click', () => {
+  const showing = logWrap.classList.toggle('show-log');
+  logWrap.style.display = showing ? 'block' : 'none';
+  debugToggle.textContent = showing ? 'Sembunyikan log teknis' : 'Tampilkan log teknis';
+});
 
 // ================= 1) DETEKSI IN-APP BROWSER =================
 // Ini penyebab paling umum "loading/download diam saja tanpa proses":
@@ -182,7 +237,6 @@ async function boot(){
   try{
     status.innerText = "Memuat mesin FFmpeg (~30MB)...";
     appendLog("[ConvertYaAll] loading ffmpeg-core...");
-    logWrap.style.display = 'block';
     // PENTING: harus pakai folder /dist/esm (bukan /dist/umd) untuk core.
     // Library FFmpeg secara internal pakai dynamic import() buat ambil core,
     // dan import() itu butuh format ES Module (ada `export`), sedangkan build
@@ -298,22 +352,24 @@ btn.addEventListener('click', async ()=>{
   btn.disabled = true;
   dlBtn.classList.add('hidden');
   logEl.innerText = "";
-  logWrap.style.display = "block";
   progWrap.style.display = "block";
   progFill.style.width = "0%";
-  status.innerText = "Memproses... ikuti log di bawah";
+  status.innerText = "Memproses... (ketuk 'Tampilkan log teknis' kalau mau lihat detail)";
 
   try{
     const ext = picked.name.substring(picked.name.lastIndexOf('.'));
     const inp = "in"+ext, out = "out.ogg";
+    const p = presets[activePreset];
 
     appendLog("[ConvertYaAll] menulis file input ke memori...");
     await ffmpeg.writeFile(inp, await fetchFile(picked));
 
-    appendLog("[ConvertYaAll] menjalankan ffmpeg dengan preset SPEED 2.3X · AMPLIFY -4DB ...");
+    appendLog(`[ConvertYaAll] menjalankan ffmpeg dengan preset SPEED ${p.speed}X · AMPLIFY ${p.db}DB ...`);
+    // asetrate = mempercepat SEKALIGUS menaikkan pitch proporsional (efek nightcore),
+    // baru di-resample balik ke 48000Hz supaya bisa diputar normal di semua device.
     await withTimeout(ffmpeg.exec([
       '-i', inp,
-      '-filter:a', 'asetrate=44100*2.3,aresample=48000,volume=-4dB',
+      '-filter:a', `asetrate=44100*${p.speed},aresample=48000,volume=${p.db}dB`,
       '-c:a', 'libvorbis',
       '-q:a','6',
       out
@@ -325,7 +381,7 @@ btn.addEventListener('click', async ()=>{
 
     if(resultURL) URL.revokeObjectURL(resultURL);
     resultURL = URL.createObjectURL(blob);
-    resultName = picked.name.replace(/\.[^/.]+$/,"") + "_convertyaall.ogg";
+    resultName = picked.name.replace(/\.[^/.]+$/,"") + `_preset${activePreset+1}_convertyaall.ogg`;
 
     dlBtn.href = resultURL;
     dlBtn.download = resultName;
