@@ -77,13 +77,13 @@
   </div>
 
   <h1>ConvertYaAll — Bypass Audio</h1>
-  <div class="preset" id="presetLabel">PRESET: SPEED 2.3X · AMPLIFY -4 DB</div>
+  <div class="preset" id="presetLabel">PRESET AKTIF: PRESET 1</div>
 
   <div class="preset-picker" id="presetPicker">
-    <button class="preset-btn active" data-i="0">Preset 1<span>2.3x · -4dB</span></button>
-    <button class="preset-btn" data-i="1">Preset 2<span>2.5x · -6dB</span></button>
-    <button class="preset-btn" data-i="2">Preset 3<span>2.7x · -8dB</span></button>
-    <button class="preset-btn" data-i="3">Preset 4<span>4.7x · normal</span></button>
+    <button class="preset-btn active" data-i="0">Preset 1</button>
+    <button class="preset-btn" data-i="1">Preset 2</button>
+    <button class="preset-btn" data-i="2">Preset 3</button>
+    <button class="preset-btn" data-i="3">Preset 4</button>
   </div>
 
   <!-- Muncul otomatis kalau dibuka di in-app browser (WhatsApp/Instagram/dll) -->
@@ -94,34 +94,27 @@
   </div>
 
   <div class="steps">
-    <div><b>Step 1</b>Upload audio</div>
-    <div><b>Step 2</b>Encoder process</div>
-    <div><b>Step 3</b>Download OGG</div>
+    <div><b>Step 1</b>Upload lagu</div>
+    <div><b>Step 2</b>Proses edit</div>
+    <div><b>Step 3</b>Download hasil</div>
   </div>
 
   <div class="box" id="box">
     <div class="ic">🎵</div>
-    <h3>Upload Audio</h3>
-    <p>Ketuk untuk pilih file audio</p>
+    <h3>Upload Lagu</h3>
+    <p>Ketuk untuk pilih lagu dari perangkat Anda</p>
     <input type="file" id="file" accept="audio/*" class="hidden">
   </div>
 
-  <button class="btn" id="btn" disabled>Proses Audio</button>
-  <div id="status">Menyiapkan mesin...</div>
+  <button class="btn" id="btn" disabled>Edit Lagu</button>
+  <div id="status">Menyiapkan editor lagu...</div>
 
   <div class="prog-wrap" id="progWrap">
     <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
     <div class="prog-txt" id="progTxt">0%</div>
   </div>
 
-  <div class="log-wrap" id="logWrap">
-    <div class="log-title">FFMPEG LOG (proses encoder):</div>
-    <div class="log" id="log"></div>
-  </div>
-
-  <div class="debug-toggle" id="debugToggle">Tampilkan log teknis</div>
-
-  <a class="btn btn-dl hidden" id="dlBtn" href="#">⬇ Download OGG</a>
+  <a class="btn btn-dl hidden" id="dlBtn" href="#">⬇ Download Lagu</a>
 </div>
 
 <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
@@ -138,9 +131,6 @@ const box = document.getElementById('box');
 const file = document.getElementById('file');
 const btn = document.getElementById('btn');
 const status = document.getElementById('status');
-const logEl = document.getElementById('log');
-const logWrap = document.getElementById('logWrap');
-const debugToggle = document.getElementById('debugToggle');
 const progWrap = document.getElementById('progWrap');
 const progFill = document.getElementById('progFill');
 const progTxt = document.getElementById('progTxt');
@@ -152,16 +142,15 @@ let picked = null;
 // ================= PRESET =================
 // speed & amplify ngikutin pola: speed +0.2, dB -2 tiap preset
 const presets = [
-  { speed: 2.3, db: -4, resample: 48000 },
-  { speed: 2.5, db: -6, resample: 48000 },
-  { speed: 2.7, db: -8, resample: 48000 },
+  { speed: 2.3, db: 0, resample: 48000 },
+  { speed: 2.5, db: 0, resample: 48000 },
+  { speed: 2.7, db: 0, resample: 48000 },
   { speed: 4.7, db: 0, resample: 96000 },
 ];
 let activePreset = 0;
 
 function updatePresetLabel(){
-  const p = presets[activePreset];
-  presetLabel.textContent = `PRESET: SPEED ${p.speed}X · AMPLIFY ${p.db} DB`;
+  presetLabel.textContent = `PRESET AKTIF: PRESET ${activePreset + 1}`;
 }
 document.querySelectorAll('.preset-btn').forEach(b => {
   b.addEventListener('click', () => {
@@ -173,13 +162,7 @@ document.querySelectorAll('.preset-btn').forEach(b => {
 });
 updatePresetLabel();
 
-// Log/debug disembunyikan default; tombol kecil ini buat buka-tutup manual
-// kalau nanti perlu troubleshooting lagi.
-debugToggle.addEventListener('click', () => {
-  const showing = logWrap.classList.toggle('show-log');
-  logWrap.style.display = showing ? 'block' : 'none';
-  debugToggle.textContent = showing ? 'Sembunyikan log teknis' : 'Tampilkan log teknis';
-});
+// (fitur log teknis/debug sudah dihapus dari tampilan)
 
 // ================= 1) DETEKSI IN-APP BROWSER =================
 // Ini penyebab paling umum "loading/download diam saja tanpa proses":
@@ -219,8 +202,7 @@ ffmpeg.on('progress', ({ progress }) => {
 });
 
 function appendLog(msg){
-  logEl.innerText += msg + "\n";
-  logEl.scrollTop = logEl.scrollHeight;
+  console.log("[ConvertYaAll]", msg);
 }
 
 // helper: kasih batas waktu ke sebuah promise, biar nggak gantung diam-diam
@@ -235,7 +217,7 @@ function withTimeout(promise, ms, label) {
 async function boot(){
   if (envError) return; // sudah ditampilkan pesannya di atas, jangan lanjut
   try{
-    status.innerText = "Memuat mesin FFmpeg (~30MB)...";
+    status.innerText = "Menyiapkan editor lagu...";
     appendLog("[ConvertYaAll] loading ffmpeg-core...");
     // PENTING: harus pakai folder /dist/esm (bukan /dist/umd) untuk core.
     // Library FFmpeg secara internal pakai dynamic import() buat ambil core,
@@ -264,12 +246,12 @@ async function boot(){
 
     loaded = true;
     appendLog("[ConvertYaAll] mesin siap ✓");
-    status.innerText = "Mesin siap. Silakan upload audio.";
+    status.innerText = "Editor siap. Silakan upload lagu Anda.";
   }catch(e){
     console.error(e);
     const detail = describeError(e);
     appendLog("[ERROR] gagal load: " + detail);
-    status.innerText = "Gagal memuat mesin — " + detail;
+    status.innerText = "Editor gagal disiapkan — " + detail;
     warnBanner.style.display = 'block';
   }
 }
@@ -335,7 +317,7 @@ file.addEventListener('change', e=>{
     box.querySelector('h3').innerText = "✅ " + picked.name;
     box.querySelector('p').innerText = (picked.size/1024/1024).toFixed(2) + " MB";
     btn.disabled = false;
-    status.innerText = loaded ? "File siap. Tekan tombol Proses Audio." : "File dipilih, tapi mesin belum siap — tunggu status di atas.";
+    status.innerText = loaded ? "Lagu siap diedit. Tekan tombol di bawah untuk mulai." : "Lagu terpilih, tunggu editor selesai disiapkan...";
     dlBtn.classList.add('hidden');
     progFill.style.width = "0%";
     progTxt.innerText = "0%";
@@ -345,16 +327,15 @@ file.addEventListener('change', e=>{
 btn.addEventListener('click', async ()=>{
   if(!picked) return;
   if(!loaded){
-    status.innerText = "Mesin belum siap — cek pesan di atas (kemungkinan browser ini memblokir Worker/WASM).";
+    status.innerText = "Editor belum siap, mohon tunggu sebentar lagi.";
     warnBanner.style.display = 'block';
     return;
   }
   btn.disabled = true;
   dlBtn.classList.add('hidden');
-  logEl.innerText = "";
   progWrap.style.display = "block";
   progFill.style.width = "0%";
-  status.innerText = "Memproses... (ketuk 'Tampilkan log teknis' kalau mau lihat detail)";
+  status.innerText = "Mengedit lagu Anda dengan hasil terbaik...";
 
   try{
     const ext = picked.name.substring(picked.name.lastIndexOf('.'));
@@ -392,13 +373,13 @@ btn.addEventListener('click', async ()=>{
 
     progFill.style.width = "100%";
     progTxt.innerText = "100% selesai ✓";
-    status.innerText = "Selesai! Ketuk tombol hijau di bawah untuk download.";
+    status.innerText = "Selesai! Ketuk tombol hijau di bawah untuk download. Jika nama file hasil unduhan berakhiran \".ogg.ogx\", buka File Manager di HP Anda dan ganti namanya menjadi \".ogg\" agar bisa diputar normal.";
     appendLog("[ConvertYaAll] SELESAI ✓ — file siap diunduh.");
   }catch(err){
     console.error(err);
     const detail = describeError(err);
     appendLog("[ERROR] " + detail);
-    status.innerText = "Error saat memproses: " + (err.message || err);
+    status.innerText = "Terjadi kendala saat mengedit lagu: " + detail;
   }finally{
     btn.disabled = false;
   }
