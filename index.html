@@ -83,7 +83,7 @@
     <button class="preset-btn active" data-i="0">Preset 1<span>2.3x · -4dB</span></button>
     <button class="preset-btn" data-i="1">Preset 2<span>2.5x · -6dB</span></button>
     <button class="preset-btn" data-i="2">Preset 3<span>2.7x · -8dB</span></button>
-    <button class="preset-btn" data-i="3">Preset 4<span>4.7x · -8dB</span></button>
+    <button class="preset-btn" data-i="3">Preset 4<span>4.7x · normal</span></button>
   </div>
 
   <!-- Muncul otomatis kalau dibuka di in-app browser (WhatsApp/Instagram/dll) -->
@@ -155,7 +155,7 @@ const presets = [
   { speed: 2.3, db: -4, resample: 48000 },
   { speed: 2.5, db: -6, resample: 48000 },
   { speed: 2.7, db: -8, resample: 48000 },
-  { speed: 4.7, db: -8, resample: 96000 },
+  { speed: 4.7, db: 0, resample: 96000 },
 ];
 let activePreset = 0;
 
