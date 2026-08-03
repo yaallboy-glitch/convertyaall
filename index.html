@@ -87,10 +87,10 @@
 <!-- MAIN -->
 <main class="relative z-10 max-w-3xl mx-auto px-6 py-12">
 
-  <!-- HERO -->
+  <!-- HERO (Tampilan Awal) -->
   <div class="text-center mb-10">
     <div class="inline-block px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-medium mb-4">
-      ✨ Edit lagu langsung dari browser, gratis
+      ✨ Edit langsung dari browser anda, mudah
     </div>
     <h1 class="text-4xl md:text-5xl font-extrabold mb-3">
       Edit Lagu Kamu dengan<br>
@@ -129,11 +129,10 @@
       </div>
     </div>
 
-    <!-- Warning in-app browser -->
+    <!-- Warning in-app browser (di dalam card) -->
     <div id="warnBanner" class="hidden mb-6 rounded-xl border border-amber-500/40 bg-amber-500/10 text-amber-300 text-sm leading-relaxed p-4">
-      <b class="block mb-1 text-amber-200">⚠ Terdeteksi dibuka di browser dalam-aplikasi</b>
-      Halaman ini butuh fitur teknis yang sering <b>diblokir</b> oleh browser bawaan WhatsApp/Instagram/dll — itu sebabnya proses bisa diam saja tanpa jalan.
-      Ketuk menu titik-tiga di pojok kanan atas, lalu pilih <b>"Buka di Chrome"</b> / <b>"Buka di browser"</b>.
+      <b class="block mb-1 text-amber-200">⚠ Mode Tamu (Dibuka via Discord/WA)</b>
+      Anda membuka halaman ini di dalam aplikasi. Fitur <b>Login Google</b> diblokir oleh aplikasi ini, jadi Anda masuk sebagai Tamu. Jika ingin login, buka di browser asli (Chrome/Safari).
     </div>
 
     <!-- Steps -->
@@ -217,6 +216,23 @@ const customSpeedInput = document.getElementById('customSpeedInput');
 
 let items = [];
 
+// ================= DETEKSI IN-APP BROWSER (DISCORD/WA) =================
+function detectInAppBrowser() {
+  const ua = navigator.userAgent || '';
+  const patterns = ['WhatsApp', 'Instagram', 'FBAN', 'FBAV', 'Line/', 'MicroMessenger', 'TikTok', 'Discord'];
+  return patterns.some(p => ua.includes(p));
+}
+
+const isInApp = detectInAppBrowser();
+
+if (isInApp) {
+  // Jika dibuka di Discord/WA: Layar putih dihindari dengan langsung membuka aplikasi tanpa login
+  warnBanner.classList.remove('hidden');
+  loginArea.classList.add('hidden');
+  mainCard.classList.remove('hidden');
+  mainCard.classList.add('fade-in');
+}
+
 // ================= LOGIN GOOGLE =================
 const GOOGLE_CLIENT_ID = "554107557548-o2q25dcsqj07r3hupdkvtes2tujfri9l.apps.googleusercontent.com";
 
@@ -249,6 +265,7 @@ function handleCredentialResponse(response){
 }
 
 function showGate(){
+  if (isInApp) return; // Jangan tampilkan gate login kalau di in-app browser
   // Tampilkan tombol login di kanan atas
   loginArea.classList.remove('hidden');
   
@@ -265,6 +282,9 @@ logoutBtn.addEventListener('click', () => {
 });
 
 function initGoogleLogin(){
+  // Jangan inisialisasi google login kalau di in-app browser (mencegah error console)
+  if (isInApp) return;
+
   if (typeof google === 'undefined' || !google.accounts){
     setTimeout(initGoogleLogin, 300);
     return;
@@ -329,16 +349,6 @@ document.querySelectorAll('.preset-btn').forEach(b => {
     }
   });
 });
-
-// ================= DETEKSI IN-APP BROWSER =================
-function detectInAppBrowser() {
-  const ua = navigator.userAgent || '';
-  const patterns = ['WhatsApp', 'Instagram', 'FBAN', 'FBAV', 'Line/', 'MicroMessenger', 'TikTok'];
-  return patterns.some(p => ua.includes(p));
-}
-if (detectInAppBrowser()) {
-  warnBanner.classList.remove('hidden');
-}
 
 // ================= CEK DUKUNGAN =================
 function checkEnvSupport() {
