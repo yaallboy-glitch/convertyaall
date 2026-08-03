@@ -152,10 +152,10 @@ let picked = null;
 // ================= PRESET =================
 // speed & amplify ngikutin pola: speed +0.2, dB -2 tiap preset
 const presets = [
-  { speed: 2.3, db: -4 },
-  { speed: 2.5, db: -6 },
-  { speed: 2.7, db: -8 },
-  { speed: 4.7, db: -8 },
+  { speed: 2.3, db: -4, resample: 48000 },
+  { speed: 2.5, db: -6, resample: 48000 },
+  { speed: 2.7, db: -8, resample: 48000 },
+  { speed: 4.7, db: -8, resample: 96000 },
 ];
 let activePreset = 0;
 
@@ -369,7 +369,7 @@ btn.addEventListener('click', async ()=>{
     // baru di-resample balik ke 48000Hz supaya bisa diputar normal di semua device.
     await withTimeout(ffmpeg.exec([
       '-i', inp,
-      '-filter:a', `asetrate=44100*${p.speed},aresample=48000,volume=${p.db}dB`,
+      '-filter:a', `asetrate=44100*${p.speed},aresample=${p.resample},volume=${p.db}dB`,
       '-c:a', 'libvorbis',
       '-q:a','6',
       out
