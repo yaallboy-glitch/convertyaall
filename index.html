@@ -30,19 +30,31 @@
   .prog-bar{height:6px;background:#27272a;border-radius:3px;overflow:hidden}
   .prog-fill{height:100%;width:0%;background:linear-gradient(90deg,#6366f1,#a855f7);border-radius:3px;transition:width .2s}
   .preset-btn.active{background:rgba(99,102,241,.15);border-color:rgba(99,102,241,.5);color:#a5b4fc}
-  .hidden{display:none!important}
   .speed-custom-input{background:transparent;border:none;color:#a5b4fc;font-size:1.5rem;font-weight:700;width:80px;text-align:center;outline:none;padding:0}
   .speed-custom-input::-webkit-outer-spin-button,.speed-custom-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
   .speed-custom-input[type=number]{-moz-appearance:textfield}
-  .modal-bg{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s ease}
-  .modal-bg.open{opacity:1;pointer-events:all}
-  .modal-box{background:#18181b;border:1px solid #27272a;border-radius:20px;padding:28px;max-width:520px;width:92%;transform:scale(.95) translateY(10px);transition:transform .25s ease}
-  .modal-bg.open .modal-box{transform:scale(1) translateY(0)}
+
+  /* ===== MODAL: pakai inline style, bukan class toggle ===== */
+  .modal-bg{
+    position:fixed; inset:0; z-index:9999;
+    background:rgba(0,0,0,.75); backdrop-filter:blur(8px);
+    display:none; /* HIDDEN by default via inline, bukan class */
+    align-items:center; justify-content:center;
+  }
+  .modal-bg.visible{
+    display:flex;
+    animation: fadeInScale .25s ease;
+  }
+  .modal-box{
+    background:#18181b; border:1px solid #27272a; border-radius:20px;
+    padding:28px; max-width:520px; width:92%;
+  }
+
   .pay-card{border:1px solid #27272a;border-radius:14px;padding:20px;background:#0f0f12;transition:all .25s ease;cursor:pointer}
   .pay-card:hover{border-color:rgba(99,102,241,.5);background:#141418}
   .pay-card.chosen{border-color:#6366f1;background:rgba(99,102,241,.08);box-shadow:0 0 20px rgba(99,102,241,.12)}
   .credit-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:600}
-  .toast-wrap{position:fixed;top:80px;right:16px;z-index:200;display:flex;flex-direction:column;gap:8px}
+  .toast-wrap{position:fixed;top:80px;right:16px;z-index:99999;display:flex;flex-direction:column;gap:8px}
   .toast-item{padding:12px 18px;border-radius:12px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;min-width:260px;animation:slideIn .3s ease,slideOut .3s ease 3.2s forwards;box-shadow:0 8px 24px rgba(0,0,0,.4)}
   .toast-ok{background:#052e16;border:1px solid #166534;color:#4ade80}
   .toast-err{background:#2a0a0a;border:1px solid #7f1d1d;color:#f87171}
@@ -67,12 +79,10 @@
       <span class="font-bold text-lg">Converter<span class="gradient-text">YL</span></span>
     </div>
     <div class="flex items-center gap-3">
-      <!-- Login Area: SELALU TERLIHAT saat belum login & bukan in-app -->
       <div id="loginArea" class="flex items-center gap-3">
         <div id="googleBtnContainer"></div>
       </div>
-      <!-- User Chip: MUNCUL setelah login -->
-      <div id="userChip" class="hidden items-center gap-2.5">
+      <div id="userChip" style="display:none" class="items-center gap-2.5">
         <img id="userAvatar" src="" alt="" class="w-8 h-8 rounded-full border border-zinc-700">
         <span id="userName" class="text-sm text-zinc-300 hidden sm:inline"></span>
         <div id="creditChip" class="credit-chip bg-zinc-800 border border-zinc-700 text-zinc-500">
@@ -100,7 +110,7 @@
   </div>
 
   <!-- CARD UTAMA -->
-  <div id="mainCard" class="hidden bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 md:p-8 glow-border mb-8 fade-in">
+  <div id="mainCard" style="display:none" class="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 md:p-8 glow-border mb-8 fade-in">
 
     <!-- Bar Kuota -->
     <div id="quotaBar" class="mb-5 rounded-xl border border-zinc-800 bg-zinc-800/30 px-4 py-3 flex items-center justify-between text-sm">
@@ -125,7 +135,7 @@
         <button class="preset-btn feature-card px-3 py-2.5 rounded-lg text-sm font-semibold bg-zinc-800/60 border border-zinc-700 text-zinc-200" data-i="3">Preset 4</button>
         <button class="preset-btn feature-card px-3 py-2.5 rounded-lg text-sm font-semibold bg-zinc-800/60 border border-zinc-700 text-zinc-200" data-i="4">Custom</button>
       </div>
-      <div id="customSpeedWrap" class="hidden mt-4 flex items-center justify-center gap-3 bg-zinc-800/40 border border-zinc-800 rounded-xl p-4">
+      <div id="customSpeedWrap" style="display:none" class="mt-4 flex items-center justify-center gap-3 bg-zinc-800/40 border border-zinc-800 rounded-xl p-4">
         <label class="text-zinc-400 text-sm font-medium">Masukkan Speed:</label>
         <input type="number" id="customSpeedInput" class="speed-custom-input" value="2.5" min="0.1" max="10" step="0.1">
         <span class="text-zinc-400 font-bold text-xl">x</span>
@@ -133,7 +143,7 @@
     </div>
 
     <!-- Warning -->
-    <div id="warnBanner" class="hidden mb-6 rounded-xl border border-amber-500/40 bg-amber-500/10 text-amber-300 text-sm leading-relaxed p-4">
+    <div id="warnBanner" style="display:none" class="mb-6 rounded-xl border border-amber-500/40 bg-amber-500/10 text-amber-300 text-sm leading-relaxed p-4">
       <b class="block mb-1 text-amber-200">⚠ Mode Tamu (Dibuka via Discord/WA)</b>
       Anda membuka halaman ini di dalam aplikasi. Fitur <b>Login Google</b> diblokir, jadi Anda masuk sebagai Tamu. Jika ingin login, buka di browser asli (Chrome/Safari).
     </div>
@@ -155,17 +165,15 @@
       <p id="boxSub" class="text-zinc-500 text-sm">Ketuk untuk pilih satu atau beberapa lagu sekaligus</p>
     </div>
 
-    <!-- File list -->
-    <div id="fileList" class="hidden flex-col gap-2 mb-4"></div>
+    <div id="fileList" style="display:none" class="flex-col gap-2 mb-4"></div>
 
-    <!-- Tombol proses -->
     <button id="btn" disabled class="w-full py-3.5 rounded-xl font-bold text-white bg-gradient-to-br from-indigo-500 to-purple-600 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">
       Edit Lagu
     </button>
 
     <div id="status" class="text-center text-zinc-400 text-sm mt-3 min-h-[18px]">Menyiapkan editor lagu...</div>
 
-    <div id="progWrap" class="hidden mt-4">
+    <div id="progWrap" style="display:none" class="mt-4">
       <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
       <div class="text-center text-xs text-zinc-500 mt-1.5" id="progTxt">0%</div>
     </div>
@@ -177,8 +185,9 @@
   </footer>
 </main>
 
-<!-- MODAL PEMBAYARAN -->
-<div class="modal-bg" id="payModal">
+<!-- ===== MODAL PEMBAYARAN ===== -->
+<!-- PENTING: style="display:none" langsung di elemen, bukan pakai class -->
+<div class="modal-bg" id="payModal" style="display:none">
   <div class="modal-box">
     <div class="flex items-center justify-between mb-5">
       <div>
@@ -238,8 +247,8 @@
   </div>
 </div>
 
-<!-- MODAL SUKSES -->
-<div class="modal-bg" id="successModal">
+<!-- ===== MODAL SUKSES ===== -->
+<div class="modal-bg" id="successModal" style="display:none">
   <div class="modal-box text-center" style="max-width:380px">
     <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-emerald-500/15 flex items-center justify-center">
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
@@ -250,63 +259,57 @@
   </div>
 </div>
 
-<!-- FFMPEG -->
 <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
 <script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
 
 <script>
 // ================================================================
 // 0. KONFIGURASI
-//    'demo'   = simulasi pakai localStorage (langsung bisa ditest)
-//    'production' = panggil backend asli + Midtrans
+//    'demo' = simulasi localStorage (bisa langsung ditest)
+//    'production' = panggil backend + Midtrans asli
 // ================================================================
 var CONFIG_MODE = 'demo';
 var API_BASE = 'https://backend-kamu.contoh.workers.dev';
 
 // ================================================================
-// 1. AMBIL SEMUA DOM REFERENCE SEKALI DI SINI (tidak ada duplikat)
+// 1. SEMUA DOM REFERENCE — sekali saja, pakai $prefix
 // ================================================================
-var $box          = document.getElementById('box');
-var $boxTitle     = document.getElementById('boxTitle');
-var $boxSub       = document.getElementById('boxSub');
-var $fileInput    = document.getElementById('file');
-var $fileList     = document.getElementById('fileList');
-var $btn          = document.getElementById('btn');
-var $status       = document.getElementById('status');
-var $progWrap     = document.getElementById('progWrap');
-var $progFill     = document.getElementById('progFill');
-var $progTxt      = document.getElementById('progTxt');
-var $warnBanner   = document.getElementById('warnBanner');
-var $presetLabel  = document.getElementById('presetLabel');
-var $loginArea    = document.getElementById('loginArea');
-var $mainCard     = document.getElementById('mainCard');
-var $userChip     = document.getElementById('userChip');
-var $userAvatar   = document.getElementById('userAvatar');
-var $userName     = document.getElementById('userName');
-var $logoutBtn    = document.getElementById('logoutBtn');
-var $creditChip   = document.getElementById('creditChip');
-var $creditText   = document.getElementById('creditText');
-var $quotaText    = document.getElementById('quotaText');
-var $payModal     = document.getElementById('payModal');
-var $payBtn       = document.getElementById('payBtn');
-var $successModal = document.getElementById('successModal');
-var $successMsg   = document.getElementById('successMsg');
-var $customSpeedWrap = document.getElementById('customSpeedWrap');
+var $box            = document.getElementById('box');
+var $boxTitle       = document.getElementById('boxTitle');
+var $boxSub         = document.getElementById('boxSub');
+var $fileInput      = document.getElementById('file');
+var $fileList       = document.getElementById('fileList');
+var $btn            = document.getElementById('btn');
+var $status         = document.getElementById('status');
+var $progWrap       = document.getElementById('progWrap');
+var $progFill       = document.getElementById('progFill');
+var $progTxt        = document.getElementById('progTxt');
+var $warnBanner     = document.getElementById('warnBanner');
+var $presetLabel    = document.getElementById('presetLabel');
+var $loginArea      = document.getElementById('loginArea');
+var $mainCard       = document.getElementById('mainCard');
+var $userChip       = document.getElementById('userChip');
+var $userAvatar     = document.getElementById('userAvatar');
+var $userName       = document.getElementById('userName');
+var $logoutBtn      = document.getElementById('logoutBtn');
+var $creditChip     = document.getElementById('creditChip');
+var $creditText     = document.getElementById('creditText');
+var $quotaText      = document.getElementById('quotaText');
+var $payModal       = document.getElementById('payModal');
+var $payBtn         = document.getElementById('payBtn');
+var $successModal   = document.getElementById('successModal');
+var $successMsg     = document.getElementById('successMsg');
+var $customSpeedWrap  = document.getElementById('customSpeedWrap');
 var $customSpeedInput = document.getElementById('customSpeedInput');
 
 // ================================================================
 // 2. STATE
 // ================================================================
 var state = {
-  email: null,
-  name: null,
-  credits: 0,
-  isSubscribed: false,
-  subExpiry: null,
-  freeUsed: false,
-  chosenPlan: null
+  email: null, name: null,
+  credits: 0, isSubscribed: false, subExpiry: null,
+  freeUsed: false, chosenPlan: null
 };
-
 var PLAN_PRICES  = { per_song: 1200, bundle_65: 50000, subscription: 210000 };
 var PLAN_CREDITS = { per_song: 1, bundle_65: 65, subscription: null };
 
@@ -329,51 +332,51 @@ function toast(msg, type) {
 // 4. QUOTA DISPLAY
 // ================================================================
 function updateQuotaDisplay() {
-  // Cek expired subscription
   if (state.isSubscribed && state.subExpiry && Date.now() >= state.subExpiry) {
-    state.isSubscribed = false;
-    state.subExpiry = null;
-    saveLocal();
+    state.isSubscribed = false; state.subExpiry = null; saveLocal();
   }
-
   if (state.isSubscribed && state.subExpiry) {
     var sisa = Math.ceil((state.subExpiry - Date.now()) / 86400000);
     $quotaText.textContent = 'Unlimited (' + sisa + ' hari lagi)';
-    $quotaText.className = 'font-bold text-emerald-400';
+    $quotaText.style.color = '#4ade80';
     $creditText.textContent = 'Unlimited';
-    $creditChip.className = 'credit-chip bg-emerald-500/10 border border-emerald-500/20 text-emerald-400';
+    $creditChip.style.background = 'rgba(52,211,153,.1)';
+    $creditChip.style.borderColor = 'rgba(52,211,153,.2)';
+    $creditChip.style.color = '#4ade80';
     return;
   }
-
   var total = state.credits + (state.freeUsed ? 0 : 1);
   if (total > 0) {
     $quotaText.textContent = state.freeUsed
       ? (state.credits + ' lagu tersimpan')
       : ('1 lagu gratis + ' + state.credits + ' lagu tersimpan');
-    $quotaText.className = 'font-bold text-zinc-200';
+    $quotaText.style.color = '#f4f4f5';
   } else {
     $quotaText.textContent = 'Kuota habis — pilih paket untuk lanjut';
-    $quotaText.className = 'font-bold text-rose-400';
+    $quotaText.style.color = '#f87171';
   }
   $creditText.textContent = state.credits + ' lagu';
-  $creditChip.className = state.credits > 0
-    ? 'credit-chip bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
-    : 'credit-chip bg-zinc-800 border border-zinc-700 text-zinc-500';
+  if (state.credits > 0) {
+    $creditChip.style.background = 'rgba(52,211,153,.1)';
+    $creditChip.style.borderColor = 'rgba(52,211,153,.2)';
+    $creditChip.style.color = '#4ade80';
+  } else {
+    $creditChip.style.background = '#27272a';
+    $creditChip.style.borderColor = '#3f3f46';
+    $creditChip.style.color = '#71717a';
+  }
 }
 
 // ================================================================
-// 5. LOCAL STORAGE (demo mode)
+// 5. LOCAL STORAGE (demo)
 // ================================================================
 function saveLocal() {
   if (CONFIG_MODE !== 'demo') return;
-  try {
-    localStorage.setItem('convyl_pay', JSON.stringify({
-      email: state.email, credits: state.credits,
-      isSubscribed: state.isSubscribed, subExpiry: state.subExpiry
-    }));
-  } catch(e){}
+  try { localStorage.setItem('convyl_pay', JSON.stringify({
+    email: state.email, credits: state.credits,
+    isSubscribed: state.isSubscribed, subExpiry: state.subExpiry
+  })); } catch(e){}
 }
-
 function loadLocal(email) {
   if (CONFIG_MODE !== 'demo') return;
   try {
@@ -390,35 +393,35 @@ function loadLocal(email) {
 // 6. CEK KUOTA
 // ================================================================
 function canEdit() {
-  if (state.isSubscribed && state.subExpiry && Date.now() < state.subExpiry) return { ok: true, src: 'sub' };
-  if (state.credits > 0) return { ok: true, src: 'credit' };
-  if (!state.freeUsed) return { ok: true, src: 'free' };
-  return { ok: false, src: null };
+  if (state.isSubscribed && state.subExpiry && Date.now() < state.subExpiry) return { ok:true, src:'sub' };
+  if (state.credits > 0) return { ok:true, src:'credit' };
+  if (!state.freeUsed) return { ok:true, src:'free' };
+  return { ok:false, src:null };
 }
-
 function useQuota(src) {
   if (src === 'free') { state.freeUsed = true; return; }
   if (src === 'credit') { state.credits--; saveLocal(); }
 }
-
 function refundQuota(src) {
   if (src === 'free') { state.freeUsed = false; return; }
   if (src === 'credit') { state.credits++; saveLocal(); }
 }
 
 // ================================================================
-// 7. MODAL PEMBAYARAN
+// 7. MODAL — PAKAI INLINE STYLE, bukan class toggle
+//    Ini fix utamanya. Tidak ada class 'hidden' atau 'open'
+//    yang bisa konflik dengan Tailwind.
 // ================================================================
 function openPayModal() {
   state.chosenPlan = null;
   document.querySelectorAll('.pay-card').forEach(function(c){ c.classList.remove('chosen'); });
   $payBtn.disabled = true;
-  $payBtn.innerHTML = 'Pilih paket di atas';
-  $payModal.classList.add('open');
+  $payBtn.textContent = 'Pilih paket di atas';
+  $payModal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 }
 function closePayModal() {
-  $payModal.classList.remove('open');
+  $payModal.style.display = 'none';
   document.body.style.overflow = '';
 }
 function pickPlan(el) {
@@ -426,32 +429,30 @@ function pickPlan(el) {
   el.classList.add('chosen');
   state.chosenPlan = el.getAttribute('data-plan');
   $payBtn.disabled = false;
-  $payBtn.innerHTML = 'Bayar Rp' + PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');
+  $payBtn.textContent = 'Bayar Rp' + PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');
 }
-
 function showSuccessModal(plan) {
   if (plan === 'subscription') $successMsg.textContent = 'Paket Unlimited aktif selama 30 hari. Selamat berkreasi!';
   else if (plan === 'bundle_65') $successMsg.textContent = '65 lagu telah ditambahkan ke akun Anda.';
   else $successMsg.textContent = '1 lagu telah ditambahkan ke akun Anda.';
-  $successModal.classList.add('open');
+  $successModal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 }
 function closeSuccessModal() {
-  $successModal.classList.remove('open');
+  $successModal.style.display = 'none';
   document.body.style.overflow = '';
   updateQuotaDisplay();
 }
 
-// Tutup modal: klik backdrop / Escape
-document.querySelectorAll('.modal-bg').forEach(function(bg){
-  bg.addEventListener('click', function(e){ if(e.target===bg){ bg.classList.remove('open'); document.body.style.overflow=''; }});
-});
+// Klik backdrop untuk tutup
+ $payModal.addEventListener('click', function(e){ if(e.target === $payModal) closePayModal(); });
+ $successModal.addEventListener('click', function(e){ if(e.target === $successModal) closeSuccessModal(); });
 document.addEventListener('keydown', function(e){
-  if(e.key==='Escape') document.querySelectorAll('.modal-bg.open').forEach(function(bg){ bg.classList.remove('open'); document.body.style.overflow=''; });
+  if(e.key === 'Escape') { closePayModal(); closeSuccessModal(); }
 });
 
 // ================================================================
-// 8. PROSES PEMBAYARAN
+// 8. PEMBAYARAN
 // ================================================================
 function doPayment() {
   if (!state.chosenPlan || !state.email) return;
@@ -459,7 +460,6 @@ function doPayment() {
   $payBtn.innerHTML = '<span class="btn-spinner"></span> Memproses...';
 
   if (CONFIG_MODE === 'demo') {
-    // Simulasi berhasil
     setTimeout(function(){
       if (state.chosenPlan === 'subscription') {
         state.isSubscribed = true;
@@ -478,67 +478,59 @@ function doPayment() {
 
   // PRODUCTION: Midtrans Snap
   fetch(API_BASE + '/create-transaction', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ email: state.email, type: state.chosenPlan })
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(data){
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ email:state.email, type:state.chosenPlan })
+  }).then(function(r){ return r.json(); }).then(function(data){
     if (!data.snap_token) throw new Error('No snap token');
     window.snap.pay(data.snap_token, {
       onSuccess: function(){
         toast('Memverifikasi pembayaran...', 'info');
         var tries = 0;
         var poll = setInterval(function(){
-          fetch(API_BASE + '/check?email=' + encodeURIComponent(state.email))
+          fetch(API_BASE+'/check?email='+encodeURIComponent(state.email))
           .then(function(r){return r.json()})
           .then(function(d){
-            state.credits = d.credits || 0;
-            state.isSubscribed = d.is_subscribed || false;
-            state.subExpiry = d.subscription_expiry ? new Date(d.subscription_expiry).getTime() : null;
+            state.credits=d.credits||0; state.isSubscribed=d.is_subscribed||false;
+            state.subExpiry=d.subscription_expiry?new Date(d.subscription_expiry).getTime():null;
             updateQuotaDisplay();
-            var ok = (state.chosenPlan==='subscription' && state.isSubscribed) || (state.chosenPlan!=='subscription' && state.credits > 0);
-            if (ok || ++tries > 20) { clearInterval(poll); if(ok){ closePayModal(); showSuccessModal(state.chosenPlan); } }
+            var ok=(state.chosenPlan==='subscription'&&state.isSubscribed)||(state.chosenPlan!=='subscription'&&state.credits>0);
+            if(ok||++tries>20){clearInterval(poll);if(ok){closePayModal();showSuccessModal(state.chosenPlan);}}
           });
         }, 3000);
       },
-      onPending: function(){ toast('Pembayaran pending. Selesaikan di aplikasi Anda.', 'info'); closePayModal(); },
-      onError: function(){ toast('Pembayaran gagal.', 'err'); $payBtn.disabled=false; $payBtn.innerHTML='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID'); },
-      onClose: function(){ $payBtn.disabled=false; $payBtn.innerHTML='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID'); }
+      onPending: function(){ toast('Pembayaran pending. Selesaikan di aplikasi Anda.','info'); closePayModal(); },
+      onError: function(){ toast('Pembayaran gagal.','err'); $payBtn.disabled=false; $payBtn.textContent='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID'); },
+      onClose: function(){ $payBtn.disabled=false; $payBtn.textContent='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID'); }
     });
-  })
-  .catch(function(e){
-    console.error(e);
-    toast('Gagal memproses pembayaran.', 'err');
-    $payBtn.disabled = false;
-    $payBtn.innerHTML = 'Bayar Rp' + PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');
+  }).catch(function(e){
+    console.error(e); toast('Gagal memproses pembayaran.','err');
+    $payBtn.disabled=false; $payBtn.textContent='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');
   });
 }
 
 // ================================================================
-// 9. DETEKSI IN-APP BROWSER
+// 9. IN-APP BROWSER
 // ================================================================
 var isInApp = (function(){
   var ua = navigator.userAgent || '';
-  return ['WhatsApp','Instagram','FBAN','FBAV','Line/','MicroMessenger','TikTok','Discord'].some(function(p){ return ua.indexOf(p) !== -1; });
+  return ['WhatsApp','Instagram','FBAN','FBAV','Line/','MicroMessenger','TikTok','Discord'].some(function(p){ return ua.indexOf(p)!==-1; });
 })();
-
 if (isInApp) {
-  $warnBanner.classList.remove('hidden');
-  $loginArea.classList.add('hidden');
-  $mainCard.classList.remove('hidden');
+  $warnBanner.style.display = '';
+  $loginArea.style.display = 'none';
+  $mainCard.style.display = '';
   updateQuotaDisplay();
 }
 
 // ================================================================
-// 10. GOOGLE LOGIN — persis seperti kode asli kamu
+// 10. GOOGLE LOGIN
 // ================================================================
 var GOOGLE_CLIENT_ID = "554107557548-o2q25dcsqj07r3hupdkvtes2tujfri9l.apps.googleusercontent.com";
 
 function decodeJwt(token) {
   try {
     var p = token.split('.')[1];
-    var j = decodeURIComponent(atob(p).split('').map(function(c){ return '%' + ('00'+c.charCodeAt(0).toString(16)).slice(-2); }).join(''));
+    var j = decodeURIComponent(atob(p).split('').map(function(c){ return '%'+('00'+c.charCodeAt(0).toString(16)).slice(-2); }).join(''));
     return JSON.parse(j);
   } catch(e){ return null; }
 }
@@ -546,297 +538,214 @@ function decodeJwt(token) {
 function handleCredentialResponse(response) {
   var profile = decodeJwt(response.credential);
   if (!profile) return;
-
   state.email = profile.email;
   state.name = profile.name || profile.email;
   state.freeUsed = false;
 
   $userAvatar.src = profile.picture || '';
   $userName.textContent = state.name;
-
-  $loginArea.classList.add('hidden');
-  $userChip.classList.remove('hidden');
+  $loginArea.style.display = 'none';
   $userChip.style.display = 'flex';
-
-  $mainCard.classList.remove('hidden');
+  $mainCard.style.display = '';
 
   loadLocal(state.email);
   updateQuotaDisplay();
-
   try { localStorage.setItem('convyl_user', JSON.stringify(profile)); } catch(e){}
 }
 
  $logoutBtn.addEventListener('click', function(){
   try { google.accounts.id.disableAutoSelect(); } catch(e){}
   try { localStorage.removeItem('convyl_user'); } catch(e){}
-  state.email = null; state.name = null; state.credits = 0;
-  state.isSubscribed = false; state.subExpiry = null; state.freeUsed = false;
-  $loginArea.classList.remove('hidden');
-  $userChip.classList.add('hidden');
-  $userChip.style.display = '';
-  $mainCard.classList.add('hidden');
+  state.email=null; state.name=null; state.credits=0;
+  state.isSubscribed=false; state.subExpiry=null; state.freeUsed=false;
+  $loginArea.style.display = '';
+  $userChip.style.display = 'none';
+  $mainCard.style.display = 'none';
 });
 
 function initGoogleLogin() {
   if (isInApp) return;
-  if (typeof google === 'undefined' || !google.accounts) {
-    setTimeout(initGoogleLogin, 300);
-    return;
-  }
-  google.accounts.id.initialize({
-    client_id: GOOGLE_CLIENT_ID,
-    callback: handleCredentialResponse,
-  });
-  google.accounts.id.renderButton(
-    document.getElementById('googleBtnContainer'),
-    { type:"standard", theme:"filled_black", size:"medium", shape:"pill", text:"signin_with", width:180 }
-  );
+  if (typeof google === 'undefined' || !google.accounts) { setTimeout(initGoogleLogin, 300); return; }
+  google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleCredentialResponse });
+  google.accounts.id.renderButton(document.getElementById('googleBtnContainer'),
+    { type:"standard", theme:"filled_black", size:"medium", shape:"pill", text:"signin_with", width:180 });
 
-  // Restore session sebelumnya
+  // Restore session
   try {
     var saved = localStorage.getItem('convyl_user');
     if (saved) {
       var profile = JSON.parse(saved);
-      state.email = profile.email;
-      state.name = profile.name || profile.email;
-
-      $userAvatar.src = profile.picture || '';
-      $userName.textContent = state.name;
-
-      $loginArea.classList.add('hidden');
-      $userChip.classList.remove('hidden');
-      $userChip.style.display = 'flex';
-      $mainCard.classList.remove('hidden');
-
-      loadLocal(state.email);
-      updateQuotaDisplay();
+      state.email = profile.email; state.name = profile.name || profile.email;
+      $userAvatar.src = profile.picture || ''; $userName.textContent = state.name;
+      $loginArea.style.display = 'none'; $userChip.style.display = 'flex'; $mainCard.style.display = '';
+      loadLocal(state.email); updateQuotaDisplay();
     }
   } catch(e){}
 }
 initGoogleLogin();
 
 // ================================================================
-// 11. PRESET — persis seperti kode asli kamu
+// 11. PRESET
 // ================================================================
 var presets = [
-  { speed: 2.3, db: 0, resample: 48000 },
-  { speed: 2.5, db: 0, resample: 48000 },
-  { speed: 2.7, db: 0, resample: 48000 },
-  { speed: 4.7, db: 0, resample: 96000 },
+  { speed:2.3, db:0, resample:48000 }, { speed:2.5, db:0, resample:48000 },
+  { speed:2.7, db:0, resample:48000 }, { speed:4.7, db:0, resample:96000 },
 ];
 var activePreset = 0;
-
 document.querySelectorAll('.preset-btn').forEach(function(b){
   b.addEventListener('click', function(){
     document.querySelectorAll('.preset-btn').forEach(function(x){ x.classList.remove('active'); });
     b.classList.add('active');
     activePreset = parseInt(b.getAttribute('data-i'), 10);
     if (activePreset === 4) {
-      $customSpeedWrap.classList.remove('hidden');
       $customSpeedWrap.style.display = 'flex';
       $presetLabel.textContent = "PRESET AKTIF: CUSTOM SPEED";
     } else {
-      $customSpeedWrap.classList.add('hidden');
-      $customSpeedWrap.style.display = '';
-      $presetLabel.textContent = "PRESET AKTIF: PRESET " + (activePreset + 1);
+      $customSpeedWrap.style.display = 'none';
+      $presetLabel.textContent = "PRESET AKTIF: PRESET " + (activePreset+1);
     }
   });
 });
 
 // ================================================================
-// 12. FFMPEG — persis seperti kode asli kamu
+// 12. FFMPEG
 // ================================================================
-var FFmpegWASM2 = FFmpegWASM;
-var FFmpegUtil2 = FFmpegUtil;
-var ffmpeg = new FFmpegWASM2.FFmpeg();
-var toBlobURL = FFmpegUtil2.toBlobURL;
-var fetchFile = FFmpegUtil2.fetchFile;
+var ffmpeg = new FFmpegWASM.FFmpeg();
+var toBlobURL = FFmpegUtil.toBlobURL;
+var fetchFile = FFmpegUtil.fetchFile;
 var loaded = false;
 var items = [];
 
-function checkEnvSupport() {
-  if (typeof Worker === 'undefined') return 'Browser tidak mendukung Web Worker.';
-  if (typeof WebAssembly === 'undefined') return 'Browser tidak mendukung WebAssembly.';
+function checkEnv() {
+  if (typeof Worker==='undefined') return 'Browser tidak mendukung Web Worker.';
+  if (typeof WebAssembly==='undefined') return 'Browser tidak mendukung WebAssembly.';
   return null;
 }
-var envError = checkEnvSupport();
+var envError = checkEnv();
 if (envError) {
-  $status.innerText = envError + ' Coba buka di Chrome/Safari versi terbaru.';
-  $warnBanner.classList.remove('hidden');
+  $status.innerText = envError+' Coba buka di Chrome/Safari terbaru.';
+  $warnBanner.style.display = '';
   $warnBanner.querySelector('b').innerText = '⚠ Browser tidak didukung';
 }
 
-function appendLog(msg){ console.log("[ConverterYL]", msg); }
-ffmpeg.on('log', function(ev){ appendLog(ev.message); });
-ffmpeg.on('progress', function(ev){
-  var p = Math.max(0, Math.min(1, ev.progress)) * 100;
-  $progFill.style.width = p.toFixed(1) + "%";
-  $progTxt.innerText = p.toFixed(1) + "%";
+function appendLog(m){ console.log("[ConverterYL]",m); }
+ffmpeg.on('log', function(e){ appendLog(e.message); });
+ffmpeg.on('progress', function(e){
+  var p = Math.max(0,Math.min(1,e.progress))*100;
+  $progFill.style.width = p.toFixed(1)+"%"; $progTxt.innerText = p.toFixed(1)+"%";
 });
-
-function withTimeout(promise, ms, label) {
-  return Promise.race([
-    promise,
-    new Promise(function(_, reject){ setTimeout(function(){ reject(new Error(label + ' timeout setelah ' + (ms/1000) + 's')); }, ms); })
-  ]);
+function withTimeout(pr,ms,lb){ return Promise.race([pr, new Promise(function(_,rej){ setTimeout(function(){rej(new Error(lb+' timeout'))},ms); })]); }
+function describeError(e){
+  try{ if(!e)return'kosong'; if(typeof e==='string')return e; if(e.message)return e.message; if(e.reason)return describeError(e.reason); if(e.error)return describeError(e.error); return JSON.stringify(e,Object.getOwnPropertyNames(e)); }catch(_){return String(e);}
 }
+async function diagFile(u,l){ try{var r=await fetch(u);appendLog(l+' → '+r.status);}catch(e){appendLog(l+' GAGAL');} }
+window.addEventListener('error',function(e){appendLog('[ERR]'+describeError(e));});
+window.addEventListener('unhandledrejection',function(e){appendLog('[REJ]'+describeError(e.reason));});
 
-function describeError(e) {
-  try {
-    if (!e) return 'error kosong';
-    if (typeof e === 'string') return e;
-    if (e.message) return e.message;
-    if (e.reason) return describeError(e.reason);
-    if (e.error) return describeError(e.error);
-    return JSON.stringify(e, Object.getOwnPropertyNames(e));
-  } catch(_){ return String(e); }
-}
-
-async function diagnoseFile(url, label) {
-  try { var r = await fetch(url); appendLog(label + ' → status ' + r.status); }
-  catch(err){ appendLog(label + ' GAGAL fetch'); }
-}
-
-window.addEventListener('error', function(ev){ appendLog('[WINDOW ERROR] ' + describeError(ev)); });
-window.addEventListener('unhandledrejection', function(ev){ appendLog('[UNHANDLED REJECTION] ' + describeError(ev.reason)); });
-
-async function boot() {
-  if (envError) return;
-  try {
-    $status.innerText = "Menyiapkan editor lagu...";
-    var base = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm";
-    await diagnoseFile(base + '/ffmpeg-core.js', 'ffmpeg-core.js');
-    await diagnoseFile(base + '/ffmpeg-core.wasm', 'ffmpeg-core.wasm');
+async function boot(){
+  if(envError)return;
+  try{
+    $status.innerText="Menyiapkan editor lagu...";
+    var base="https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm";
+    await diagFile(base+'/ffmpeg-core.js','core.js');
+    await diagFile(base+'/ffmpeg-core.wasm','core.wasm');
     await withTimeout(ffmpeg.load({
-      coreURL: await toBlobURL(base + '/ffmpeg-core.js', "text/javascript"),
-      wasmURL: await toBlobURL(base + '/ffmpeg-core.wasm', "application/wasm"),
-      classWorkerURL: await toBlobURL("https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js", "text/javascript"),
-    }), 25000, "Load FFmpeg");
-    loaded = true;
-    $status.innerText = items.length ? "Lagu siap diedit. Tekan tombol di bawah untuk mulai." : "Editor siap. Silakan upload lagu Anda.";
-  } catch(e) {
-    $status.innerText = "Editor gagal disiapkan — " + describeError(e);
-    $warnBanner.classList.remove('hidden');
+      coreURL:await toBlobURL(base+'/ffmpeg-core.js',"text/javascript"),
+      wasmURL:await toBlobURL(base+'/ffmpeg-core.wasm',"application/wasm"),
+      classWorkerURL:await toBlobURL("https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js","text/javascript"),
+    }),25000,"Load FFmpeg");
+    loaded=true;
+    $status.innerText=items.length?"Lagu siap diedit. Tekan tombol untuk mulai.":"Editor siap. Silakan upload lagu Anda.";
+  }catch(e){
+    $status.innerText="Editor gagal disiapkan — "+describeError(e);
+    $warnBanner.style.display='';
   }
 }
 boot();
 
 // ================================================================
-// 13. UPLOAD — persis seperti kode asli kamu
+// 13. UPLOAD
 // ================================================================
  $box.addEventListener('click', function(){ $fileInput.click(); });
-
  $fileInput.addEventListener('change', function(e){
-  var picked = Array.from(e.target.files || []);
-  if (!picked.length) return;
-  items = picked.map(function(f){ return { file:f, name:f.name, status:'pending', url:null, dlName:null }; });
-  $boxTitle.innerText = "✅ " + items.length + " lagu dipilih";
-  $boxSub.innerText = "Ketuk lagi untuk mengganti pilihan lagu";
-  $btn.disabled = false;
-  $status.innerText = loaded ? "Lagu siap diedit. Tekan tombol di bawah untuk mulai." : "Lagu terpilih, tunggu editor siap...";
+  var picked = Array.from(e.target.files||[]);
+  if(!picked.length)return;
+  items=picked.map(function(f){return{file:f,name:f.name,status:'pending',url:null,dlName:null};});
+  $boxTitle.innerText="✅ "+items.length+" lagu dipilih";
+  $boxSub.innerText="Ketuk lagi untuk mengganti pilihan lagu";
+  $btn.disabled=false;
+  $status.innerText=loaded?"Lagu siap diedit. Tekan tombol untuk mulai.":"Lagu terpilih, tunggu editor siap...";
   renderList();
 });
-
-function renderList() {
-  if (items.length) { $fileList.classList.remove('hidden'); $fileList.style.display = 'flex'; }
-  else { $fileList.classList.add('hidden'); $fileList.style.display = ''; }
-
-  $fileList.innerHTML = items.map(function(it){
-    var icon='🎵', st='Menunggu diproses', sc='text-zinc-500', extra='';
-    if(it.status==='processing'){ icon='⏳'; st='Sedang diedit...'; sc='text-indigo-400'; }
-    if(it.status==='done'){
-      icon='✅'; st='Selesai'; sc='text-emerald-400';
-      extra='<a class="px-3 py-1.5 rounded-lg bg-emerald-500 text-black text-xs font-bold flex-shrink-0" href="'+it.url+'" download="'+it.dlName+'">Download</a>';
-    }
-    if(it.status==='error'){ icon='⚠️'; st='Gagal diproses'; sc='text-rose-400'; }
+function renderList(){
+  if(items.length){$fileList.style.display='flex';}else{$fileList.style.display='none';}
+  $fileList.innerHTML=items.map(function(it){
+    var icon='🎵',st='Menunggu diproses',sc='text-zinc-500',extra='';
+    if(it.status==='processing'){icon='⏳';st='Sedang diedit...';sc='text-indigo-400';}
+    if(it.status==='done'){icon='✅';st='Selesai';sc='text-emerald-400';extra='<a class="px-3 py-1.5 rounded-lg bg-emerald-500 text-black text-xs font-bold flex-shrink-0" href="'+it.url+'" download="'+it.dlName+'">Download</a>';}
+    if(it.status==='error'){icon='⚠️';st='Gagal diproses';sc='text-rose-400';}
     return '<div class="flex items-center gap-3 bg-zinc-800/40 border border-zinc-800 rounded-xl px-4 py-3 fade-in"><div class="text-lg flex-shrink-0">'+icon+'</div><div class="flex-1 min-w-0"><div class="text-sm font-semibold text-zinc-100 truncate">'+it.name+'</div><div class="text-xs '+sc+' mt-0.5">'+st+'</div></div>'+extra+'</div>';
   }).join('');
 }
 
 // ================================================================
-// 14. PROSES EDIT — ditambah paywall check
+// 14. PROSES EDIT + PAYWALL
 // ================================================================
  $btn.addEventListener('click', async function(){
-  if (!items.length) return;
-  if (!loaded) {
-    $status.innerText = "Editor belum siap, mohon tunggu sebentar lagi.";
-    $warnBanner.classList.remove('hidden');
+  if(!items.length)return;
+  if(!loaded){$status.innerText="Editor belum siap, mohon tunggu.";$warnBanner.style.display='';return;}
+
+  var chk=canEdit();
+  if(!chk.ok){
+    toast('Kuota gratis habis. Silakan pilih paket untuk melanjutkan.','info');
+    openPayModal();
     return;
   }
 
-  // CEK PAYWALL
-  var chk = canEdit();
-  if (!chk.ok) { openPayModal(); return; }
+  $btn.disabled=true;
+  $progWrap.style.display='';
 
-  $btn.disabled = true;
-  $progWrap.classList.remove('hidden');
+  var total=items.length;
+  var cspeed,cresample,cdb;
+  if(activePreset===4){cspeed=parseFloat($customSpeedInput.value)||2.5;cresample=cspeed>4?96000:48000;cdb=0;}
+  else{var pr=presets[activePreset];cspeed=pr.speed;cresample=pr.resample;cdb=pr.db;}
 
-  var total = items.length;
-  var currentSpeed, currentResample, currentDb;
-  if (activePreset === 4) {
-    currentSpeed = parseFloat($customSpeedInput.value) || 2.5;
-    currentResample = currentSpeed > 4 ? 96000 : 48000;
-    currentDb = 0;
-  } else {
-    var p = presets[activePreset];
-    currentSpeed = p.speed; currentResample = p.resample; currentDb = p.db;
-  }
+  for(var i=0;i<total;i++){
+    var it=items[i];
+    if(it.status==='done')continue;
 
-  for (var i = 0; i < total; i++) {
-    var it = items[i];
-    if (it.status === 'done') continue;
+    if(i>0){var re=canEdit();if(!re.ok){$status.innerText='Kuota habis setelah '+i+' lagu. Beli paket untuk melanjutkan.';openPayModal();break;}}
 
-    // Cek ulang kuota untuk lagu ke-2 dst
-    if (i > 0) {
-      var re = canEdit();
-      if (!re.ok) {
-        $status.innerText = 'Kuota habis setelah ' + i + ' lagu. Beli paket untuk melanjutkan.';
-        openPayModal();
-        break;
-      }
-    }
+    var src=canEdit().src;
+    it.status='processing'; renderList();
+    $status.innerText=total>1?'Mengedit lagu '+(i+1)+' dari '+total+': '+it.name:'Mengedit lagu Anda...';
+    $progFill.style.width="0%"; $progTxt.innerText="0%";
 
-    var src = canEdit().src;
-    it.status = 'processing';
-    renderList();
-    $status.innerText = total > 1 ? 'Mengedit lagu '+(i+1)+' dari '+total+': '+it.name : 'Mengedit lagu Anda dengan hasil terbaik...';
-    $progFill.style.width = "0%";
-    $progTxt.innerText = "0%";
-
-    try {
-      var ext = it.file.name.substring(it.file.name.lastIndexOf('.'));
-      var inp = 'in_'+i+ext, out = 'out_'+i+'.ogg';
-      await ffmpeg.writeFile(inp, await fetchFile(it.file));
-      await withTimeout(ffmpeg.exec([
-        '-i', inp,
-        '-filter:a', 'asetrate=44100*'+currentSpeed+',aresample='+currentResample+',volume='+currentDb+'dB',
-        '-c:a', 'libvorbis', '-q:a', '6', out
-      ]), 60000, "Proses encode");
-      var data = await ffmpeg.readFile(out);
-      var blob = new Blob([data.buffer], {type:'audio/ogg'});
-      it.url = URL.createObjectURL(blob);
-      it.dlName = it.file.name.replace(/\.[^/.]+$/,"") + '_speed'+currentSpeed+'x_converteryl.ogg';
-      it.status = 'done';
-      useQuota(src);
-      updateQuotaDisplay();
+    try{
+      var ext=it.file.name.substring(it.file.name.lastIndexOf('.'));
+      var inp='in_'+i+ext,out='out_'+i+'.ogg';
+      await ffmpeg.writeFile(inp,await fetchFile(it.file));
+      await withTimeout(ffmpeg.exec(['-i',inp,'-filter:a','asetrate=44100*'+cspeed+',aresample='+cresample+',volume='+cdb+'dB','-c:a','libvorbis','-q:a','6',out]),60000,"Encode");
+      var data=await ffmpeg.readFile(out);
+      var blob=new Blob([data.buffer],{type:'audio/ogg'});
+      it.url=URL.createObjectURL(blob);
+      it.dlName=it.file.name.replace(/\.[^/.]+$/,"")+'_speed'+cspeed+'x_converteryl.ogg';
+      it.status='done';
+      useQuota(src); updateQuotaDisplay();
       await ffmpeg.deleteFile(inp).catch(function(){});
       await ffmpeg.deleteFile(out).catch(function(){});
-    } catch(err) {
-      it.status = 'error';
-      refundQuota(src);
-      updateQuotaDisplay();
+    }catch(err){
+      it.status='error'; refundQuota(src); updateQuotaDisplay();
     }
     renderList();
   }
 
-  $progFill.style.width = "100%";
-  $progTxt.innerText = "100% selesai ✓";
-  var doneCount = items.filter(function(x){ return x.status==='done'; }).length;
-  $status.innerText = doneCount ? 'Selesai! '+doneCount+' dari '+total+' lagu siap diunduh.' : "Semua lagu gagal diproses, silakan coba lagi.";
-  $btn.disabled = false;
+  $progFill.style.width="100%"; $progTxt.innerText="100% selesai ✓";
+  var done=items.filter(function(x){return x.status==='done';}).length;
+  $status.innerText=done?'Selesai! '+done+' dari '+total+' lagu siap diunduh.':"Semua lagu gagal diproses.";
+  $btn.disabled=false;
 });
 
-// Init
 updateQuotaDisplay();
 </script>
 </body>
