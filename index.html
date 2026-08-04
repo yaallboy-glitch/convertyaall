@@ -526,7 +526,7 @@ async function uploadToRoblox(idx){
     var speedUsed=activePreset===4?(parseFloat($customSpeedInput.value)||2.5):presets[activePreset].speed;
     var rawName = it.customName || it.file.name.replace(/\.[^/.]+$/,'');
 var safeName = truncateName(rawName, 50);
-fd.append('request',JSON.stringify({assetType:'Audio',displayName:safeName,description:...
+fd.append('request',JSON.stringify({assetType:'Audio',displayName:safeName,description:'Speed '+speedUsed+'x via ConverterYL',creationContext:{creator:{userId:state.rbxUserId}}}));
     fd.append('file',it.blobData,it.dlName);
     var res=await fetch(ROBLOX_PROXY_URL,{method:'POST',body:fd});
     var data=await res.json();
