@@ -1,1127 +1,1051 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ConverterYL - Audio Converter</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <style>
-        :root {
-            --bg-primary: #0d0f14;
-            --bg-secondary: #151820;
-            --bg-card: #1a1e28;
-            --bg-card-hover: #1f2433;
-            --bg-input: #12151c;
-            --border: #2a2f3d;
-            --border-light: #343a4d;
-            --text-primary: #e8eaf0;
-            --text-secondary: #8a90a4;
-            --text-muted: #5c6178;
-            --accent: #00d68f;
-            --accent-dim: rgba(0, 214, 143, 0.12);
-            --accent-glow: rgba(0, 214, 143, 0.25);
-            --danger: #ff5c72;
-            --danger-dim: rgba(255, 92, 114, 0.12);
-            --warning: #ffb547;
-            --warning-dim: rgba(255, 181, 71, 0.12);
-            --info: #4da6ff;
-            --info-dim: rgba(77, 166, 255, 0.12);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 0;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* Container mobile-first */
-        .app-container {
-            width: 100%;
-            max-width: 420px;
-            min-height: 100vh;
-            background: var(--bg-primary);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        /* === HEADER === */
-        .app-header {
-            padding: 18px 20px 14px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--border);
-            background: var(--bg-secondary);
-            position: relative;
-            z-index: 10;
-        }
-
-        .app-header::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 20px;
-            right: 20px;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--accent-glow), transparent);
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .logo-icon {
-            width: 34px;
-            height: 34px;
-            border-radius: 9px;
-            background: linear-gradient(135deg, var(--accent), #00b87a);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 15px;
-            color: #0d0f14;
-            box-shadow: 0 2px 12px var(--accent-glow);
-        }
-
-        .app-title {
-            font-size: 18px;
-            font-weight: 800;
-            letter-spacing: -0.3px;
-        }
-
-        .app-title span {
-            color: var(--accent);
-        }
-
-        .header-badge {
-            font-size: 10px;
-            font-weight: 600;
-            padding: 3px 8px;
-            border-radius: 20px;
-            background: var(--accent-dim);
-            color: var(--accent);
-            letter-spacing: 0.3px;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .header-btn {
-            width: 34px;
-            height: 34px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: var(--bg-card);
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 13px;
-            transition: all 0.2s;
-        }
-
-        .header-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            background: var(--accent-dim);
-        }
-
-        /* === MAIN CONTENT === */
-        .app-body {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px 16px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            scrollbar-width: thin;
-            scrollbar-color: var(--border) transparent;
-        }
-
-        .app-body::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .app-body::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .app-body::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 4px;
-        }
-
-        /* === FORMAT SELECTOR === */
-        .format-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .format-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            white-space: nowrap;
-        }
-
-        .format-select-wrapper {
-            flex: 1;
-            position: relative;
-        }
-
-        .format-select {
-            width: 100%;
-            padding: 10px 36px 10px 14px;
-            border-radius: 9px;
-            border: 1px solid var(--border);
-            background: var(--bg-input);
-            color: var(--text-primary);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 13px;
-            font-weight: 500;
-            appearance: none;
-            cursor: pointer;
-            transition: all 0.2s;
-            outline: none;
-        }
-
-        .format-select:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-dim);
-        }
-
-        .format-select-wrapper::after {
-            content: '\f107';
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 11px;
-            pointer-events: none;
-        }
-
-        /* === UPLOAD LIST === */
-        .section-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 14px 10px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .section-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .section-title i {
-            font-size: 12px;
-            color: var(--accent);
-        }
-
-        .file-count {
-            font-size: 11px;
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: 20px;
-            background: var(--accent-dim);
-            color: var(--accent);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .section-body {
-            padding: 6px;
-            max-height: 260px;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: var(--border) transparent;
-        }
-
-        .section-body::-webkit-scrollbar {
-            width: 3px;
-        }
-
-        .section-body::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 3px;
-        }
-
-        /* File Item */
-        .file-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 9px 10px;
-            border-radius: 8px;
-            transition: all 0.15s;
-            cursor: default;
-            position: relative;
-        }
-
-        .file-item:hover {
-            background: var(--bg-card-hover);
-        }
-
-        .file-icon {
-            width: 34px;
-            height: 34px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            flex-shrink: 0;
-        }
-
-        .file-icon.mp3 { background: var(--accent-dim); color: var(--accent); }
-        .file-icon.ogg { background: var(--info-dim); color: var(--info); }
-        .file-icon.wav { background: var(--warning-dim); color: var(--warning); }
-        .file-icon.flac { background: rgba(168, 85, 247, 0.12); color: #a855f7; }
-        .file-icon.default { background: var(--danger-dim); color: var(--danger); }
-
-        .file-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .file-name {
-            font-size: 12.5px;
-            font-weight: 600;
-            color: var(--text-primary);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .file-meta {
-            font-size: 10.5px;
-            color: var(--text-muted);
-            font-family: 'JetBrains Mono', monospace;
-            margin-top: 2px;
-        }
-
-        .file-remove {
-            width: 26px;
-            height: 26px;
-            border-radius: 6px;
-            border: none;
-            background: transparent;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 11px;
-            transition: all 0.15s;
-            flex-shrink: 0;
-            opacity: 0;
-        }
-
-        .file-item:hover .file-remove {
-            opacity: 1;
-        }
-
-        .file-remove:hover {
-            background: var(--danger-dim);
-            color: var(--danger);
-        }
-
-        /* File status */
-        .file-status {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 9px;
-            flex-shrink: 0;
-        }
-
-        .file-status.pending {
-            border: 1.5px solid var(--text-muted);
-        }
-
-        .file-status.converting {
-            border: 1.5px solid var(--warning);
-            background: var(--warning-dim);
-            color: var(--warning);
-            animation: spin 1s linear infinite;
-        }
-
-        .file-status.done {
-            background: var(--accent-dim);
-            color: var(--accent);
-            border: 1.5px solid var(--accent);
-        }
-
-        .file-status.error {
-            background: var(--danger-dim);
-            color: var(--danger);
-            border: 1.5px solid var(--danger);
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Empty state */
-        .empty-state {
-            padding: 30px 20px;
-            text-align: center;
-        }
-
-        .empty-state i {
-            font-size: 28px;
-            color: var(--text-muted);
-            margin-bottom: 10px;
-            opacity: 0.5;
-        }
-
-        .empty-state p {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        /* === LOG CONSOLE === */
-        .log-section {
-            flex: 1;
-            min-height: 0;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .log-section .section-card {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .log-header-actions {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .log-action-btn {
-            padding: 3px 8px;
-            border-radius: 5px;
-            border: 1px solid var(--border);
-            background: var(--bg-input);
-            color: var(--text-muted);
-            font-size: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.15s;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .log-action-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
-        .log-body {
-            flex: 1;
-            padding: 8px 10px;
-            overflow-y: auto;
-            max-height: 200px;
-            min-height: 100px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            line-height: 1.7;
-            scrollbar-width: thin;
-            scrollbar-color: var(--border) transparent;
-        }
-
-        .log-body::-webkit-scrollbar {
-            width: 3px;
-        }
-
-        .log-body::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 3px;
-        }
-
-        .log-line {
-            display: flex;
-            gap: 8px;
-            animation: logFade 0.25s ease;
-        }
-
-        @keyframes logFade {
-            from { opacity: 0; transform: translateY(4px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .log-time {
-            color: var(--text-muted);
-            flex-shrink: 0;
-        }
-
-        .log-msg { flex: 1; }
-        .log-msg.info { color: var(--text-secondary); }
-        .log-msg.success { color: var(--accent); }
-        .log-msg.warn { color: var(--warning); }
-        .log-msg.error { color: var(--danger); }
-        .log-msg.system { color: var(--info); }
-
-        .log-empty {
-            color: var(--text-muted);
-            font-style: italic;
-            padding: 20px 0;
-            text-align: center;
-        }
-
-        /* === BOTTOM ACTIONS === */
-        .bottom-actions {
-            padding: 12px 16px;
-            padding-bottom: max(12px, env(safe-area-inset-bottom));
-            border-top: 1px solid var(--border);
-            background: var(--bg-secondary);
-            display: flex;
-            gap: 10px;
-            position: relative;
-            z-index: 10;
-        }
-
-        .bottom-actions::before {
-            content: '';
-            position: absolute;
-            top: -1px;
-            left: 16px;
-            right: 16px;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--accent-glow), transparent);
-        }
-
-        .btn {
-            flex: 1;
-            padding: 12px 16px;
-            border-radius: 10px;
-            border: none;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 7px;
-            transition: all 0.2s;
-            outline: none;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-upload {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
-        }
-
-        .btn-upload:hover {
-            border-color: var(--accent);
-            background: var(--accent-dim);
-            color: var(--accent);
-        }
-
-        .btn-upload:active {
-            transform: scale(0.97);
-        }
-
-        .btn-convert {
-            background: linear-gradient(135deg, var(--accent), #00b87a);
-            color: #0d0f14;
-            box-shadow: 0 2px 16px var(--accent-glow);
-        }
-
-        .btn-convert:hover {
-            box-shadow: 0 4px 24px var(--accent-glow);
-            filter: brightness(1.08);
-        }
-
-        .btn-convert:active {
-            transform: scale(0.97);
-        }
-
-        .btn-convert:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            filter: none;
-            box-shadow: none;
-        }
-
-        .btn i {
-            font-size: 13px;
-        }
-
-        /* === TOAST === */
-        .toast-container {
-            position: fixed;
-            top: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            pointer-events: none;
-        }
-
-        .toast {
-            padding: 10px 18px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 600;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            animation: toastIn 0.3s ease, toastOut 0.3s ease 2.5s forwards;
-            pointer-events: auto;
-            white-space: nowrap;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-        }
-
-        .toast.success {
-            background: #0d2818;
-            border: 1px solid #1a5c35;
-            color: var(--accent);
-        }
-
-        .toast.error {
-            background: #2a0f14;
-            border: 1px solid #5c1a24;
-            color: var(--danger);
-        }
-
-        .toast.info {
-            background: #0d1a2a;
-            border: 1px solid #1a355c;
-            color: var(--info);
-        }
-
-        @keyframes toastIn {
-            from { opacity: 0; transform: translateY(-12px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes toastOut {
-            from { opacity: 1; }
-            to { opacity: 0; transform: translateY(-8px); }
-        }
-
-        /* === DROP ZONE OVERLAY === */
-        .drop-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0, 214, 143, 0.06);
-            border: 2px dashed var(--accent);
-            border-radius: 12px;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 50;
-            backdrop-filter: blur(4px);
-        }
-
-        .drop-overlay.active {
-            display: flex;
-        }
-
-        .drop-overlay-text {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--accent);
-        }
-
-        /* === PROGRESS BAR (per file) === */
-        .file-progress {
-            height: 2px;
-            border-radius: 2px;
-            background: var(--border);
-            margin-top: 4px;
-            overflow: hidden;
-            display: none;
-        }
-
-        .file-progress.active {
-            display: block;
-        }
-
-        .file-progress-bar {
-            height: 100%;
-            background: var(--accent);
-            border-radius: 2px;
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        /* Hidden file input */
-        #fileInput {
-            display: none;
-        }
-
-        /* Responsive: desktop */
-        @media (min-width: 500px) {
-            body {
-                padding: 24px 0;
-                align-items: center;
-            }
-
-            .app-container {
-                min-height: auto;
-                max-height: 90vh;
-                border-radius: 20px;
-                border: 1px solid var(--border);
-                box-shadow: 0 20px 80px rgba(0,0,0,0.5);
-                overflow: hidden;
-            }
-
-            .app-body {
-                max-height: calc(90vh - 130px);
-            }
-        }
-
-        /* Pulse glow on converting */
-        @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow); }
-            50% { box-shadow: 0 0 0 6px transparent; }
-        }
-
-        .file-status.converting {
-            animation: spin 1s linear infinite, pulseGlow 1.5s ease infinite;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ConverterYL — Pro Audio Converter</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-client-XXXXX_GANTI"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/all.min.css">
+<style>
+*{font-family:'Inter',sans-serif;margin:0;padding:0;box-sizing:border-box}
+body{background:#060608;color:#e4e4e7;overflow-x:hidden}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#27272a;border-radius:3px}::-webkit-scrollbar-thumb:hover{background:#3f3f46}
+.grad-text{background:linear-gradient(135deg,#818cf8,#a78bfa,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.glass{background:rgba(255,255,255,.02);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.05)}
+.glass-hover{transition:all .25s ease}
+.glass-hover:hover{border-color:rgba(129,140,248,.2);background:rgba(255,255,255,.04);transform:translateY(-1px)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .4s cubic-bezier(.16,1,.3,1)}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.fade-in{animation:fadeIn .3s ease}
+@keyframes scaleIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+.scale-in{animation:scaleIn .25s ease}
+.bg-mesh{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 600px 400px at 15% 20%,rgba(99,102,241,.06),transparent),radial-gradient(ellipse 500px 500px at 85% 80%,rgba(168,85,247,.05),radial-gradient(ellipse 400px 300px at 50% 50%,rgba(129,140,248,.03),transparent));pointer-events:none}
+.bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:64px 64px;}
+.upload-zone{border:1.5px dashed rgba(255,255,255,.1);transition:all .3s ease;cursor:pointer}
+.upload-zone:hover{border-color:rgba(129,140,248,.4);background:rgba(129,140,248,.03)}
+.upload-zone:active{border-color:rgba(129,140,248,.6)}
+.prog-bar{height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;width:0%;background:linear-gradient(90deg,#818cf8,#a78bfa);border-radius:2px;transition:width .15s}
+.preset-btn{transition:all .25s cubic-bezier(.16,1,.3,1);cursor:pointer;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);color:#a1a1aa}
+.preset-btn:hover{border-color:rgba(129,140,248,.25);background:rgba(129,140,248,.05);transform:translateY(-1px)}
+.preset-btn.active{background:linear-gradient(135deg,rgba(129,140,248,.18),rgba(168,85,247,.14));border-color:rgba(129,140,248,.45);color:#c4b5fd;transform:scale(1.04);box-shadow:0 0 18px rgba(129,140,248,.18)}
+.preset-btn:active{transform:scale(.97)}
+.modal-bg{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s ease}
+.modal-bg.show{opacity:1;pointer-events:auto}
+.modal-box{background:#0e0e11;border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:24px;max-width:480px;width:92%;max-height:88vh;overflow-y:auto;transform:scale(.94) translateY(10px);transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.modal-bg.show .modal-box{transform:scale(1) translateY(0)}
+.fmt-card{border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;background:rgba(255,255,255,.02);transition:all .2s ease;cursor:pointer}
+.fmt-card:hover{border-color:rgba(129,140,248,.25);background:rgba(255,255,255,.04)}
+.fmt-card.chosen{border-color:rgba(129,140,248,.4);background:rgba(129,140,248,.06);box-shadow:0 0 20px rgba(129,140,248,.06)}
+.pay-card{border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:18px;background:rgba(255,255,255,.02);transition:all .25s ease;cursor:pointer;position:relative;overflow:hidden}
+.pay-card:hover{border-color:rgba(129,140,248,.3);background:rgba(255,255,255,.04);transform:translateY(-2px)}
+.pay-card.chosen{border-color:rgba(129,140,248,.5);background:rgba(129,140,248,.06);box-shadow:0 0 24px rgba(129,140,248,.08)}
+.pay-card.chosen::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#6366f1,#8b5cf6,#a78bfa)}
+.toast-wrap{position:fixed;top:72px;right:16px;z-index:99999;display:flex;flex-direction:column;gap:8px}
+.toast-item{padding:10px 16px;border-radius:10px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:8px;min-width:240px;animation:fadeUp .3s ease,toastOut .3s ease 3s forwards;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.toast-ok{background:#052e16;border:1px solid #14532d;color:#4ade80}
+.toast-err{background:#2a0a0a;border:1px solid #7f1d1d;color:#f87171}
+.toast-info{background:#1a1508;border:1px solid #422006;color:#fbbf24}
+@keyframes toastOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-8px)}}
+.btn-primary{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-weight:600;padding:10px 24px;border-radius:10px;border:none;cursor:pointer;font-size:.875rem;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 4px 20px rgba(99,102,241,.3)}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-ghost{background:transparent;color:#a1a1aa;font-weight:500;padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.06);cursor:pointer;font-size:.8rem;transition:all .2s}
+.btn-ghost:hover{color:#e4e4e7;border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.03)}
+.input-f{width:100%;padding:11px 14px;background:#09090b;border:1px solid rgba(255,255,255,.08);border-radius:8px;color:#e4e4e7;font-size:.85rem;font-family:'Inter',sans-serif;transition:border-color .2s;outline:none}
+.input-f:focus{border-color:rgba(129,140,248,.5);box-shadow:0 0 0 3px rgba(129,140,248,.08)}
+.input-f::placeholder{color:#3f3f46}
+.speed-input{background:transparent;border:none;color:#a5b4fc;font-size:1.3rem;font-weight:700;width:70px;text-align:center;outline:none}
+.speed-input::-webkit-outer-spin-button,.speed-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.speed-input[type=number]{-moz-appearance:textfield}
+.rbx-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid;transition:all .2s;white-space:nowrap}
+.rbx-btn.idle{background:rgba(226,29,72,.08);color:#fb7185;border-color:rgba(226,29,72,.2)}
+.rbx-btn.idle:hover{background:rgba(226,29,72,.15);border-color:rgba(226,29,72,.35)}
+.rbx-btn.locked{background:rgba(255,255,255,.03);color:#52525b;border-color:rgba(255,255,255,.06);cursor:default}
+.rbx-btn.loading{pointer-events:none;background:rgba(129,140,248,.1);color:#a5b4fc;border-color:rgba(129,140,248,.2)}
+.rbx-btn.done{background:rgba(52,211,153,.08);color:#4ade80;border-color:rgba(52,211,153,.2)}
+.rbx-btn.done:hover{background:rgba(52,211,153,.15)}
+.spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.2);border-top-color:currentColor;border-radius:50%;animation:spin .5s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;letter-spacing:.3px}
+.badge-pro{background:rgba(168,85,247,.1);color:#c084fc;border:1px solid rgba(168,85,247,.15)}
+.section-label{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#52525b;margin-bottom:10px}
+.divider{height:1px;background:rgba(255,255,255,.04);margin:16px 0}
+.gear-btn{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#52525b;transition:all .2s}
+.gear-btn:hover{background:rgba(255,255,255,.1);color:#e4e4e7;border-color:rgba(255,255,255,.12)}
+.rbx-nav-btn{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#52525b;transition:all .2s;flex-shrink:0}
+.rbx-nav-btn:hover{background:rgba(255,255,255,.1);color:#e4e4e7;border-color:rgba(255,255,255,.12)}
+@keyframes floatBlob{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(18px,-14px) scale(1.05)}}
+.bg-mesh{animation:floatBlob 14s ease-in-out infinite}
+.btn-primary{position:relative;overflow:hidden}
+.btn-primary::after{content:'';position:absolute;top:0;left:-75%;width:50%;height:100%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.28),transparent);transform:skewX(-20deg)}
+.btn-primary:hover:not(:disabled)::after{animation:shine .9s ease}
+@keyframes shine{from{left:-75%}to{left:130%}}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 0 0 rgba(129,140,248,.35)}50%{box-shadow:0 0 0 7px rgba(129,140,248,0)}}
+.pay-card[data-plan="subscription"]{animation:pulseGlow 2.6s ease-in-out infinite}
+.upgrade-pill{cursor:pointer;transition:all .2s ease}
+.upgrade-pill:hover{transform:translateY(-1px);filter:brightness(1.15)}
+.hidden{display:none!important}
+
+/* ===== ENHANCED PROFESSIONAL UI ===== */
+.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:10px;height:56px;padding:0 14px;background:rgba(6,6,8,.9);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05)}
+.hamburger-btn{width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);display:none;align-items:center;justify-content:center;cursor:pointer;color:#a1a1aa;flex-shrink:0}
+.hamburger-btn:hover{background:rgba(255,255,255,.1);color:#e4e4e7}
+.app-layout{display:flex;align-items:stretch;min-height:calc(100vh - 56px)}
+.sidebar{width:236px;flex-shrink:0;padding:16px;display:flex;flex-direction:column;gap:14px;background:rgba(255,255,255,.015);border-right:1px solid rgba(255,255,255,.05);position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font-size:13px;font-weight:600;color:#a1a1aa;cursor:pointer;transition:all .2s ease;border:1px solid transparent}
+.nav-item i{width:16px;text-align:center;font-size:13px}
+.nav-item:hover{background:rgba(255,255,255,.04);color:#e4e4e7}
+.nav-item.active{background:linear-gradient(135deg,rgba(129,140,248,.15),rgba(168,85,247,.1));color:#c4b5fd;border-color:rgba(129,140,248,.2)}
+.nav-item.disabled{opacity:.4;cursor:not-allowed}
+.side-upgrade-card{background:linear-gradient(160deg,rgba(129,140,248,.1),rgba(168,85,247,.05));border:1px solid rgba(129,140,248,.15);border-radius:12px;padding:14px;margin-top:auto}
+.side-quota-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:12px}
+.side-footer{font-size:10px;color:#3f3f46;line-height:1.6;padding-top:6px}
+.main-dashboard{flex:1;min-width:0;padding:18px;display:grid;grid-template-columns:1.25fr .95fr;gap:18px;align-items:start}
+.dash-col{display:flex;flex-direction:column;gap:18px;min-width:0}
+.panel{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:14px;padding:16px}
+.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.panel-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#e4e4e7}
+.upload-row{background:rgba(255,255,255,.015);border:1px solid rgba(255,255,255,.03);border-radius:10px}
+.row-index{width:22px;height:22px;border-radius:6px;background:rgba(129,140,248,.1);color:#a5b4fc;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.log-console{background:#000;border-radius:10px;padding:12px;font-family:'SFMono-Regular',Consolas,monospace;font-size:10.5px;line-height:1.7;max-height:280px;overflow-y:auto;display:flex;flex-direction:column}
+.log-line{display:flex;gap:8px;white-space:pre-wrap;word-break:break-word}
+.log-tag{flex-shrink:0;font-weight:700;width:66px}
+.log-tag.info{color:#60a5fa}
+.log-tag.convert{color:#fbbf24}
+.log-tag.success{color:#4ade80}
+.log-tag.upload{color:#c084fc}
+.log-tag.done{color:#f472b6}
+.log-tag.error{color:#f87171}
+.log-time{color:#3f3f46;flex-shrink:0}
+.log-msg{color:#a1a1aa}
+.action-row{display:flex;align-items:center;gap:12px;width:100%;padding:12px;border-radius:12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);cursor:pointer;transition:all .2s ease;text-align:left}
+.action-row:hover:not(:disabled){border-color:rgba(129,140,248,.25);background:rgba(255,255,255,.045);transform:translateY(-1px)}
+.action-row:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.action-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:14px}
+.action-row .action-chev{margin-left:auto;color:#3f3f46;font-size:11px}
+
+/* ===== NEW ENHANCED ANIMATIONS & EFFECTS ===== */
+@keyframes glowPulse{0%,100%{filter:drop-shadow(0 0 8px rgba(129,140,248,.4))}50%{filter:drop-shadow(0 0 16px rgba(129,140,248,.7))}}
+.logo-glow{animation:glowPulse 3s ease-in-out infinite}
+@keyframes shimmerText{0%{background-position:-200% center}100%{background-position:200% center}}
+.shimmer-text{background:linear-gradient(90deg,#818cf8 0%,#a78bfa 25%,#c084fc 50%,#a78bfa 75%,#818cf8 100%);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shimmerText 4s linear infinite}
+@keyframes ripple{0%{transform:scale(0);opacity:1}100%{transform:scale(4);opacity:0}}
+.ripple-effect{position:absolute;border-radius:50%;background:rgba(255,255,255,.3);pointer-events:none;animation:ripple .6s ease-out}
+@keyframes checkmarkDraw{0%{stroke-dashoffset:50}100%{stroke-dashoffset:0}}
+.checkmark-circle{stroke-dasharray:166;stroke-dashoffset:166;animation:checkmarkDraw .6s cubic-bezier(.65,0,.45,1) forwards}
+.checkmark-check{stroke-dasharray:48;stroke-dashoffset:48;animation:checkmarkDraw .3s cubic-bezier(.65,0,.45,1) .6s forwards}
+@keyframes slideInRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+.slide-in-right{animation:slideInRight .4s cubic-bezier(.16,1,.3,1)}
+@keyframes slideInLeft{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:translateX(0)}}
+.slide-in-left{animation:slideInLeft .4s cubic-bezier(.16,1,.3,1)}
+@keyframes bounceIn{0%{opacity:0;transform:scale(.3)}50%{transform:scale(1.05)}70%{transform:scale(.95)}100%{opacity:1;transform:scale(1)}}
+.bounce-in{animation:bounceIn .5s cubic-bezier(.16,1,.3,1)}
+@keyframes fadeInScale{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.fade-in-scale{animation:fadeInScale .3s ease}
+@keyframes progressShine{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.prog-fill{background-image:linear-gradient(90deg,#818cf8,#a78bfa,#818cf8);background-size:200% 100%;animation:progressShine 2s linear infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.float-anim{animation:float 3s ease-in-out infinite}
+@keyframes rotateGlow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.rotate-glow{animation:rotateGlow 8s linear infinite}
+@keyframes borderGlow{0%,100%{border-color:rgba(129,140,248,.2)}50%{border-color:rgba(129,140,248,.5)}}
+.border-glow{animation:borderGlow 2s ease-in-out infinite}
+@keyframes scanLine{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
+.scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(129,140,248,.6),transparent);animation:scanLine 2s linear infinite}
+@keyframes particleFloat{0%{transform:translateY(0) translateX(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-100px) translateX(20px);opacity:0}}
+.particle{position:absolute;width:4px;height:4px;border-radius:50%;background:rgba(129,140,248,.6);pointer-events:none;animation:particleFloat 3s ease-out infinite}
+@keyframes modalBounce{0%{opacity:0;transform:scale(.8) translateY(-20px)}60%{transform:scale(1.02) translateY(0)}100%{opacity:1;transform:scale(1) translateY(0)}}
+.modal-bounce{animation:modalBounce .4s cubic-bezier(.16,1,.3,1)}
+@keyframes pulseRing{0%{transform:scale(.8);opacity:1}100%{transform:scale(2);opacity:0}}
+.pulse-ring{position:absolute;border:2px solid rgba(52,211,153,.5);border-radius:50%;animation:pulseRing 1.5s ease-out infinite}
+@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.gradient-animated{background:linear-gradient(135deg,#6366f1,#8b5cf6,#a78bfa,#8b5cf6,#6366f1);background-size:300% 300%;animation:gradientShift 6s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.blink{animation:blink 1.5s ease-in-out infinite}
+@keyframes wave{0%,100%{transform:translateY(0)}25%{transform:translateY(-3px)}75%{transform:translateY(3px)}}
+.wave-anim{animation:wave 1.5s ease-in-out infinite}
+@keyframes glowBorder{0%,100%{box-shadow:0 0 5px rgba(129,140,248,.2),inset 0 0 5px rgba(129,140,248,.1)}50%{box-shadow:0 0 20px rgba(129,140,248,.5),inset 0 0 10px rgba(129,140,248,.2)}}
+.glow-border{animation:glowBorder 2s ease-in-out infinite}
+@keyframes countUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.count-up{animation:countUp .4s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.shake{animation:shake .3s ease}
+@keyframes flipIn{0%{opacity:0;transform:rotateY(90deg)}100%{opacity:1;transform:rotateY(0)}}
+.flip-in{animation:flipIn .4s ease}
+
+/* Payment method cards */
+.pay-method-card{border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;background:rgba(255,255,255,.02);transition:all .25s ease;cursor:pointer;display:flex;align-items:center;gap:12px}
+.pay-method-card:hover{border-color:rgba(129,140,248,.3);background:rgba(255,255,255,.04);transform:translateX(4px)}
+.pay-method-card.chosen{border-color:rgba(129,140,248,.5);background:rgba(129,140,248,.06);box-shadow:0 0 20px rgba(129,140,248,.08)}
+.pay-method-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+
+/* Skeleton loading */
+.skeleton{background:linear-gradient(90deg,rgba(255,255,255,.02) 25%,rgba(255,255,255,.05) 50%,rgba(255,255,255,.02) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* Success animation container */
+.success-animation{position:relative;width:80px;height:80px;margin:0 auto}
+.success-animation svg{width:100%;height:100%}
+
+/* Confetti */
+.confetti{position:fixed;width:10px;height:10px;pointer-events:none;z-index:99999}
+@keyframes confettiFall{0%{transform:translateY(-100vh) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+/* Payment status indicator */
+.status-indicator{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:8px}
+.status-pending{background:#fbbf24;animation:blink 1s infinite}
+.status-processing{background:#60a5fa;animation:blink .5s infinite}
+.status-success{background:#4ade80}
+.status-failed{background:#f87171}
+
+/* Floating action button effect */
+@keyframes fabPulse{0%,100%{box-shadow:0 0 0 0 rgba(99,102,241,.4)}50%{box-shadow:0 0 0 12px rgba(99,102,241,0)}}
+.fab-pulse{animation:fabPulse 2s infinite}
+
+@media(max-width:900px){
+  .hamburger-btn{display:flex}
+  .app-layout{position:relative}
+  .sidebar{position:fixed;left:0;top:56px;transform:translateX(-105%);z-index:46;box-shadow:0 10px 40px rgba(0,0,0,.6)}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-overlay{position:fixed;inset:56px 0 0 0;background:rgba(0,0,0,.55);z-index:45;opacity:0;pointer-events:none;transition:opacity .25s ease}
+  .sidebar-overlay.show{opacity:1;pointer-events:auto}
+  .main-dashboard{grid-template-columns:1fr;padding:14px}
+}
+</style>
 </head>
-<body>
+<body class="min-h-screen">
 
-<div class="app-container" id="appContainer">
-    <!-- Header -->
-    <header class="app-header">
-        <div class="header-left">
-            <div class="logo-icon">
-                <i class="fas fa-waveform-lines"></i>
-            </div>
-            <div>
-                <div class="app-title">Converter<span>YL</span></div>
-            </div>
-        </div>
-        <div class="header-right">
-            <span class="header-badge">AUDIO</span>
-            <button class="header-btn" id="btnClearAll" title="Hapus Semua">
-                <i class="fas fa-trash-can"></i>
-            </button>
-        </div>
-    </header>
+<div class="bg-mesh"></div>
+<div class="bg-grid"></div>
+<div class="toast-wrap" id="toastWrap"></div>
 
-    <!-- Body -->
-    <main class="app-body" id="appBody">
-        <!-- Format Selector -->
-        <div class="format-section">
-            <span class="format-label">Output</span>
-            <div class="format-select-wrapper">
-                <select class="format-select" id="formatSelect">
-                    <option value="mp3">MP3 - MPEG Audio</option>
-                    <option value="wav">WAV - Waveform Audio</option>
-                    <option value="ogg">OGG - Ogg Vorbis</option>
-                    <option value="flac">FLAC - Free Lossless</option>
-                    <option value="aac">AAC - Advanced Audio</option>
-                    <option value="m4a">M4A - MPEG-4 Audio</option>
-                </select>
-            </div>
-        </div>
+<!-- TOPBAR -->
+<header class="topbar">
+  <button class="hamburger-btn" onclick="toggleSidebar()" title="Menu"><i class="fas fa-bars"></i></button>
+  <div class="flex items-center gap-2">
+    <div class="w-8 h-8 rounded-lg flex items-center justify-center logo-glow" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)"><i class="fas fa-bolt text-[11px] text-white"></i></div>
+    <div class="leading-tight">
+      <div class="font-bold text-sm tracking-tight">Converter<span class="shimmer-text">YL</span></div>
+      <div class="text-[9px] text-zinc-600 hidden sm:block">Pro Audio Converter</div>
+    </div>
+  </div>
+  <div id="navRight" class="flex items-center gap-2" style="margin-left:auto">
+    <div id="loginArea" class="flex items-center gap-2"><div id="googleBtnContainer"></div></div>
+    <div id="userChip" class="hidden items-center gap-2">
+      <img id="userAvatar" src="" alt="" style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.08)">
+      <span id="userName" class="text-xs text-zinc-400 hidden sm:inline max-w-[90px] truncate"></span>
+      <div id="creditChip" class="badge" style="background:rgba(255,255,255,.04);color:#52525b;border:1px solid rgba(255,255,255,.06)"><span id="creditText">0</span></div>
+      <button class="rbx-nav-btn" onclick="openRbxModal()" title="Pengaturan Roblox"><i class="fas fa-cube" style="font-size:13px"></i></button>
+      <button id="logoutBtn" onclick="handleLogout()" class="btn-ghost" style="padding:6px 8px" title="Keluar"><i class="fas fa-right-from-bracket" style="font-size:11px"></i></button>
+    </div>
+  </div>
+</header>
 
-        <!-- Upload List -->
-        <div class="section-card" id="uploadListCard">
-            <div class="section-header">
-                <div class="section-title">
-                    <i class="fas fa-list-ul"></i>
-                    Upload List
-                </div>
-                <span class="file-count" id="fileCount">0</span>
-            </div>
-            <div class="section-body" id="fileList">
-                <div class="empty-state" id="emptyState">
-                    <i class="fas fa-cloud-arrow-up"></i>
-                    <p>Belum ada file. Tap Upload Audio.</p>
-                </div>
-            </div>
-            <div class="drop-overlay" id="dropOverlay">
-                <span class="drop-overlay-text"><i class="fas fa-download"></i> Lepaskan file di sini</span>
-            </div>
-        </div>
+<div id="mainCard" class="app-layout hidden">
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-        <!-- Log Console -->
-        <div class="log-section">
-            <div class="section-card">
-                <div class="section-header">
-                    <div class="section-title">
-                        <i class="fas fa-terminal"></i>
-                        Log Console
-                    </div>
-                    <div class="log-header-actions">
-                        <button class="log-action-btn" id="btnClearLog">CLEAR</button>
-                    </div>
-                </div>
-                <div class="log-body" id="logBody">
-                    <div class="log-empty">Menunggu aktivitas...</div>
-                </div>
-            </div>
-        </div>
-    </main>
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="nav-item active"><i class="fas fa-music"></i> Converter</div>
+    <div class="nav-item disabled" onclick="toast('Segera hadir','info')"><i class="fas fa-sliders"></i> Equalizer</div>
 
-    <!-- Bottom Actions -->
-    <div class="bottom-actions">
-        <button class="btn btn-upload" id="btnUpload">
-            <i class="fas fa-plus"></i>
-            Upload Audio
-        </button>
-        <button class="btn btn-convert" id="btnConvert" disabled>
-            <i class="fas fa-bolt"></i>
-            Convert
-        </button>
+    <div class="side-quota-card">
+      <div class="flex items-center justify-between mb-1.5">
+        <div class="flex items-center gap-2">
+          <div id="quotaDot" class="w-1.5 h-1.5 rounded-full bg-zinc-600"></div>
+          <span class="text-[10px] text-zinc-500 font-semibold uppercase tracking-wide">Kuota</span>
+        </div>
+        <span id="planBadge" class="badge" style="background:rgba(255,255,255,.04);color:#52525b;border:1px solid rgba(255,255,255,.06);font-size:9px">FREE</span>
+      </div>
+      <div id="quotaText" class="text-xs text-zinc-400">1 lagu gratis</div>
     </div>
 
-    <input type="file" id="fileInput" accept="audio/*" multiple>
+    <div class="side-upgrade-card">
+      <div class="flex items-center gap-2 mb-1.5"><i class="fas fa-gem text-purple-300" style="font-size:13px"></i><span class="text-xs font-bold text-zinc-200">Upgrade ke Premium</span></div>
+      <p class="text-[10px] text-zinc-500 leading-relaxed mb-2.5">Dapatkan fitur tanpa batas dan upload otomatis ke Roblox.</p>
+      <button onclick="openPayModal()" class="btn-primary w-full justify-center py-2 text-[11px]">Upgrade Sekarang <i class="fas fa-arrow-right" style="font-size:9px"></i></button>
+    </div>
+
+    <div class="side-footer">
+      ConverterYL v2.0.0<br>&copy; 2026 ConverterYL. All rights reserved.
+    </div>
+  </aside>
+
+  <!-- MAIN DASHBOARD -->
+  <main class="main-dashboard">
+    <div class="dash-col">
+      <div id="warnBanner" class="hidden p-3 rounded-lg text-xs text-amber-300/80" style="background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.1)">
+        <b class="text-amber-200/90">Mode Tamu</b> &mdash; dibuka via in-app browser.
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <span class="panel-title"><i class="fas fa-list text-indigo-400" style="font-size:12px"></i> Upload List</span>
+          <span class="badge" style="background:rgba(255,255,255,.04);color:#71717a;border:1px solid rgba(255,255,255,.06)" id="fileCountBadge">0 Files</span>
+        </div>
+        <div id="fileList" class="flex flex-col gap-1.5"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <span class="panel-title"><i class="fas fa-terminal text-indigo-400" style="font-size:12px"></i> Log Console</span>
+          <button onclick="clearLogConsole()" class="btn-ghost" style="padding:4px 10px;font-size:10px"><i class="fas fa-trash" style="font-size:9px"></i> Clear</button>
+        </div>
+        <div id="logConsole" class="log-console"></div>
+      </div>
+    </div>
+
+    <div class="dash-col">
+      <div class="panel">
+        <div class="section-label">Speed Preset</div>
+        <div class="grid grid-cols-5 gap-1.5" id="presetPicker">
+          <button class="preset-btn active text-xs font-semibold py-2 rounded-lg" data-i="0">2.3x</button>
+          <button class="preset-btn text-xs font-semibold py-2 rounded-lg" data-i="1">2.5x</button>
+          <button class="preset-btn text-xs font-semibold py-2 rounded-lg" data-i="2">2.7x</button>
+          <button class="preset-btn text-xs font-semibold py-2 rounded-lg" data-i="3">4.7x</button>
+          <button class="preset-btn text-xs font-semibold py-2 rounded-lg" data-i="4">Custom</button>
+        </div>
+        <div id="customSpeedWrap" class="hidden mt-3 flex items-center justify-center gap-3 py-3 px-4 rounded-lg" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04)">
+          <span class="text-xs text-zinc-500">Speed:</span>
+          <input type="number" id="customSpeedInput" class="speed-input" value="2.5" min="0.1" max="10" step="0.1">
+          <span class="text-zinc-600 font-bold">x</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <span class="panel-title"><i class="fas fa-cloud-arrow-up text-indigo-400" style="font-size:12px"></i> Upload Audio</span>
+        </div>
+        <label for="audioFile" id="box" class="upload-zone rounded-xl p-6 text-center block mb-3">
+          <div class="w-11 h-11 mx-auto mb-2.5 rounded-xl flex items-center justify-center float-anim" style="background:rgba(129,140,248,.06)">
+            <i class="fas fa-music text-indigo-400" style="font-size:16px"></i>
+          </div>
+          <p id="boxTitle" class="text-sm font-semibold text-zinc-200 mb-0.5">Drag & drop audio file here</p>
+          <p id="boxSub" class="text-[11px] text-zinc-600">or click to browse &mdash; maks 10 file</p>
+        </label>
+        <input type="file" id="audioFile" accept=".mp3,audio/mpeg,.wav,audio/wav,.ogg,audio/ogg,.flac,audio/flac,.m4a,audio/mp4,.aac,audio/aac,.wma,.opus,audio/opus" multiple style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0">
+
+        <div class="flex flex-col gap-2">
+          <button class="action-row" onclick="$fileInput.click()">
+            <div class="action-icon" style="background:linear-gradient(135deg,#818cf8,#a78bfa)"><i class="fas fa-cloud-arrow-up"></i></div>
+            <div class="min-w-0"><div class="text-xs font-semibold text-zinc-200">Upload Audio</div><div class="text-[10px] text-zinc-600">Pilih file audio dari perangkat</div></div>
+            <i class="fas fa-chevron-right action-chev"></i>
+          </button>
+          <button id="btn" disabled class="action-row">
+            <div class="action-icon" style="background:linear-gradient(135deg,#60a5fa,#818cf8)"><i class="fas fa-rotate"></i></div>
+            <div class="min-w-0"><div class="text-xs font-semibold text-zinc-200">Convert</div><div class="text-[10px] text-zinc-600">Proses file ke format pilihan</div></div>
+            <i class="fas fa-chevron-right action-chev"></i>
+          </button>
+          <button class="action-row" onclick="downloadAllFiles()">
+            <div class="action-icon" style="background:linear-gradient(135deg,#34d399,#4ade80)"><i class="fas fa-download"></i></div>
+            <div class="min-w-0"><div class="text-xs font-semibold text-zinc-200">Download All</div><div class="text-[10px] text-zinc-600">Unduh semua file hasil convert</div></div>
+            <i class="fas fa-chevron-right action-chev"></i>
+          </button>
+          <button class="action-row" onclick="uploadAllToRoblox()">
+            <div class="action-icon" style="background:linear-gradient(135deg,#fb7185,#e11d48)"><i class="fas fa-cube"></i></div>
+            <div class="min-w-0"><div class="text-xs font-semibold text-zinc-200">Upload ke Roblox</div><div class="text-[10px] text-zinc-600">Upload audio langsung ke Roblox</div></div>
+            <i class="fas fa-chevron-right action-chev"></i>
+          </button>
+        </div>
+
+        <div id="status" class="text-center text-[11px] text-zinc-600 mt-3 min-h-[16px]">Menyiapkan editor...</div>
+        <div id="progWrap" class="hidden mt-2">
+          <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+          <div class="text-center text-[10px] text-zinc-600 mt-1" id="progTxt">0%</div>
+        </div>
+      </div>
+    </div>
+  </main>
 </div>
 
-<!-- Toast Container -->
-<div class="toast-container" id="toastContainer"></div>
+<div class="text-center py-10 px-5" id="loggedOutHero">
+  <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight mb-2.5 fade-up" style="line-height:1.15">
+    Audio Converter <span class="shimmer-text">Profesional</span>
+  </h1>
+  <p class="text-sm text-zinc-500 max-w-md mx-auto leading-relaxed fade-up">Edit kecepatan audio, upload langsung ke Roblox. Masuk dengan Google untuk mulai.</p>
+</div>
 
+
+<!-- MODAL FORMAT -->
+<div class="modal-bg" id="fmtModal">
+  <div class="modal-box modal-bounce" style="max-width:400px">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-base font-bold">Format Output</h3>
+    </div>
+    <div class="space-y-1.5">
+      <div class="fmt-card chosen" data-fmt="ogg" onclick="pickFmt(this)">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center text-[11px] font-bold" style="background:rgba(251,146,60,.08);color:#fb923c">OGG</div>
+            <div><div class="text-sm font-semibold text-zinc-200">OGG Vorbis</div><div class="text-[10px] text-zinc-600">Roblox compatible</div></div>
+          </div>
+          <span class="badge" style="background:rgba(251,146,60,.08);color:#fb923c;border:1px solid rgba(251,146,60,.12);font-size:9px">REC</span>
+        </div>
+      </div>
+      <div class="fmt-card" data-fmt="mp3" onclick="pickFmt(this)">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg flex items-center justify-center text-[11px] font-bold" style="background:rgba(96,165,250,.08);color:#60a5fa">MP3</div>
+          <div><div class="text-sm font-semibold text-zinc-200">MP3</div><div class="text-[10px] text-zinc-600">Kompak, universal</div></div>
+        </div>
+      </div>
+      <div class="fmt-card" data-fmt="wav" onclick="pickFmt(this)">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg flex items-center justify-center text-[11px] font-bold" style="background:rgba(167,139,250,.08);color:#a78bfa">WAV</div>
+          <div><div class="text-sm font-semibold text-zinc-200">WAV</div><div class="text-[10px] text-zinc-600">Lossless, file besar</div></div>
+        </div>
+      </div>
+      <div class="fmt-card" data-fmt="flac" onclick="pickFmt(this)">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg flex items-center justify-center text-[11px] font-bold" style="background:rgba(244,114,182,.08);color:#f472b6">FLAC</div>
+          <div><div class="text-sm font-semibold text-zinc-200">FLAC</div><div class="text-[10px] text-zinc-600">Lossless kompresi</div></div>
+        </div>
+      </div>
+    </div>
+    <button id="fmtBtn" onclick="startProcess()" class="btn-primary w-full justify-center mt-4 py-2.5 text-sm">Mulai Edit — OGG</button>
+  </div>
+</div>
+
+<!-- MODAL ROBLOX SETTINGS -->
+<div class="modal-bg" id="rbxModal">
+  <div class="modal-box modal-bounce" style="max-width:420px">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-base font-bold">Pengaturan Roblox</h3>
+      <button onclick="closeRbxModal()" class="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-200 transition-colors" style="background:rgba(255,255,255,.04)"><i class="fas fa-xmark text-xs"></i></button>
+    </div>
+    <div class="p-3 rounded-lg mb-4 text-[11px] text-zinc-500 leading-relaxed" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04)">
+      <b class="text-zinc-400">Cara mendapatkan API Key:</b><br>
+      1. <span class="text-indigo-400">create.roblox.com/manage/api-keys</span> → Create Key → pilih <b>assets</b> → tambah <b>write</b> → Generate Key → salin
+    </div>
+    <div class="mb-3">
+      <label class="block text-[11px] font-medium text-zinc-400 mb-1.5">Proxy URL</label>
+      <input type="text" id="rbxProxyInput" class="input-f text-xs" placeholder="https://nama.workers.dev">
+    </div>
+    <div class="mb-3">
+      <label class="block text-[11px] font-medium text-zinc-400 mb-1.5">API Key</label>
+      <input type="password" id="rbxKeyInput" class="input-f text-xs" placeholder="Tempel API Key Roblox">
+    </div>
+    <div class="mb-4">
+      <label class="block text-[11px] font-medium text-zinc-400 mb-1.5">User ID</label>
+      <input type="text" id="rbxUserIdInput" class="input-f text-xs" placeholder="123456789">
+      <p class="text-[10px] text-zinc-700 mt-1.5">Ada di profil Roblox → angka di URL</p>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="saveRbxSettings()" class="btn-primary flex-1 justify-center py-2.5 text-xs">Simpan</button>
+      <button onclick="clearRbxSettings()" class="btn-ghost flex-1 justify-center py-2.5 text-xs">Hapus</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL UPGRADE -->
+<div class="modal-bg" id="upgradeModal">
+  <div class="modal-box modal-bounce text-center" style="max-width:340px">
+    <div class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center float-anim" style="background:rgba(168,85,247,.08)"><i class="fas fa-cube text-purple-400 text-xl"></i></div>
+    <h3 class="text-base font-bold mb-1">Fitur Premium</h3>
+    <p class="text-xs text-zinc-500 mb-5 leading-relaxed">Auto upload ke Roblox hanya tersedia untuk paket Unlimited</p>
+    <button onclick="closeUpgradeModal();openPayModal()" class="btn-primary px-8 py-2.5 text-xs">Lihat Paket Unlimited</button>
+    <button onclick="closeUpgradeModal()" class="btn-ghost mt-2 text-xs">Kembali</button>
+  </div>
+</div>
+
+<!-- MODAL PEMBAYARAN (ENHANCED) -->
+<div class="modal-bg" id="payModal">
+  <div class="modal-box modal-bounce" style="max-width:440px">
+    <div class="flex items-center justify-between mb-1">
+      <h3 class="text-base font-bold flex items-center gap-2"><i class="fas fa-gem text-purple-400 text-sm"></i> Pilih Paket</h3>
+      <button onclick="closePayModal()" class="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-200 transition-colors" style="background:rgba(255,255,255,.04)"><i class="fas fa-xmark text-xs"></i></button>
+    </div>
+    <p class="text-[11px] text-zinc-600 mb-4">Pilih paket yang sesuai kebutuhan kamu</p>
+    
+    <div class="space-y-2">
+      <div class="pay-card" data-plan="per_song" onclick="pickPlan(this)">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background:rgba(96,165,250,.08)"><i class="fas fa-music text-blue-400 text-sm"></i></div>
+            <div><div class="text-sm font-semibold">1 Lagu</div><div class="text-[10px] text-zinc-600">Untuk coba sekali</div></div>
+          </div>
+          <div class="text-right"><div class="text-base font-extrabold">Rp1.200</div></div>
+        </div>
+      </div>
+      
+      <div class="pay-card" data-plan="bundle_65" onclick="pickPlan(this)">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background:rgba(52,211,153,.08)"><i class="fas fa-box text-emerald-400 text-sm"></i></div>
+            <div><div class="text-sm font-semibold flex items-center gap-1.5">65 Lagu <span class="badge" style="background:rgba(52,211,153,.08);color:#4ade80;border:1px solid rgba(52,211,153,.12);font-size:9px">HEMAT</span></div><div class="text-[10px] text-zinc-600">Hemat 35%</div></div>
+          </div>
+          <div class="text-right"><div class="text-base font-extrabold">Rp50.000</div></div>
+        </div>
+      </div>
+      
+      <div class="pay-card relative" data-plan="subscription" onclick="pickPlan(this)">
+        <div class="absolute top-0 right-0 text-[9px] font-bold text-white px-2.5 py-0.5 rounded-bl-lg" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">BEST</div>
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background:rgba(168,85,247,.08)"><i class="fas fa-infinity text-purple-400 text-sm"></i></div>
+            <div><div class="text-sm font-semibold flex items-center gap-1.5">Unlimited <span class="badge badge-pro"><i class="fas fa-cube" style="font-size:8px"></i> ROBLOX</span></div><div class="text-[10px] text-zinc-600">Tanpa batas + auto upload</div></div>
+          </div>
+          <div class="text-right"><div class="text-base font-extrabold">Rp210.000</div><div class="text-[9px] text-zinc-600">/30 hari</div></div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="payMethodSection" class="hidden mt-4">
+      <div class="section-label mt-4 mb-2">Metode Pembayaran</div>
+      <div class="grid grid-cols-2 gap-2">
+        <div class="pay-method-card chosen" data-method="qris" onclick="pickPayMethod(this)">
+          <div class="pay-method-icon" style="background:rgba(52,211,153,.08)"><i class="fas fa-qrcode text-emerald-400"></i></div>
+          <div><div class="text-xs font-semibold">QRIS</div><div class="text-[9px] text-zinc-600">Semua e-wallet</div></div>
+        </div>
+        <div class="pay-method-card" data-method="va" onclick="pickPayMethod(this)">
+          <div class="pay-method-icon" style="background:rgba(96,165,250,.08)"><i class="fas fa-building-columns text-blue-400"></i></div>
+          <div><div class="text-xs font-semibold">Virtual Account</div><div class="text-[9px] text-zinc-600">BCA, Mandiri, BNI</div></div>
+        </div>
+        <div class="pay-method-card" data-method="gopay" onclick="pickPayMethod(this)">
+          <div class="pay-method-icon" style="background:rgba(52,211,153,.08)"><i class="fas fa-wallet text-emerald-400"></i></div>
+          <div><div class="text-xs font-semibold">GoPay</div><div class="text-[9px] text-zinc-600">Bayar instan</div></div>
+        </div>
+        <div class="pay-method-card" data-method="card" onclick="pickPayMethod(this)">
+          <div class="pay-method-icon" style="background:rgba(168,85,247,.08)"><i class="fas fa-credit-card text-purple-400"></i></div>
+          <div><div class="text-xs font-semibold">Kartu Kredit</div><div class="text-[9px] text-zinc-600">Visa, Mastercard</div></div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="paySummary" class="hidden mt-4 p-3 rounded-lg" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04)">
+      <div class="flex justify-between text-xs mb-1"><span class="text-zinc-500">Paket</span><span id="sumPlan" class="text-zinc-300 font-medium">-</span></div>
+      <div class="flex justify-between text-xs mb-1"><span class="text-zinc-500">Metode</span><span id="sumMethod" class="text-zinc-300 font-medium">-</span></div>
+      <div class="divider" style="margin:8px 0"></div>
+      <div class="flex justify-between"><span class="text-sm font-semibold text-zinc-400">Total</span><span id="sumTotal" class="text-base font-extrabold grad-text">Rp0</span></div>
+    </div>
+    
+    <button id="payBtn" disabled onclick="doPayment()" class="btn-primary w-full justify-center mt-4 py-2.5 text-sm">Pilih paket</button>
+  </div>
+</div>
+
+<!-- MODAL PEMBAYARAN PROSES (NEW) -->
+<div class="modal-bg" id="payProcessModal">
+  <div class="modal-box modal-bounce text-center" style="max-width:360px">
+    <div class="relative w-20 h-20 mx-auto mb-4">
+      <div class="absolute inset-0 rounded-full border-2 border-zinc-800"></div>
+      <div class="absolute inset-0 rounded-full border-2 border-transparent border-t-indigo-500 rotate-glow"></div>
+      <div class="absolute inset-0 flex items-center justify-center"><i class="fas fa-shield-halved text-indigo-400 text-2xl"></i></div>
+    </div>
+    <h3 class="text-base font-bold mb-1">Memproses Pembayaran</h3>
+    <p class="text-xs text-zinc-500 mb-4">Mohon tunggu sebentar, sedang mengamankan transaksi kamu...</p>
+    <div class="flex items-center justify-center gap-2 text-[11px] text-zinc-600">
+      <span class="status-indicator status-processing"></span>
+      <span id="processStatus">Menghubungkan ke gateway...</span>
+    </div>
+    <div class="mt-4 p-2 rounded-lg" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04)">
+      <div class="flex justify-between text-[10px] text-zinc-600 mb-1"><span>Progress</span><span id="processProgTxt">0%</span></div>
+      <div class="prog-bar"><div class="prog-fill" id="processProgFill" style="width:0%"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUKSES (ENHANCED) -->
+<div class="modal-bg" id="successModal">
+  <div class="modal-box modal-bounce text-center" style="max-width:360px">
+    <div class="success-animation mx-auto mb-4">
+      <svg viewBox="0 0 52 52">
+        <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none" stroke="#4ade80" stroke-width="2"/>
+        <path class="checkmark-check" fill="none" stroke="#4ade80" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M14 27l8 8 16-16"/>
+      </svg>
+    </div>
+    <h3 class="text-base font-bold mb-1 bounce-in">Berhasil!</h3>
+    <p id="successMsg" class="text-xs text-zinc-500 mb-5">Kuota ditambahkan.</p>
+    <div class="grid grid-cols-2 gap-2 mb-4">
+      <div class="p-2 rounded-lg" style="background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.1)">
+        <div class="text-[9px] text-zinc-600 uppercase tracking-wide">Status</div>
+        <div class="text-xs font-bold text-emerald-400">Aktif</div>
+      </div>
+      <div class="p-2 rounded-lg" style="background:rgba(129,140,248,.05);border:1px solid rgba(129,140,248,.1)">
+        <div class="text-[9px] text-zinc-600 uppercase tracking-wide">Kuota</div>
+        <div id="successQuota" class="text-xs font-bold text-indigo-400">+0</div>
+      </div>
+    </div>
+    <button onclick="closeSuccessModal()" class="btn-primary px-8 py-2.5 text-xs w-full justify-center">Lanjut</button>
+  </div>
+</div>
+
+<!-- MODAL ERROR (NEW) -->
+<div class="modal-bg" id="errorModal">
+  <div class="modal-box modal-bounce text-center" style="max-width:360px">
+    <div class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center shake" style="background:rgba(248,113,113,.08)"><i class="fas fa-triangle-exclamation text-rose-400 text-xl"></i></div>
+    <h3 class="text-base font-bold mb-1">Transaksi Gagal</h3>
+    <p id="errorMsg" class="text-xs text-zinc-500 mb-5">Terjadi kesalahan saat memproses pembayaran.</p>
+    <button onclick="closeErrorModal()" class="btn-primary px-8 py-2.5 text-xs w-full justify-center">Coba Lagi</button>
+  </div>
+</div>
+
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
+<script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
 <script>
-    // === State ===
-    let files = [];
-    let isConverting = false;
-    let logCleared = false;
+var CONFIG_MODE='demo',API_BASE='https://backend-kamu.contoh.workers.dev',MAX_FILES=10;
+var FORMATS={ogg:{ext:'.ogg',mime:'audio/ogg',args:['-c:a','libvorbis'],label:'OGG'},mp3:{ext:'.mp3',mime:'audio/mpeg',args:['-c:a','libmp3lame'],label:'MP3'},wav:{ext:'.wav',mime:'audio/wav',args:['-c:a','pcm_s16le'],label:'WAV'},flac:{ext:'.flac',mime:'audio/flac',args:['-c:a','flac'],label:'FLAC'}};
+var $=function(id){return document.getElementById(id)};
+var $box=$('box'),$boxTitle=$('boxTitle'),$boxSub=$('boxSub'),$fileInput=$('audioFile'),$fileList=$('fileList'),$btn=$('btn'),$status=$('status'),$progWrap=$('progWrap'),$progFill=$('progFill'),$progTxt=$('progTxt'),$warnBanner=$('warnBanner'),$loginArea=$('loginArea'),$mainCard=$('mainCard'),$userChip=$('userChip'),$userAvatar=$('userAvatar'),$userName=$('userName'),$logoutBtn=$('logoutBtn'),$creditChip=$('creditChip'),$creditText=$('creditText'),$quotaText=$('quotaText'),$quotaDot=$('quotaDot'),$planBadge=$('planBadge'),$payModal=$('payModal'),$payBtn=$('payBtn'),$successModal=$('successModal'),$successMsg=$('successMsg'),$customSpeedWrap=$('customSpeedWrap'),$customSpeedInput=$('customSpeedInput'),$fmtModal=$('fmtModal'),$fmtBtn=$('fmtBtn'),$rbxModal=$('rbxModal'),$rbxProxyInput=$('rbxProxyInput'),$rbxKeyInput=$('rbxKeyInput'),$rbxUserIdInput=$('rbxUserIdInput'),$upgradeModal=$('upgradeModal'),$sidebar=$('sidebar'),$sidebarOverlay=$('sidebarOverlay'),$logConsole=$('logConsole'),$fileCountBadge=$('fileCountBadge'),$loggedOutHero=$('loggedOutHero');
 
-    // === DOM ===
-    const fileInput = document.getElementById('fileInput');
-    const fileList = document.getElementById('fileList');
-    const emptyState = document.getElementById('emptyState');
-    const fileCount = document.getElementById('fileCount');
-    const logBody = document.getElementById('logBody');
-    const btnUpload = document.getElementById('btnUpload');
-    const btnConvert = document.getElementById('btnConvert');
-    const btnClearAll = document.getElementById('btnClearAll');
-    const btnClearLog = document.getElementById('btnClearLog');
-    const formatSelect = document.getElementById('formatSelect');
-    const appContainer = document.getElementById('appContainer');
-    const dropOverlay = document.getElementById('dropOverlay');
-    const toastContainer = document.getElementById('toastContainer');
+function toggleSidebar(){$sidebar.classList.toggle('open');$sidebarOverlay.classList.toggle('show');}
+function logLine(tag,msg){
+  if(!$logConsole)return;
+  var cls=String(tag).toLowerCase();
+  var time=new Date().toLocaleTimeString('id-ID',{hour12:false});
+  var row=document.createElement('div');
+  row.className='log-line fade-in';
+  row.innerHTML='<span class="log-tag '+cls+'">['+String(tag).toUpperCase()+']</span><span class="log-time">'+time+'</span><span class="log-msg"></span>';
+  row.querySelector('.log-msg').textContent=msg;
+  $logConsole.appendChild(row);
+  $logConsole.scrollTop=$logConsole.scrollHeight;
+}
+function clearLogConsole(){if($logConsole)$logConsole.innerHTML='';}
+function downloadAllFiles(){
+  var doneItems=items.filter(function(x){return x.status==='done';});
+  if(!doneItems.length){toast('Belum ada file siap diunduh.','info');return;}
+  doneItems.forEach(function(it,idx){
+    setTimeout(function(){
+      var a=document.createElement('a');a.href=it.url;a.download=it.dlName;document.body.appendChild(a);a.click();a.remove();
+    },idx*350);
+  });
+  logLine('done','Mengunduh '+doneItems.length+' file hasil convert');
+}
+function uploadAllToRoblox(){
+  var idxs=[];
+  for(var i=0;i<items.length;i++){if(items[i].status==='done'&&items[i].blobData)idxs.push(i);}
+  if(!idxs.length){toast('Belum ada file siap diupload.','info');return;}
+  if(!isPremium()){openUpgradeModal();return;}
+  if(!state.rbxProxy||!state.rbxKey||!state.rbxUserId){openRbxModal();toast('Lengkapi pengaturan Roblox dulu','info');return;}
+  idxs.forEach(function(i){uploadToRoblox(i);});
+}
 
-    // === Format ukuran file ===
-    function formatSize(bytes) {
-        if (bytes === 0) return '0 B';
-        const k = 1024;
-        const sizes = ['B', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+var state={email:null,name:null,credits:0,isSubscribed:false,subExpiry:null,freeUsed:false,chosenPlan:null,chosenFmt:'ogg',rbxProxy:null,rbxKey:null,rbxUserId:null,chosenPayMethod:'qris'};
+var PLAN_PRICES={per_song:1200,bundle_65:50000,subscription:210000},PLAN_CREDITS={per_song:1,bundle_65:65,subscription:null};
+var PAY_METHOD_LABELS={qris:'QRIS',va:'Virtual Account',gopay:'GoPay',card:'Kartu Kredit'};
+var PLAN_LABELS={per_song:'1 Lagu',bundle_65:'65 Lagu',subscription:'Unlimited'};
+
+function toast(m,t){
+  t=t||'info';
+  var w=$('toastWrap'),e=document.createElement('div');
+  var c=t==='ok'?'toast-ok':t==='err'?'toast-err':'toast-info';
+  var i=t==='ok'?'fa-check':t==='err'?'fa-xmark':'fa-info';
+  e.className='toast-item '+c+' slide-in-right';
+  e.innerHTML='<i class="fas '+i+'" style="font-size:11px"></i><span>'+m+'</span>';
+  w.appendChild(e);
+  setTimeout(function(){if(e.parentNode)e.remove();},3400);
+}
+
+function updateQuotaDisplay(){
+  if(state.isSubscribed&&state.subExpiry&&Date.now()>=state.subExpiry){state.isSubscribed=false;state.subExpiry=null;saveLocal();}
+  if(state.isSubscribed&&state.subExpiry){
+    var s=Math.ceil((state.subExpiry-Date.now())/86400000);
+    $quotaText.textContent='Unlimited — '+s+' hari lagi';$quotaText.style.color='#c084fc';$quotaDot.style.background='#c084fc';
+    $planBadge.textContent='UNLIMITED';$planBadge.style.background='rgba(168,85,247,.1)';$planBadge.style.color='#c084fc';$planBadge.style.borderColor='rgba(168,85,247,.15)';
+    $creditText.textContent='∞';$creditChip.style.background='rgba(168,85,247,.08)';$creditChip.style.color='#c084fc';$creditChip.style.borderColor='rgba(168,85,247,.15)';
+    return;
+  }
+  var t=state.credits+(state.freeUsed?0:1);
+  $planBadge.textContent='FREE';$planBadge.style.background='rgba(255,255,255,.04)';$planBadge.style.color='#52525b';$planBadge.style.borderColor='rgba(255,255,255,.06)';
+  if(t>0){
+    $quotaText.textContent=state.freeUsed?(state.credits+' lagu tersisa'):('1 gratis + '+state.credits+' lagu');
+    $quotaText.style.color='#a1a1aa';$quotaDot.style.background='#4ade80';
+    $creditText.textContent=state.credits;$creditChip.style.background='rgba(52,211,153,.08)';$creditChip.style.color='#4ade80';$creditChip.style.borderColor='rgba(52,211,153,.15)';
+  }else{
+    $quotaText.textContent='Kuota habis';$quotaText.style.color='#f87171';$quotaDot.style.background='#f87171';
+    $creditText.textContent='0';$creditChip.style.background='rgba(255,255,255,.04)';$creditChip.style.color='#52525b';$creditChip.style.borderColor='rgba(255,255,255,.06)';
+  }
+}
+
+function saveLocal(){if(CONFIG_MODE!=='demo')return;try{localStorage.setItem('convyl_pay',JSON.stringify({email:state.email,credits:state.credits,isSubscribed:state.isSubscribed,subExpiry:state.subExpiry}));}catch(e){}}
+function loadLocal(em){if(CONFIG_MODE!=='demo')return;try{var d=JSON.parse(localStorage.getItem('convyl_pay'));if(d&&d.email===em){state.credits=d.credits||0;state.isSubscribed=d.isSubscribed||false;state.subExpiry=d.subExpiry||null;}}catch(e){}}
+function saveRbxLocal(){try{localStorage.setItem('convyl_rbx_'+state.email,JSON.stringify({proxy:state.rbxProxy,key:state.rbxKey,uid:state.rbxUserId}));}catch(e){}}
+function loadRbxLocal(){try{var d=JSON.parse(localStorage.getItem('convyl_rbx_'+state.email));if(d){state.rbxProxy=d.proxy||null;state.rbxKey=d.key||null;state.rbxUserId=d.uid||null;}}catch(e){}}
+function openRbxModal(){$rbxProxyInput.value=state.rbxProxy||'';$rbxKeyInput.value=state.rbxKey||'';$rbxUserIdInput.value=state.rbxUserId||'';$rbxModal.classList.add('show');document.body.style.overflow='hidden';}
+function closeRbxModal(){$rbxModal.classList.remove('show');document.body.style.overflow='';}
+function saveRbxSettings(){state.rbxProxy=$rbxProxyInput.value.trim()||null;state.rbxKey=$rbxKeyInput.value.trim()||null;state.rbxUserId=$rbxUserIdInput.value.trim()||null;saveRbxLocal();closeRbxModal();toast(state.rbxKey?'Roblox terhubung':'Pengaturan disimpan','ok');}
+function clearRbxSettings(){$rbxProxyInput.value='';$rbxKeyInput.value='';$rbxUserIdInput.value='';state.rbxProxy=null;state.rbxKey=null;state.rbxUserId=null;saveRbxLocal();closeRbxModal();toast('Dihapus','info');}
+function openUpgradeModal(){$upgradeModal.classList.add('show');document.body.style.overflow='hidden';}
+function closeUpgradeModal(){$upgradeModal.classList.remove('show');document.body.style.overflow='';}
+ $rbxModal.addEventListener('click',function(e){if(e.target===$rbxModal)closeRbxModal();});
+ $upgradeModal.addEventListener('click',function(e){if(e.target===$upgradeModal)closeUpgradeModal();});
+
+function isPremium(){return state.isSubscribed&&state.subExpiry&&Date.now()<state.subExpiry;}
+
+async function uploadToRoblox(idx){
+  var it=items[idx];if(!it||!it.blobData)return;
+  if(!isPremium()){openUpgradeModal();return;}
+  if(!state.rbxProxy||!state.rbxKey||!state.rbxUserId){openRbxModal();toast('Lengkapi pengaturan Roblox dulu','info');return;}
+  var b=document.getElementById('rbx_'+idx);if(!b||b.disabled)return;
+  b.disabled=true;b.className='rbx-btn loading';b.innerHTML='<span class="spinner"></span> Upload...';
+  try{
+    var fd=new FormData();fd.append('api_key',state.rbxKey);
+    var speedUsed=activePreset===4?(parseFloat($customSpeedInput.value)||2.5):presets[activePreset].speed;
+    fd.append('request',JSON.stringify({assetType:'Audio',displayName:it.file.name.replace(/\.[^/.]+$/,''),description:'Speed '+speedUsed+'x via ConverterYL',creationContext:{creator:{userId:state.rbxUserId}}}));
+    fd.append('file',it.blobData,it.dlName);
+    var res=await fetch(state.rbxProxy,{method:'POST',body:fd});
+    var data=await res.json();
+    if(!res.ok)throw new Error(data.error||data.message||'HTTP '+res.status);
+    var aid=data.assetId||data.path;
+    b.disabled=false;b.className='rbx-btn done';b.innerHTML='<i class="fas fa-check"></i> '+aid;b.title='Klik salin';b.style.cursor='pointer';
+    b.onclick=function(){navigator.clipboard.writeText(String(aid)).then(function(){toast('Asset ID '+aid+' disalin','ok');});};
+    toast('Upload berhasil! ID: '+aid,'ok');
+    logLine('upload','Roblox upload berhasil, ID: '+aid);
+  }catch(err){
+    b.disabled=false;b.className='rbx-btn idle';b.innerHTML='<i class="fas fa-rotate-right"></i> Coba Lagi';
+    toast('Gagal: '+(err.message||'').substring(0,100),'err');
+    logLine('error','Roblox upload gagal: '+(err.message||''));
+  }
+}
+
+function canEdit(){
+  if(isPremium())return{ok:true,src:'sub'};
+  if(state.credits>0)return{ok:true,src:'credit'};
+  if(!state.freeUsed)return{ok:true,src:'free'};
+  return{ok:false,src:null};
+}
+function useQuota(s){if(s==='free'){state.freeUsed=true;return;}if(s==='credit'){state.credits--;saveLocal();}}
+function refundQuota(s){if(s==='free'){state.freeUsed=false;return;}if(s==='credit'){state.credits++;saveLocal();}}
+
+function openFmtModal(){$fmtModal.classList.add('show');document.body.style.overflow='hidden';}
+function closeFmtModal(){$fmtModal.classList.remove('show');document.body.style.overflow='';}
+function pickFmt(el){document.querySelectorAll('.fmt-card').forEach(function(c){c.classList.remove('chosen');});el.classList.add('chosen');state.chosenFmt=el.getAttribute('data-fmt');$fmtBtn.textContent='Mulai Edit — '+FORMATS[state.chosenFmt].label;}
+ $fmtModal.addEventListener('click',function(e){if(e.target===$fmtModal)closeFmtModal();});
+
+function openPayModal(){
+  state.chosenPlan=null;state.chosenPayMethod='qris';
+  document.querySelectorAll('.pay-card').forEach(function(c){c.classList.remove('chosen');});
+  document.querySelectorAll('.pay-method-card').forEach(function(c,i){if(i===0)c.classList.add('chosen');else c.classList.remove('chosen');});
+  $('payMethodSection').classList.add('hidden');
+  $('paySummary').classList.add('hidden');
+  $payBtn.disabled=true;$payBtn.textContent='Pilih paket';
+  $payModal.classList.add('show');document.body.style.overflow='hidden';
+}
+function closePayModal(){$payModal.classList.remove('show');document.body.style.overflow='';}
+function pickPlan(el){
+  document.querySelectorAll('.pay-card').forEach(function(c){c.classList.remove('chosen');});
+  el.classList.add('chosen');
+  state.chosenPlan=el.getAttribute('data-plan');
+  $('payMethodSection').classList.remove('hidden');
+  $('paySummary').classList.remove('hidden');
+  updatePaySummary();
+  $payBtn.disabled=false;
+  $payBtn.textContent='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');
+}
+function pickPayMethod(el){
+  document.querySelectorAll('.pay-method-card').forEach(function(c){c.classList.remove('chosen');});
+  el.classList.add('chosen');
+  state.chosenPayMethod=el.getAttribute('data-method');
+  updatePaySummary();
+}
+function updatePaySummary(){
+  if(!state.chosenPlan)return;
+  $('sumPlan').textContent=PLAN_LABELS[state.chosenPlan]||'-';
+  $('sumMethod').textContent=PAY_METHOD_LABELS[state.chosenPayMethod]||'-';
+  $('sumTotal').textContent='Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');
+}
+function showSuccessModal(p){
+  if(p==='subscription')$successMsg.textContent='Unlimited aktif 30 hari. Roblox upload tersedia.';
+  else if(p==='bundle_65')$successMsg.textContent='65 lagu ditambahkan ke akun kamu.';
+  else $successMsg.textContent='1 lagu ditambahkan ke akun kamu.';
+  $('successQuota').textContent=p==='subscription'?'∞':'+'+PLAN_CREDITS[p];
+  $successModal.classList.add('show');document.body.style.overflow='hidden';
+  createConfetti();
+}
+function closeSuccessModal(){$successModal.classList.remove('show');document.body.style.overflow='';updateQuotaDisplay();}
+function showErrorModal(msg){
+  $('errorMsg').textContent=msg||'Terjadi kesalahan saat memproses pembayaran.';
+  $('errorModal').classList.add('show');document.body.style.overflow='hidden';
+}
+function closeErrorModal(){$('errorModal').classList.remove('show');document.body.style.overflow='';}
+ $payModal.addEventListener('click',function(e){if(e.target===$payModal)closePayModal();});
+ $successModal.addEventListener('click',function(e){if(e.target===$successModal)closeSuccessModal();});
+ $('errorModal').addEventListener('click',function(e){if(e.target===$('errorModal'))closeErrorModal();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeFmtModal();closePayModal();closeSuccessModal();closeRbxModal();closeUpgradeModal();closeErrorModal();closePayProcessModal();}});
+
+function createConfetti(){
+  var colors=['#6366f1','#8b5cf6','#a78bfa','#4ade80','#fbbf24','#f472b6'];
+  for(var i=0;i<50;i++){
+    (function(idx){
+      setTimeout(function(){
+        var c=document.createElement('div');
+        c.className='confetti';
+        c.style.left=Math.random()*100+'vw';
+        c.style.background=colors[Math.floor(Math.random()*colors.length)];
+        c.style.borderRadius=Math.random()>0.5?'50%':'0';
+        c.style.animation='confettiFall '+(2+Math.random()*2)+'s linear forwards';
+        document.body.appendChild(c);
+        setTimeout(function(){if(c.parentNode)c.remove();},4000);
+      },idx*30);
+    })(i);
+  }
+}
+
+function openPayProcessModal(){
+  $('payProcessModal').classList.add('show');
+  document.body.style.overflow='hidden';
+  var prog=0;
+  var statuses=['Menghubungkan ke gateway...','Memvalidasi data...','Menunggu konfirmasi...','Memproses pembayaran...','Finalisasi...'];
+  var si=0;
+  $('processStatus').textContent=statuses[0];
+  $('processProgFill').style.width='0%';
+  $('processProgTxt').textContent='0%';
+  var iv=setInterval(function(){
+    prog+=Math.random()*15+5;
+    if(prog>100)prog=100;
+    $('processProgFill').style.width=prog+'%';
+    $('processProgTxt').textContent=Math.floor(prog)+'%';
+    if(prog>20&&si<1){si=1;$('processStatus').textContent=statuses[1];}
+    if(prog>40&&si<2){si=2;$('processStatus').textContent=statuses[2];}
+    if(prog>60&&si<3){si=3;$('processStatus').textContent=statuses[3];}
+    if(prog>80&&si<4){si=4;$('processStatus').textContent=statuses[4];}
+    if(prog>=100){clearInterval(iv);}
+  },300);
+  return iv;
+}
+function closePayProcessModal(){$('payProcessModal').classList.remove('show');document.body.style.overflow='';}
+
+function doPayment(){
+  if(!state.chosenPlan||!state.email)return;
+  $payBtn.disabled=true;$payBtn.innerHTML='<span class="spinner"></span> Memproses...';
+  if(CONFIG_MODE==='demo'){
+    closePayModal();
+    var iv=openPayProcessModal();
+    setTimeout(function(){
+      clearInterval(iv);
+      $('processProgFill').style.width='100%';
+      $('processProgTxt').textContent='100%';
+      $('processStatus').textContent='Selesai!';
+      setTimeout(function(){
+        closePayProcessModal();
+        if(state.chosenPlan==='subscription'){state.isSubscribed=true;state.subExpiry=Date.now()+30*86400000;}
+        else{state.credits+=PLAN_CREDITS[state.chosenPlan];}
+        saveLocal();updateQuotaDisplay();showSuccessModal(state.chosenPlan);toast('Pembayaran berhasil (demo)','ok');
+        $payBtn.disabled=false;$payBtn.textContent='Pilih paket';
+      },500);
+    },2500);
+    return;
+  }
+  fetch(API_BASE+'/create-transaction',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:state.email,type:state.chosenPlan,method:state.chosenPayMethod})})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(!d.snap_token)throw new Error('No token');
+      window.snap.pay(d.snap_token,{
+        onSuccess:function(){
+          toast('Verifikasi...','info');
+          var t=0;
+          var p=setInterval(function(){
+            fetch(API_BASE+'/check?email='+encodeURIComponent(state.email)).then(function(r){return r.json();}).then(function(d){
+              state.credits=d.credits||0;state.isSubscribed=d.is_subscribed||false;state.subExpiry=d.subscription_expiry?new Date(d.subscription_expiry).getTime():null;
+              updateQuotaDisplay();
+              var ok=(state.chosenPlan==='subscription'&&state.isSubscribed)||(state.chosenPlan!=='subscription'&&state.credits>0);
+              if(ok||++t>20){clearInterval(p);if(ok){closePayModal();showSuccessModal(state.chosenPlan);}}
+            });
+          },3000);
+        },
+        onPending:function(){toast('Pending.','info');closePayModal();},
+        onError:function(){toast('Gagal.','err');showErrorModal('Pembayaran ditolak atau gagal diproses.');$payBtn.disabled=false;$payBtn.textContent='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');},
+        onClose:function(){$payBtn.disabled=false;$payBtn.textContent='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');}
+      });
+    })
+    .catch(function(e){toast('Gagal.','err');showErrorModal('Tidak dapat terhubung ke server pembayaran.');$payBtn.disabled=false;$payBtn.textContent='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');});
+}
+
+var isInApp=(function(){
+  var u=navigator.userAgent||'';
+  return['WhatsApp','Instagram','FBAN','FBAV','Line/','MicroMessenger','TikTok','Discord'].some(function(p){return u.indexOf(p)!==-1;});
+})();
+if(isInApp){$warnBanner.classList.remove('hidden');$loginArea.classList.add('hidden');$mainCard.classList.remove('hidden');if($loggedOutHero)$loggedOutHero.classList.add('hidden');updateQuotaDisplay();}
+
+var GOOGLE_CLIENT_ID="554107557548-o2q25dcsqj07r3hupdkvtes2tujfri9l.apps.googleusercontent.com";
+function decodeJwt(t){try{var p=t.split('.')[1];return JSON.parse(decodeURIComponent(atob(p).split('').map(function(c){return'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2);}).join('')));}catch(e){return null;}}
+function handleCredentialResponse(r){
+  var p=decodeJwt(r.credential);if(!p)return;
+  state.email=p.email;state.name=p.name||p.email;state.freeUsed=false;
+  $userAvatar.src=p.picture||'';$userName.textContent=state.name;
+  $loginArea.classList.add('hidden');$userChip.classList.remove('hidden');$mainCard.classList.remove('hidden');if($loggedOutHero)$loggedOutHero.classList.add('hidden');
+  loadLocal(state.email);loadRbxLocal();updateQuotaDisplay();
+  try{localStorage.setItem('convyl_user',JSON.stringify(p));}catch(e){}
+  toast('Selamat datang, '+(p.name||p.email.split('@')[0])+'!','ok');
+}
+function handleLogout(){
+  try{google.accounts.id.disableAutoSelect();}catch(e){}
+  try{localStorage.removeItem('convyl_user');}catch(e){}
+  state.email=null;state.name=null;state.credits=0;state.isSubscribed=false;state.subExpiry=null;state.freeUsed=false;
+  state.rbxProxy=null;state.rbxKey=null;state.rbxUserId=null;
+  $loginArea.classList.remove('hidden');$userChip.classList.add('hidden');$mainCard.classList.add('hidden');if($loggedOutHero)$loggedOutHero.classList.remove('hidden');
+}
+ $logoutBtn.addEventListener('click',handleLogout);
+function initGoogleLogin(){
+  if(isInApp)return;
+  if(typeof google==='undefined'||!google.accounts){setTimeout(initGoogleLogin,300);return;}
+  google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:handleCredentialResponse});
+  google.accounts.id.renderButton($('googleBtnContainer'),{type:"standard",theme:"filled_black",size:"medium",shape:"pill",text:"signin_with",width:160});
+  try{
+    var s=localStorage.getItem('convyl_user');
+    if(s){
+      var p=JSON.parse(s);
+      state.email=p.email;state.name=p.name||p.email;
+      $userAvatar.src=p.picture||'';$userName.textContent=state.name;
+      $loginArea.classList.add('hidden');$userChip.classList.remove('hidden');$mainCard.classList.remove('hidden');if($loggedOutHero)$loggedOutHero.classList.add('hidden');
+      loadLocal(state.email);loadRbxLocal();updateQuotaDisplay();
     }
+  }catch(e){}
+}
+initGoogleLogin();
 
-    // === Waktu saat ini ===
-    function timeNow() {
-        const d = new Date();
-        return d.toTimeString().split(' ')[0];
+var presets=[{speed:2.3,db:0,resample:48000},{speed:2.5,db:0,resample:48000},{speed:2.7,db:0,resample:48000},{speed:4.7,db:0,resample:96000}];
+var activePreset=0;
+document.querySelectorAll('.preset-btn').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('.preset-btn').forEach(function(x){x.classList.remove('active');});
+    b.classList.add('active');
+    activePreset=parseInt(b.getAttribute('data-i'),10);
+    if(activePreset===4){$customSpeedWrap.classList.remove('hidden');$customSpeedWrap.classList.add('fade-in');}else{$customSpeedWrap.classList.add('hidden');}
+  });
+});
+
+var ffmpeg=new FFmpegWASM.FFmpeg(),toBlobURL=FFmpegUtil.toBlobURL,fetchFile=FFmpegUtil.fetchFile;
+var loaded=false,items=[];
+function checkEnv(){if(typeof Worker==='undefined')return'Web Worker tidak didukung.';if(typeof WebAssembly==='undefined')return'WebAssembly tidak didukung.';return null;}
+var envError=checkEnv();
+if(envError){$status.innerText=envError;$warnBanner.classList.remove('hidden');$warnBanner.querySelector('b').innerText='⚠ Error';}
+ffmpeg.on('log',function(e){console.log("[YL]",e.message);});
+ffmpeg.on('progress',function(e){var p=Math.max(0,Math.min(1,e.progress))*100;$progFill.style.width=p.toFixed(1)+"%";$progTxt.innerText=p.toFixed(1)+"%";});
+function withTimeout(p,m,l){
+  return Promise.race([p,new Promise(function(_,r){setTimeout(function(){r(new Error(l+' timeout'))},m);})]);
+}
+function describeError(e){try{if(!e)return'kosong';if(typeof e==='string')return e;if(e.message)return e.message;if(e.reason)return describeError(e.reason);if(e.error)return describeError(e.error);return JSON.stringify(e);}catch(_){return String(e);}}
+window.addEventListener('error',function(e){console.error(e);});
+window.addEventListener('unhandledrejection',function(e){console.error(e.reason);});
+
+async function boot(){
+  if(envError)return;
+  try{
+    $status.innerText="Memuat editor...";
+    logLine('info','Menginisialisasi ConverterYL...');
+    logLine('info','Memuat FFmpeg engine...');
+    var b="https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm";
+    await withTimeout(ffmpeg.load({
+      coreURL:await toBlobURL(b+'/ffmpeg-core.js',"text/javascript"),
+      wasmURL:await toBlobURL(b+'/ffmpeg-core.wasm',"application/wasm"),
+      classWorkerURL:await toBlobURL("https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js","text/javascript")
+    }),25000,"Load FFmpeg");
+    loaded=true;$status.innerText=items.length?"Siap diedit.":"Editor siap.";
+    logLine('info','FFmpeg berhasil dimuat');
+    logLine('success','ConverterYL siap digunakan!');
+  }catch(e){
+    $status.innerText="Gagal — "+describeError(e);$warnBanner.classList.remove('hidden');
+    logLine('error','Gagal memuat editor: '+describeError(e));
+  }
+}
+boot();
+
+ $box.addEventListener('dragover',function(e){e.preventDefault();$box.style.borderColor='rgba(129,140,248,.5)';$box.style.background='rgba(129,140,248,.03)';});
+ $box.addEventListener('dragleave',function(e){$box.style.borderColor='';$box.style.background='';});
+ $box.addEventListener('drop',function(e){
+  e.preventDefault();$box.style.borderColor='';$box.style.background='';
+  var dt=e.dataTransfer;if(!dt||!dt.files||!dt.files.length)return;
+  var ev=new Event('change');
+  var dtRef=new DataTransfer();
+  Array.from(dt.files).forEach(function(f){dtRef.items.add(f);});
+  $fileInput.files=dtRef.files;
+  $fileInput.dispatchEvent(ev);
+});
+ $fileInput.addEventListener('change',function(e){
+  var p=Array.from(e.target.files||[]);if(!p.length)return;
+  if(p.length>MAX_FILES){toast('Maks '+MAX_FILES+' file.','info');p=p.slice(0,MAX_FILES);}
+  items=p.map(function(f){return{file:f,name:f.name,size:f.size,status:'pending',url:null,blobData:null,dlName:null};});
+  $boxTitle.innerText=p.length+' file dipilih';$boxSub.innerText='Klik untuk ganti';
+  $btn.disabled=false;$status.innerText=loaded?"Siap diedit.":"Tunggu editor...";renderList();
+  logLine('info',p.length+' file terdeteksi');
+  toast(p.length+' file siap diedit','ok');
+});
+
+function renderList(){
+  if($fileCountBadge)$fileCountBadge.textContent=items.length+' Files';
+  if(!items.length){
+    $fileList.innerHTML='<div class="text-xs text-zinc-600 text-center py-8"><i class="fas fa-inbox" style="font-size:20px;opacity:.35"></i><div class="mt-2">Belum ada file. Klik "Upload Audio" untuk mulai.</div></div>';
+    return;
+  }
+  $fileList.innerHTML=items.map(function(it,i){
+    var st='Menunggu',sc='text-zinc-600',extra='',icon='<i class="fas fa-circle text-zinc-700" style="font-size:6px"></i>';
+    if(it.status==='processing'){icon='<i class="fas fa-circle-notch fa-spin text-indigo-400" style="font-size:9px"></i>';st='Mengedit...';sc='text-indigo-400';}
+    if(it.status==='done'){
+      icon='<i class="fas fa-circle-check text-emerald-500" style="font-size:9px"></i>';st=FORMATS[state.chosenFmt].label+' — '+formatSize(it.size);sc='text-emerald-500/70';
+      extra='<div class="flex items-center gap-1.5 flex-shrink-0">';
+      extra+='<a class="text-[11px] font-semibold px-2.5 py-1.5 rounded-md text-black" style="background:#4ade80" href="'+it.url+'" download="'+it.dlName+'">Download</a>';
+      extra+='<button id="rbx_'+i+'" class="rbx-btn '+(isPremium()?'idle':'locked')+'" onclick="uploadToRoblox('+i+')">'+(isPremium()?'<i class="fas fa-cloud-arrow-up"></i> Upload Roblox':'<i class="fas fa-lock text-[10px]"></i> Pro')+'</button>';
+      extra+='</div>';
     }
+    if(it.status==='error'){icon='<i class="fas fa-circle-xmark text-rose-500" style="font-size:9px"></i>';st='Gagal';sc='text-rose-500/70';}
+    return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row fade-up"><div class="row-index">'+(i+1)+'</div><div class="flex-1 min-w-0"><div class="text-xs font-medium text-zinc-300 truncate">'+it.name+'</div><div class="text-[10px] '+sc+' mt-0.5 flex items-center gap-1.5">'+icon+' '+st+'</div></div>'+extra+'</div>';
+  }).join('');
+}
+function formatSize(b){if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB';}
 
-    // === Toast ===
-    function showToast(msg, type = 'info') {
-        const icons = { success: 'fa-check-circle', error: 'fa-circle-xmark', info: 'fa-circle-info' };
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.innerHTML = `<i class="fas ${icons[type]}"></i> ${msg}`;
-        toastContainer.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
+ $btn.addEventListener('click',function(){
+  if(!items.length)return;
+  if(!loaded){$status.innerText="Editor belum siap.";return;}
+  var c=canEdit();if(!c.ok){toast('Kuota habis.','info');openPayModal();return;}
+  openFmtModal();
+});
+
+async function startProcess(){
+  closeFmtModal();
+  var fmt=FORMATS[state.chosenFmt];
+  $btn.disabled=true;$progWrap.classList.remove('hidden');
+  var total=items.length;
+  var cspeed,cresample,cdb;
+  if(activePreset===4){cspeed=parseFloat($customSpeedInput.value)||2.5;cresample=cspeed>4?96000:48000;cdb=0;}
+  else{var pr=presets[activePreset];cspeed=pr.speed;cresample=pr.resample;cdb=pr.db;}
+
+  for(var i=0;i<total;i++){
+    var it=items[i];
+    if(it.status==='done')continue;
+    if(i>0){
+      var re=canEdit();
+      if(!re.ok){
+        $btn.disabled=false;$status.innerText='Kuota habis setelah '+i+' lagu.';
+        (function(sisa){setTimeout(function(){toast(sisa+' tersisa.','info');openPayModal();},150);})(total-i);
+        break;
+      }
     }
-
-    // === Logging ===
-    function addLog(msg, type = 'info') {
-        if (logCleared) {
-            logBody.innerHTML = '';
-            logCleared = false;
-        }
-        // Hapus empty state
-        const empty = logBody.querySelector('.log-empty');
-        if (empty) empty.remove();
-
-        const line = document.createElement('div');
-        line.className = 'log-line';
-        line.innerHTML = `<span class="log-time">${timeNow()}</span><span class="log-msg ${type}">${msg}</span>`;
-        logBody.appendChild(line);
-        logBody.scrollTop = logBody.scrollHeight;
+    var src=canEdit().src;
+    it.status='processing';renderList();
+    $status.innerText=total>1?'Lagu '+(i+1)+'/'+total+' → '+fmt.label:'Mengedit → '+fmt.label;
+    $progFill.style.width="0%";$progTxt.innerText="0%";
+    logLine('convert',it.file.name+' -> '+fmt.label+' ('+cspeed+'x)');
+    try{
+      var ext=it.file.name.substring(it.file.name.lastIndexOf('.')),inp='in_'+i+ext,out='out_'+i+fmt.ext;
+      var ff=['-i',inp,'-filter:a','asetrate=44100*'+cspeed+',aresample='+cresample+',volume='+cdb+'dB'].concat(fmt.args).concat([out]);
+      await ffmpeg.writeFile(inp,await fetchFile(it.file));
+      await withTimeout(ffmpeg.exec(ff),90000,"Encode "+fmt.label);
+      var data=await ffmpeg.readFile(out);
+      var blob=new Blob([data.buffer],{type:fmt.mime});
+      it.url=URL.createObjectURL(blob);it.blobData=blob;it.size=blob.size;
+      it.dlName=it.file.name.replace(/\.[^/.]+$/,"")+'_speed'+cspeed+'x'+fmt.ext;
+      it.status='done';useQuota(src);updateQuotaDisplay();
+      logLine('success',it.file.name+' berhasil dikonversi');
+      toast(it.file.name+' selesai','ok');
+      await ffmpeg.deleteFile(inp).catch(function(){});await ffmpeg.deleteFile(out).catch(function(){});
+    }catch(err){
+      it.status='error';refundQuota(src);updateQuotaDisplay();
+      logLine('error',it.file.name+' gagal: '+describeError(err));
+      toast(it.file.name+' gagal','err');
     }
-
-    // === Dapatkan extension ===
-    function getExt(name) {
-        return name.split('.').pop().toLowerCase();
-    }
-
-    // === Icon class berdasarkan ext ===
-    function getIconClass(ext) {
-        const map = { mp3: 'mp3', ogg: 'ogg', wav: 'wav', flac: 'flac' };
-        return map[ext] || 'default';
-    }
-
-    // === Icon FA berdasarkan ext ===
-    function getIconFA(ext) {
-        const map = { mp3: 'fa-music', ogg: 'fa-compact-disc', wav: 'fa-wave-square', flac: 'fa-compact-disc' };
-        return map[ext] || 'fa-file-audio';
-    }
-
-    // === Render file list ===
-    function renderFiles() {
-        // Bersihkan kecuali empty state
-        fileList.innerHTML = '';
-        fileCount.textContent = files.length;
-
-        if (files.length === 0) {
-            fileList.innerHTML = `<div class="empty-state" id="emptyState"><i class="fas fa-cloud-arrow-up"></i><p>Belum ada file. Tap Upload Audio.</p></div>`;
-            btnConvert.disabled = true;
-            return;
-        }
-
-        btnConvert.disabled = isConverting;
-
-        files.forEach((f, i) => {
-            const ext = getExt(f.name);
-            const iconClass = getIconClass(ext);
-            const iconFA = getIconFA(ext);
-
-            const item = document.createElement('div');
-            item.className = 'file-item';
-            item.setAttribute('data-index', i);
-
-            let statusHTML = '';
-            if (f.status === 'pending') {
-                statusHTML = `<div class="file-status pending"></div>`;
-            } else if (f.status === 'converting') {
-                statusHTML = `<div class="file-status converting"><i class="fas fa-spinner"></i></div>`;
-            } else if (f.status === 'done') {
-                statusHTML = `<div class="file-status done"><i class="fas fa-check"></i></div>`;
-            } else if (f.status === 'error') {
-                statusHTML = `<div class="file-status error"><i class="fas fa-xmark"></i></div>`;
-            }
-
-            const progressHTML = f.status === 'converting'
-                ? `<div class="file-progress active"><div class="file-progress-bar" id="progress-${i}" style="width:${f.progress || 0}%"></div></div>`
-                : '';
-
-            item.innerHTML = `
-                <div class="file-icon ${iconClass}"><i class="fas ${iconFA}"></i></div>
-                <div class="file-info">
-                    <div class="file-name" title="${f.name}">${f.name}</div>
-                    <div class="file-meta">${formatSize(f.size)} · ${ext.toUpperCase()}</div>
-                    ${progressHTML}
-                </div>
-                ${statusHTML}
-                <button class="file-remove" onclick="removeFile(${i})" title="Hapus"><i class="fas fa-xmark"></i></button>
-            `;
-
-            fileList.appendChild(item);
-        });
-    }
-
-    // === Tambah file ===
-    function addFiles(fileListObj) {
-        const audioTypes = ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/flac', 'audio/aac', 'audio/mp4', 'audio/x-m4a', 'audio/webm'];
-        const audioExts = ['mp3', 'wav', 'ogg', 'flac', 'aac', 'm4a', 'webm', 'opus'];
-
-        let added = 0;
-        for (const f of fileListObj) {
-            const ext = getExt(f.name);
-            const isValid = audioTypes.includes(f.type) || audioExts.includes(ext);
-            if (!isValid) {
-                addLog(`Skipped: ${f.name} (bukan audio)`, 'warn');
-                continue;
-            }
-            // Cek duplikat
-            if (files.some(ef => ef.name === f.name && ef.size === f.size)) {
-                addLog(`Duplikat: ${f.name}`, 'warn');
-                continue;
-            }
-            files.push({ name: f.name, size: f.size, file: f, status: 'pending', progress: 0 });
-            added++;
-        }
-
-        if (added > 0) {
-            addLog(`${added} file ditambahkan ke queue`, 'info');
-            showToast(`${added} file ditambahkan`, 'success');
-        }
-        renderFiles();
-    }
-
-    // === Hapus file ===
-    function removeFile(index) {
-        if (isConverting) return;
-        const name = files[index].name;
-        files.splice(index, 1);
-        addLog(`Dihapus: ${name}`, 'warn');
-        renderFiles();
-    }
-
-    // === Clear all ===
-    btnClearAll.addEventListener('click', () => {
-        if (isConverting) {
-            showToast('Tidak bisa hapus saat konversi', 'error');
-            return;
-        }
-        if (files.length === 0) return;
-        files = [];
-        addLog('Semua file dihapus', 'warn');
-        showToast('Semua file dihapus', 'info');
-        renderFiles();
-    });
-
-    // === Clear log ===
-    btnClearLog.addEventListener('click', () => {
-        logBody.innerHTML = '<div class="log-empty">Menunggu aktivitas...</div>';
-        logCleared = false;
-    });
-
-    // === Upload button ===
-    btnUpload.addEventListener('click', () => {
-        if (isConverting) {
-            showToast('Tunggu konversi selesai', 'error');
-            return;
-        }
-        fileInput.click();
-    });
-
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files.length > 0) {
-            addFiles(e.target.files);
-            fileInput.value = '';
-        }
-    });
-
-    // === Drag & Drop ===
-    appContainer.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropOverlay.classList.add('active');
-    });
-
-    appContainer.addEventListener('dragleave', (e) => {
-        if (!appContainer.contains(e.relatedTarget)) {
-            dropOverlay.classList.remove('active');
-        }
-    });
-
-    appContainer.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropOverlay.classList.remove('active');
-        if (isConverting) {
-            showToast('Tunggu konversi selesai', 'error');
-            return;
-        }
-        if (e.dataTransfer.files.length > 0) {
-            addFiles(e.dataTransfer.files);
-        }
-    });
-
-    // === Simulasi Konversi ===
-    btnConvert.addEventListener('click', async () => {
-        if (isConverting || files.length === 0) return;
-        isConverting = true;
-        btnConvert.disabled = true;
-        btnConvert.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Converting...';
-
-        const targetFormat = formatSelect.value;
-        addLog(`Memulai konversi ke ${targetFormat.toUpperCase()}...`, 'system');
-        addLog(`Total ${files.length} file dalam queue`, 'system');
-
-        for (let i = 0; i < files.length; i++) {
-            const f = files[i];
-            const ext = getExt(f.name);
-
-            if (ext === targetFormat) {
-                f.status = 'done';
-                f.progress = 100;
-                renderFiles();
-                addLog(`${f.name} — format sama, dilewati`, 'warn');
-                continue;
-            }
-
-            f.status = 'converting';
-            f.progress = 0;
-            renderFiles();
-            addLog(`Mengkonversi: ${f.name}`, 'info');
-
-            // Simulasi progress
-            const steps = 10;
-            const baseName = f.name.replace(/\.[^/.]+$/, '');
-
-            for (let s = 1; s <= steps; s++) {
-                await new Promise(r => setTimeout(r, 200 + Math.random() * 300));
-                f.progress = Math.min(100, Math.round((s / steps) * 100));
-                // Update progress bar langsung tanpa re-render full
-                const bar = document.getElementById(`progress-${i}`);
-                if (bar) bar.style.width = f.progress + '%';
-            }
-
-            // Simulasi sukses/error (95% sukses)
-            const success = Math.random() > 0.05;
-            if (success) {
-                f.status = 'done';
-                const newName = `${baseName}.${targetFormat}`;
-                addLog(`${newName} — converted successfully`, 'success');
-            } else {
-                f.status = 'error';
-                addLog(`${f.name} — conversion failed`, 'error');
-            }
-            renderFiles();
-        }
-
-        addLog(`All tasks completed`, 'system');
-        showToast('Konversi selesai!', 'success');
-
-        isConverting = false;
-        btnConvert.disabled = false;
-        btnConvert.innerHTML = '<i class="fas fa-bolt"></i> Convert';
-    });
-
-    // === Init: render awal ===
-    renderFiles();
+    renderList();
+  }
+  $progFill.style.width="100%";$progTxt.innerText="100%";
+  var done=items.filter(function(x){return x.status==='done';}).length;
+  $status.innerText=done?done+'/'+total+' selesai':'Gagal semua.';
+  logLine('done','Semua tugas selesai ('+done+'/'+total+')');
+  $btn.disabled=false;
+}
+updateQuotaDisplay();
 </script>
-
 </body>
 </html>
