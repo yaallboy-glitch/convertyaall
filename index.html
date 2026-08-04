@@ -11,10 +11,10 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/all.min.css">
 <style>
 *{font-family:'Inter',sans-serif;margin:0;padding:0;box-sizing:border-box}
-body{background:#060608;color:#e4e4e7;overflow-x:hidden}
-::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#27272a;border-radius:3px}::-webkit-scrollbar-thumb:hover{background:#3f3f46}
+body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#27272a;border-radius:3px}::-webkit-scrollbar-thumb:hover{background:#3f3f46}
 .grad-text{background:linear-gradient(135deg,#818cf8,#a78bfa,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.glass{background:rgba(255,255,255,.02);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.05)}
+.glass{background:rgba(20,20,25,.6);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.08)}
 .glass-hover{transition:all .25s ease}
 .glass-hover:hover{border-color:rgba(129,140,248,.2);background:rgba(255,255,255,.04);transform:translateY(-1px)}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
@@ -23,95 +23,96 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
 .fade-in{animation:fadeIn .3s ease}
 @keyframes scaleIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
 .scale-in{animation:scaleIn .25s ease}
-.bg-mesh{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 600px 400px at 15% 20%,rgba(99,102,241,.06),transparent),radial-gradient(ellipse 500px 500px at 85% 80%,rgba(168,85,247,.05),radial-gradient(ellipse 400px 300px at 50% 50%,rgba(129,140,248,.03),transparent));pointer-events:none}
-.bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:64px 64px;}
-.upload-zone{border:1.5px dashed rgba(255,255,255,.1);transition:all .3s ease;cursor:pointer}
-.upload-zone:hover{border-color:rgba(129,140,248,.4);background:rgba(129,140,248,.03)}
-.upload-zone:active{border-color:rgba(129,140,248,.6)}
-.prog-bar{height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
-.prog-fill{height:100%;width:0%;background:linear-gradient(90deg,#818cf8,#a78bfa);border-radius:2px;transition:width .15s}
-.preset-btn{transition:all .25s cubic-bezier(.16,1,.3,1);cursor:pointer;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);color:#a1a1aa}
-.preset-btn:hover{border-color:rgba(129,140,248,.25);background:rgba(129,140,248,.05);transform:translateY(-1px)}
-.preset-btn.active{background:linear-gradient(135deg,rgba(129,140,248,.18),rgba(168,85,247,.14));border-color:rgba(129,140,248,.45);color:#c4b5fd;transform:scale(1.04);box-shadow:0 0 18px rgba(129,140,248,.18)}
+.bg-mesh{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 600px 400px at 15% 20%,rgba(99,102,241,.12),transparent),radial-gradient(ellipse 500px 500px at 85% 80%,rgba(168,85,247,.1),radial-gradient(ellipse 400px 300px at 50% 50%,rgba(129,140,248,.06),transparent));pointer-events:none;opacity:0.6}
+.bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:64px 64px;}
+.upload-zone{border:1.5px dashed rgba(255,255,255,.2);transition:all .3s ease;cursor:pointer;background:rgba(255,255,255,.02)}
+.upload-zone:hover{border-color:rgba(129,140,248,.5);background:rgba(129,140,248,.05)}
+.upload-zone:active{border-color:rgba(129,140,248,.6);background:rgba(129,140,248,.08)}
+.prog-bar{height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;width:0%;background:linear-gradient(90deg,#818cf8,#a78bfa);border-radius:3px;transition:width .15s}
+.preset-btn{transition:all .25s cubic-bezier(.16,1,.3,1);cursor:pointer;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:#a1a1aa}
+.preset-btn:hover{border-color:rgba(129,140,248,.3);background:rgba(129,140,248,.08);transform:translateY(-1px)}
+.preset-btn.active{background:linear-gradient(135deg,rgba(129,140,248,.2),rgba(168,85,247,.15));border-color:rgba(129,140,248,.5);color:#c4b5fd;transform:scale(1.04);box-shadow:0 0 18px rgba(129,140,248,.2)}
 .preset-btn:active{transform:scale(.97)}
-.modal-bg{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s ease}
+.modal-bg{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s ease}
 .modal-bg.show{opacity:1;pointer-events:auto}
-.modal-box{background:#0e0e11;border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:24px;max-width:480px;width:92%;max-height:88vh;overflow-y:auto;transform:scale(.94) translateY(10px);transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.modal-box{background:#121214;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:24px;max-width:480px;width:92%;max-height:88vh;overflow-y:auto;transform:scale(.94) translateY(10px);transition:transform .3s cubic-bezier(.16,1,.3,1);box-shadow:0 20px 50px rgba(0,0,0,.5)}
 .modal-bg.show .modal-box{transform:scale(1) translateY(0)}
-.fmt-card{border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;background:rgba(255,255,255,.02);transition:all .2s ease;cursor:pointer}
-.fmt-card:hover{border-color:rgba(129,140,248,.25);background:rgba(255,255,255,.04)}
-.fmt-card.chosen{border-color:rgba(129,140,248,.4);background:rgba(129,140,248,.06);box-shadow:0 0 20px rgba(129,140,248,.06)}
-.pay-card{border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:18px;background:rgba(255,255,255,.02);transition:all .25s ease;cursor:pointer}
-.pay-card:hover{border-color:rgba(129,140,248,.3);background:rgba(255,255,255,.04)}
-.pay-card.chosen{border-color:rgba(129,140,248,.5);background:rgba(129,140,248,.06);box-shadow:0 0 24px rgba(129,140,248,.08)}
+.fmt-card{border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px;background:rgba(255,255,255,.03);transition:all .2s ease;cursor:pointer}
+.fmt-card:hover{border-color:rgba(129,140,248,.3);background:rgba(255,255,255,.05)}
+.fmt-card.chosen{border-color:rgba(129,140,248,.5);background:rgba(129,140,248,.08);box-shadow:0 0 20px rgba(129,140,248,.1)}
+.pay-card{border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:18px;background:rgba(255,255,255,.03);transition:all .25s ease;cursor:pointer}
+.pay-card:hover{border-color:rgba(129,140,248,.3);background:rgba(255,255,255,.05)}
+.pay-card.chosen{border-color:rgba(129,140,248,.6);background:rgba(129,140,248,.08);box-shadow:0 0 24px rgba(129,140,248,.12)}
 .toast-wrap{position:fixed;top:72px;right:16px;z-index:99999;display:flex;flex-direction:column;gap:8px}
-.toast-item{padding:10px 16px;border-radius:10px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:8px;min-width:240px;animation:fadeUp .3s ease,toastOut .3s ease 3s forwards;box-shadow:0 8px 32px rgba(0,0,0,.5)}
-.toast-ok{background:#052e16;border:1px solid #14532d;color:#4ade80}
-.toast-err{background:#2a0a0a;border:1px solid #7f1d1d;color:#f87171}
-.toast-info{background:#1a1508;border:1px solid #422006;color:#fbbf24}
+.toast-item{padding:12px 16px;border-radius:10px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:10px;min-width:240px;animation:fadeUp .3s ease,toastOut .3s ease 3s forwards;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.toast-ok{background:rgba(5,46,22,.9);border:1px solid #14532d;color:#4ade80}
+.toast-err{background:rgba(42,10,10,.9);border:1px solid #7f1d1d;color:#f87171}
+.toast-info{background:rgba(26,21,8,.9);border:1px solid #422006;color:#fbbf24}
 @keyframes toastOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-8px)}}
-.btn-primary{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-weight:600;padding:10px 24px;border-radius:10px;border:none;cursor:pointer;font-size:.875rem;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
-.btn-primary:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 4px 20px rgba(99,102,241,.3)}
+.btn-primary{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-weight:600;padding:10px 24px;border-radius:10px;border:none;cursor:pointer;font-size:.875rem;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary:hover{opacity:.95;transform:translateY(-1px);box-shadow:0 4px 20px rgba(99,102,241,.4)}
 .btn-primary:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
-.btn-ghost{background:transparent;color:#a1a1aa;font-weight:500;padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.06);cursor:pointer;font-size:.8rem;transition:all .2s}
-.btn-ghost:hover{color:#e4e4e7;border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.03)}
-.input-f{width:100%;padding:11px 14px;background:#09090b;border:1px solid rgba(255,255,255,.08);border-radius:8px;color:#e4e4e7;font-size:.85rem;font-family:'Inter',sans-serif;transition:border-color .2s;outline:none}
-.input-f:focus{border-color:rgba(129,140,248,.5);box-shadow:0 0 0 3px rgba(129,140,248,.08)}
+.btn-ghost{background:transparent;color:#a1a1aa;font-weight:500;padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.08);cursor:pointer;font-size:.8rem;transition:all .2s}
+.btn-ghost:hover{color:#e4e4e7;border-color:rgba(255,255,255,.15);background:rgba(255,255,255,.03)}
+.input-f{width:100%;padding:11px 14px;background:#09090b;border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#e4e4e7;font-size:.85rem;font-family:'Inter',sans-serif;transition:border-color .2s;outline:none}
+.input-f:focus{border-color:rgba(129,140,248,.6);box-shadow:0 0 0 3px rgba(129,140,248,.1)}
 .input-f::placeholder{color:#3f3f46}
 .speed-input{background:transparent;border:none;color:#a5b4fc;font-size:1.3rem;font-weight:700;width:70px;text-align:center;outline:none}
 .speed-input::-webkit-outer-spin-button,.speed-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .speed-input[type=number]{-moz-appearance:textfield}
-.rbx-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid;transition:all .2s;white-space:nowrap}
-.rbx-btn.idle{background:rgba(226,29,72,.08);color:#fb7185;border-color:rgba(226,29,72,.2)}
-.rbx-btn.idle:hover{background:rgba(226,29,72,.15);border-color:rgba(226,29,72,.35)}
-.rbx-btn.locked{background:rgba(255,255,255,.03);color:#52525b;border-color:rgba(255,255,255,.06);cursor:default}
-.rbx-btn.loading{pointer-events:none;background:rgba(129,140,248,.1);color:#a5b4fc;border-color:rgba(129,140,248,.2)}
-.rbx-btn.done{background:rgba(52,211,153,.08);color:#4ade80;border-color:rgba(52,211,153,.2)}
-.rbx-btn.done:hover{background:rgba(52,211,153,.15)}
+.rbx-btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:6px 10px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid;transition:all .2s;white-space:nowrap}
+.rbx-btn.idle{background:rgba(226,29,72,.1);color:#fb7185;border-color:rgba(226,29,72,.25)}
+.rbx-btn.idle:hover{background:rgba(226,29,72,.2);border-color:rgba(226,29,72,.4)}
+.rbx-btn.locked{background:rgba(255,255,255,.05);color:#52525b;border-color:rgba(255,255,255,.08);cursor:default}
+.rbx-btn.loading{pointer-events:none;background:rgba(129,140,248,.15);color:#a5b4fc;border-color:rgba(129,140,248,.3)}
+.rbx-btn.done{background:rgba(52,211,153,.1);color:#4ade80;border-color:rgba(52,211,153,.25)}
+.rbx-btn.done:hover{background:rgba(52,211,153,.2)}
 .spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.2);border-top-color:currentColor;border-radius:50%;animation:spin .5s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;letter-spacing:.3px}
-.badge-pro{background:rgba(168,85,247,.1);color:#c084fc;border:1px solid rgba(168,85,247,.15)}
-.section-label{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#52525b;margin-bottom:10px}
-.divider{height:1px;background:rgba(255,255,255,.04);margin:16px 0}
-.gear-btn{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#52525b;transition:all .2s}
-.gear-btn:hover{background:rgba(255,255,255,.1);color:#e4e4e7;border-color:rgba(255,255,255,.12)}
-.rbx-nav-btn{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#52525b;transition:all .2s;flex-shrink:0}
-.rbx-nav-btn:hover{background:rgba(255,255,255,.1);color:#e4e4e7;border-color:rgba(255,255,255,.12)}
+.badge-pro{background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.2)}
+.section-label{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#71717a;margin-bottom:10px}
+.divider{height:1px;background:rgba(255,255,255,.06);margin:16px 0}
+.gear-btn{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#a1a1aa;transition:all .2s}
+.gear-btn:hover{background:rgba(255,255,255,.1);color:#e4e4e7;border-color:rgba(255,255,255,.15)}
+.rbx-nav-btn{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#a1a1aa;transition:all .2s;flex-shrink:0}
+.rbx-nav-btn:hover{background:rgba(255,255,255,.1);color:#e4e4e7;border-color:rgba(255,255,255,.15)}
 @keyframes floatBlob{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(18px,-14px) scale(1.05)}}
 .bg-mesh{animation:floatBlob 14s ease-in-out infinite}
 .btn-primary{position:relative;overflow:hidden}
-.btn-primary::after{content:'';position:absolute;top:0;left:-75%;width:50%;height:100%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.28),transparent);transform:skewX(-20deg)}
+.btn-primary::after{content:'';position:absolute;top:0;left:-75%;width:50%;height:100%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.3),transparent);transform:skewX(-20deg)}
 .btn-primary:hover:not(:disabled)::after{animation:shine .9s ease}
 @keyframes shine{from{left:-75%}to{left:130%}}
-@keyframes pulseGlow{0%,100%{box-shadow:0 0 0 0 rgba(129,140,248,.35)}50%{box-shadow:0 0 0 7px rgba(129,140,248,0)}}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 0 0 rgba(129,140,248,.4)}50%{box-shadow:0 0 0 8px rgba(129,140,248,0)}}
 .pay-card[data-plan="subscription"]{animation:pulseGlow 2.6s ease-in-out infinite}
 .upgrade-pill{cursor:pointer;transition:all .2s ease}
 .upgrade-pill:hover{transform:translateY(-1px);filter:brightness(1.15)}
 .hidden{display:none!important}
 
 /* ===== DASHBOARD SHELL ===== */
-.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:10px;height:56px;padding:0 14px;background:rgba(6,6,8,.9);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05)}
-.hamburger-btn{width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);display:none;align-items:center;justify-content:center;cursor:pointer;color:#a1a1aa;flex-shrink:0}
+.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:10px;height:56px;padding:0 14px;background:rgba(10,10,14,.9);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06)}
+.hamburger-btn{width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);display:none;align-items:center;justify-content:center;cursor:pointer;color:#a1a1aa;flex-shrink:0;transition:all .2s}
 .hamburger-btn:hover{background:rgba(255,255,255,.1);color:#e4e4e7}
 .app-layout{display:flex;align-items:stretch;min-height:calc(100vh - 56px)}
-.sidebar{width:236px;flex-shrink:0;padding:16px;display:flex;flex-direction:column;gap:14px;background:rgba(255,255,255,.015);border-right:1px solid rgba(255,255,255,.05);position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.sidebar{width:236px;flex-shrink:0;padding:16px;display:flex;flex-direction:column;gap:14px;background:rgba(14,14,18,.8);backdrop-filter:blur(16px);border-right:1px solid rgba(255,255,255,.06);position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;transition:transform .3s cubic-bezier(.16,1,.3,1)}
 .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font-size:13px;font-weight:600;color:#a1a1aa;cursor:pointer;transition:all .2s ease;border:1px solid transparent}
 .nav-item i{width:16px;text-align:center;font-size:13px}
-.nav-item:hover{background:rgba(255,255,255,.04);color:#e4e4e7}
-.nav-item.active{background:linear-gradient(135deg,rgba(129,140,248,.15),rgba(168,85,247,.1));color:#c4b5fd;border-color:rgba(129,140,248,.2)}
+.nav-item:hover{background:rgba(255,255,255,.05);color:#e4e4e7}
+.nav-item.active{background:linear-gradient(135deg,rgba(129,140,248,.2),rgba(168,85,247,.15));color:#c4b5fd;border-color:rgba(129,140,248,.25)}
 .nav-item.disabled{opacity:.4;cursor:not-allowed}
-.side-upgrade-card{background:linear-gradient(160deg,rgba(129,140,248,.1),rgba(168,85,247,.05));border:1px solid rgba(129,140,248,.15);border-radius:12px;padding:14px;margin-top:auto}
-.side-quota-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:12px}
-.side-footer{font-size:10px;color:#3f3f46;line-height:1.6;padding-top:6px}
+.side-upgrade-card{background:linear-gradient(160deg,rgba(129,140,248,.12),rgba(168,85,247,.06));border:1px solid rgba(129,140,248,.2);border-radius:12px;padding:14px;margin-top:auto}
+.side-quota-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:12px}
+.side-footer{font-size:10px;color:#52525b;line-height:1.6;padding-top:6px}
 .main-dashboard{flex:1;min-width:0;padding:18px;display:grid;grid-template-columns:1.25fr .95fr;gap:18px;align-items:start}
 .dash-col{display:flex;flex-direction:column;gap:18px;min-width:0}
-.panel{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:14px;padding:16px}
+.panel{background:rgba(18,18,22,.7);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:16px}
 .panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .panel-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#e4e4e7}
-.upload-row{background:rgba(255,255,255,.015);border:1px solid rgba(255,255,255,.03);border-radius:10px}
-.row-index{width:22px;height:22px;border-radius:6px;background:rgba(129,140,248,.1);color:#a5b4fc;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.log-console{background:#000;border-radius:10px;padding:12px;font-family:'SFMono-Regular',Consolas,monospace;font-size:10.5px;line-height:1.7;max-height:280px;overflow-y:auto;display:flex;flex-direction:column}
+.upload-row{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:10px;transition:all .2s ease}
+.upload-row:hover{background:rgba(255,255,255,.04)}
+.row-index{width:22px;height:22px;border-radius:6px;background:rgba(129,140,248,.15);color:#a5b4fc;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.log-console{background:#000;border-radius:10px;padding:12px;font-family:'SFMono-Regular',Consolas,monospace;font-size:10.5px;line-height:1.7;max-height:280px;overflow-y:auto;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,.04)}
 .log-line{display:flex;gap:8px;white-space:pre-wrap;word-break:break-word}
 .log-tag{flex-shrink:0;font-weight:700;width:66px}
 .log-tag.info{color:#60a5fa}
@@ -122,72 +123,18 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
 .log-tag.error{color:#f87171}
 .log-time{color:#3f3f46;flex-shrink:0}
 .log-msg{color:#a1a1aa}
-.action-row{display:flex;align-items:center;gap:12px;width:100%;padding:12px;border-radius:12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);cursor:pointer;transition:all .2s ease;text-align:left}
-.action-row:hover:not(:disabled){border-color:rgba(129,140,248,.25);background:rgba(255,255,255,.045);transform:translateY(-1px)}
+.action-row{display:flex;align-items:center;gap:12px;width:100%;padding:12px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);cursor:pointer;transition:all .2s ease;text-align:left}
+.action-row:hover:not(:disabled){border-color:rgba(129,140,248,.3);background:rgba(255,255,255,.05);transform:translateY(-1px)}
 .action-row:disabled{opacity:.4;cursor:not-allowed;transform:none}
 .action-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:14px}
-.action-row .action-chev{margin-left:auto;color:#3f3f46;font-size:11px}
-
-/* ===== ENHANCED PROFESSIONAL UI ADDITIONS ===== */
-@keyframes shimmerText{0%{background-position:-200% center}100%{background-position:200% center}}
-.shimmer-text{background:linear-gradient(90deg,#818cf8 0%,#a78bfa 25%,#c084fc 50%,#a78bfa 75%,#818cf8 100%);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shimmerText 4s linear infinite}
-@keyframes logoGlow{0%,100%{filter:drop-shadow(0 0 6px rgba(99,102,241,.4))}50%{filter:drop-shadow(0 0 14px rgba(99,102,241,.7))}}
-.logo-glow{animation:logoGlow 3s ease-in-out infinite}
-@keyframes floatIcon{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-.float-icon{animation:floatIcon 3s ease-in-out infinite}
-@keyframes ripple{0%{transform:scale(0);opacity:1}100%{transform:scale(4);opacity:0}}
-.ripple-effect{position:absolute;border-radius:50%;background:rgba(255,255,255,.3);pointer-events:none;animation:ripple .6s ease-out}
-@keyframes checkmarkDraw{0%{stroke-dashoffset:166}100%{stroke-dashoffset:0}}
-.checkmark-circle{stroke-dasharray:166;stroke-dashoffset:166;animation:checkmarkDraw .6s cubic-bezier(.65,0,.45,1) forwards}
-.checkmark-check{stroke-dasharray:48;stroke-dashoffset:48;animation:checkmarkDraw .3s cubic-bezier(.65,0,.45,1) .6s forwards}
-@keyframes slideInRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
-.slide-in-right{animation:slideInRight .4s cubic-bezier(.16,1,.3,1)}
-@keyframes bounceIn{0%{opacity:0;transform:scale(.3)}50%{transform:scale(1.05)}70%{transform:scale(.95)}100%{opacity:1;transform:scale(1)}}
-.bounce-in{animation:bounceIn .5s cubic-bezier(.16,1,.3,1)}
-@keyframes modalBounce{0%{opacity:0;transform:scale(.8) translateY(-20px)}60%{transform:scale(1.02) translateY(0)}100%{opacity:1;transform:scale(1) translateY(0)}}
-.modal-bounce{animation:modalBounce .4s cubic-bezier(.16,1,.3,1)}
-@keyframes progressShine{0%{background-position:-200% 0}100%{background-position:200% 0}}
-.prog-fill{background-image:linear-gradient(90deg,#818cf8,#a78bfa,#818cf8);background-size:200% 100%;animation:progressShine 2s linear infinite}
-@keyframes rotateGlow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-.rotate-glow{animation:rotateGlow 8s linear infinite}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
-.shake{animation:shake .3s ease}
-@keyframes confettiFall{0%{transform:translateY(-100vh) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
-.confetti{position:fixed;width:10px;height:10px;pointer-events:none;z-index:99999}
-@keyframes pulseRing{0%{transform:scale(.8);opacity:1}100%{transform:scale(2);opacity:0}}
-.pulse-ring{position:absolute;border:2px solid rgba(52,211,153,.5);border-radius:50%;animation:pulseRing 1.5s ease-out infinite}
-@keyframes scanLine{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
-.scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(129,140,248,.6),transparent);animation:scanLine 2s linear infinite}
-@keyframes glowBorder{0%,100%{box-shadow:0 0 5px rgba(129,140,248,.2),inset 0 0 5px rgba(129,140,248,.1)}50%{box-shadow:0 0 20px rgba(129,140,248,.5),inset 0 0 10px rgba(129,140,248,.2)}}
-.glow-border{animation:glowBorder 2s ease-in-out infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.blink{animation:blink 1.5s ease-in-out infinite}
-@keyframes fadeInScale{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
-.fade-in-scale{animation:fadeInScale .3s ease}
-@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-.gradient-animated{background:linear-gradient(135deg,#6366f1,#8b5cf6,#a78bfa,#8b5cf6,#6366f1);background-size:300% 300%;animation:gradientShift 6s ease infinite}
-.pay-method-card{border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;background:rgba(255,255,255,.02);transition:all .25s ease;cursor:pointer;display:flex;align-items:center;gap:12px}
-.pay-method-card:hover{border-color:rgba(129,140,248,.3);background:rgba(255,255,255,.04);transform:translateX(4px)}
-.pay-method-card.chosen{border-color:rgba(129,140,248,.5);background:rgba(129,140,248,.06);box-shadow:0 0 20px rgba(129,140,248,.08)}
-.pay-method-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.success-animation{position:relative;width:80px;height:80px;margin:0 auto}
-.success-animation svg{width:100%;height:100%}
-.status-indicator{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:8px}
-.status-pending{background:#fbbf24;animation:blink 1s infinite}
-.status-processing{background:#60a5fa;animation:blink .5s infinite}
-.status-success{background:#4ade80}
-.status-failed{background:#f87171}
-.plan-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px}
-.summary-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:4px 0}
-.summary-label{color:#71717a}
-.summary-value{color:#e4e4e7;font-weight:500}
+.action-row .action-chev{margin-left:auto;color:#52525b;font-size:11px}
 
 @media(max-width:900px){
   .hamburger-btn{display:flex}
   .app-layout{position:relative}
   .sidebar{position:fixed;left:0;top:56px;transform:translateX(-105%);z-index:46;box-shadow:0 10px 40px rgba(0,0,0,.6)}
   .sidebar.open{transform:translateX(0)}
-  .sidebar-overlay{position:fixed;inset:56px 0 0 0;background:rgba(0,0,0,.55);z-index:45;opacity:0;pointer-events:none;transition:opacity .25s ease}
+  .sidebar-overlay{position:fixed;inset:56px 0 0 0;background:rgba(0,0,0,.65);z-index:45;opacity:0;pointer-events:none;transition:opacity .25s ease}
   .sidebar-overlay.show{opacity:1;pointer-events:auto}
   .main-dashboard{grid-template-columns:1fr;padding:14px}
 }
@@ -203,18 +150,18 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
 <header class="topbar">
   <button class="hamburger-btn" onclick="toggleSidebar()" title="Menu"><i class="fas fa-bars"></i></button>
   <div class="flex items-center gap-2">
-    <div class="w-8 h-8 rounded-lg flex items-center justify-center logo-glow" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)"><i class="fas fa-bolt text-[11px] text-white"></i></div>
+    <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)"><i class="fas fa-bolt text-[11px] text-white"></i></div>
     <div class="leading-tight">
-      <div class="font-bold text-sm tracking-tight">Converter<span class="shimmer-text">YL</span></div>
+      <div class="font-bold text-sm tracking-tight">Converter<span class="grad-text">YL</span></div>
       <div class="text-[9px] text-zinc-600 hidden sm:block">Pro Audio Converter</div>
     </div>
   </div>
   <div id="navRight" class="flex items-center gap-2" style="margin-left:auto">
     <div id="loginArea" class="flex items-center gap-2"><div id="googleBtnContainer"></div></div>
     <div id="userChip" class="hidden items-center gap-2">
-      <img id="userAvatar" src="" alt="" style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.08)">
+      <img id="userAvatar" src="" alt="" style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.1)">
       <span id="userName" class="text-xs text-zinc-400 hidden sm:inline max-w-[90px] truncate"></span>
-      <div id="creditChip" class="badge" style="background:rgba(255,255,255,.04);color:#52525b;border:1px solid rgba(255,255,255,.06)"><span id="creditText">0</span></div>
+      <div id="creditChip" class="badge" style="background:rgba(255,255,255,.05);color:#71717a;border:1px solid rgba(255,255,255,.08)"><span id="creditText">0</span></div>
       <button class="rbx-nav-btn" onclick="openRbxModal()" title="Pengaturan Roblox"><i class="fas fa-cube" style="font-size:13px"></i></button>
       <button id="logoutBtn" onclick="handleLogout()" class="btn-ghost" style="padding:6px 8px" title="Keluar"><i class="fas fa-right-from-bracket" style="font-size:11px"></i></button>
     </div>
@@ -235,7 +182,7 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
           <div id="quotaDot" class="w-1.5 h-1.5 rounded-full bg-zinc-600"></div>
           <span class="text-[10px] text-zinc-500 font-semibold uppercase tracking-wide">Kuota</span>
         </div>
-        <span id="planBadge" class="badge" style="background:rgba(255,255,255,.04);color:#52525b;border:1px solid rgba(255,255,255,.06);font-size:9px">FREE</span>
+        <span id="planBadge" class="badge" style="background:rgba(255,255,255,.05);color:#71717a;border:1px solid rgba(255,255,255,.08);font-size:9px">FREE</span>
       </div>
       <div id="quotaText" class="text-xs text-zinc-400">1 lagu gratis</div>
     </div>
@@ -254,14 +201,14 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
   <!-- MAIN DASHBOARD -->
   <main class="main-dashboard">
     <div class="dash-col">
-      <div id="warnBanner" class="hidden p-3 rounded-lg text-xs text-amber-300/80" style="background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.1)">
+      <div id="warnBanner" class="hidden p-3 rounded-lg text-xs text-amber-300/80" style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.15)">
         <b class="text-amber-200/90">Mode Tamu</b> &mdash; dibuka via in-app browser.
       </div>
 
       <div class="panel">
         <div class="panel-head">
           <span class="panel-title"><i class="fas fa-list text-indigo-400" style="font-size:12px"></i> Upload List</span>
-          <span class="badge" style="background:rgba(255,255,255,.04);color:#71717a;border:1px solid rgba(255,255,255,.06)" id="fileCountBadge">0 Files</span>
+          <span class="badge" style="background:rgba(255,255,255,.05);color:#71717a;border:1px solid rgba(255,255,255,.08)" id="fileCountBadge">0 Files</span>
         </div>
         <div id="fileList" class="flex flex-col gap-1.5"></div>
       </div>
@@ -285,7 +232,7 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
           <button class="preset-btn text-xs font-semibold py-2 rounded-lg" data-i="3">4.7x</button>
           <button class="preset-btn text-xs font-semibold py-2 rounded-lg" data-i="4">Custom</button>
         </div>
-        <div id="customSpeedWrap" class="hidden mt-3 flex items-center justify-center gap-3 py-3 px-4 rounded-lg" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04)">
+        <div id="customSpeedWrap" class="hidden mt-3 flex items-center justify-center gap-3 py-3 px-4 rounded-lg" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)">
           <span class="text-xs text-zinc-500">Speed:</span>
           <input type="number" id="customSpeedInput" class="speed-input" value="2.5" min="0.1" max="10" step="0.1">
           <span class="text-zinc-600 font-bold">x</span>
@@ -297,7 +244,7 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
           <span class="panel-title"><i class="fas fa-cloud-arrow-up text-indigo-400" style="font-size:12px"></i> Upload Audio</span>
         </div>
         <label for="audioFile" id="box" class="upload-zone rounded-xl p-6 text-center block mb-3">
-          <div class="w-11 h-11 mx-auto mb-2.5 rounded-xl flex items-center justify-center float-icon" style="background:rgba(129,140,248,.06)">
+          <div class="w-11 h-11 mx-auto mb-2.5 rounded-xl flex items-center justify-center" style="background:rgba(129,140,248,.1)">
             <i class="fas fa-music text-indigo-400" style="font-size:16px"></i>
           </div>
           <p id="boxTitle" class="text-sm font-semibold text-zinc-200 mb-0.5">Drag & drop audio file here</p>
@@ -340,7 +287,7 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
 
 <div class="text-center py-10 px-5" id="loggedOutHero">
   <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight mb-2.5 fade-up" style="line-height:1.15">
-    Audio Converter <span class="shimmer-text">Profesional</span>
+    Audio Converter <span class="grad-text">Profesional</span>
   </h1>
   <p class="text-sm text-zinc-500 max-w-md mx-auto leading-relaxed fade-up">Edit kecepatan audio, upload langsung ke Roblox. Masuk dengan Google untuk mulai.</p>
 </div>
@@ -348,7 +295,7 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
 
 <!-- MODAL FORMAT -->
 <div class="modal-bg" id="fmtModal">
-  <div class="modal-box modal-bounce" style="max-width:400px">
+  <div class="modal-box scale-in" style="max-width:400px">
     <div class="flex items-center justify-between mb-4">
       <h3 class="text-base font-bold flex items-center gap-2"><i class="fas fa-file-audio text-indigo-400 text-sm"></i> Format Output</h3>
     </div>
@@ -356,27 +303,27 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
       <div class="fmt-card chosen" data-fmt="ogg" onclick="pickFmt(this)">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-lg flex items-center justify-center text-[11px] font-bold" style="background:rgba(251,146,60,.08);color:#fb923c">OGG</div>
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center text-[11px] font-bold" style="background:rgba(251,146,60,.1);color:#fb923c">OGG</div>
             <div><div class="text-sm font-semibold text-zinc-200">OGG Vorbis</div><div class="text-[10px] text-zinc-600">Roblox compatible</div></div>
           </div>
-          <span class="badge" style="background:rgba(251,146,60,.08);color:#fb923c;border:1px solid rgba(251,146,60,.12);font-size:9px">REC</span>
+          <span class="badge" style="background:rgba(251,146,60,.1);color:#fb923c;border:1px solid rgba(251,146,60,.15);font-size:9px">REC</span>
         </div>
       </div>
       <div class="fmt-card" data-fmt="mp3" onclick="pickFmt(this)">
         <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-lg flex items-center justify-center text-[11px] font-bold" style="background:rgba(96,165,250,.08);color:#60a5fa">MP3</div>
+          <div class="w-9 h-9 rounded-lg flex items-center justify-center text-[11px] font-bold" style="background:rgba(96,165,250,.1);color:#60a5fa">MP3</div>
           <div><div class="text-sm font-semibold text-zinc-200">MP3</div><div class="text-[10px] text-zinc-600">Kompak, universal</div></div>
         </div>
       </div>
       <div class="fmt-card" data-fmt="wav" onclick="pickFmt(this)">
         <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-lg flex items-center justify-center text-[11px] font-bold" style="background:rgba(167,139,250,.08);color:#a78bfa">WAV</div>
+          <div class="w-9 h-9 rounded-lg flex items-center justify-center text-[11px] font-bold" style="background:rgba(167,139,250,.1);color:#a78bfa">WAV</div>
           <div><div class="text-sm font-semibold text-zinc-200">WAV</div><div class="text-[10px] text-zinc-600">Lossless, file besar</div></div>
         </div>
       </div>
       <div class="fmt-card" data-fmt="flac" onclick="pickFmt(this)">
         <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-lg flex items-center justify-center text-[11px] font-bold" style="background:rgba(244,114,182,.08);color:#f472b6">FLAC</div>
+          <div class="w-9 h-9 rounded-lg flex items-center justify-center text-[11px] font-bold" style="background:rgba(244,114,182,.1);color:#f472b6">FLAC</div>
           <div><div class="text-sm font-semibold text-zinc-200">FLAC</div><div class="text-[10px] text-zinc-600">Lossless kompresi</div></div>
         </div>
       </div>
@@ -387,16 +334,16 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
 
 <!-- MODAL ROBLOX SETTINGS -->
 <div class="modal-bg" id="rbxModal">
-  <div class="modal-box modal-bounce" style="max-width:420px">
+  <div class="modal-box scale-in" style="max-width:420px">
     <div class="flex items-center justify-between mb-4">
       <h3 class="text-base font-bold flex items-center gap-2"><i class="fas fa-cube text-rose-400 text-sm"></i> Pengaturan Roblox</h3>
-      <button onclick="closeRbxModal()" class="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-200 transition-colors" style="background:rgba(255,255,255,.04)"><i class="fas fa-xmark text-xs"></i></button>
+      <button onclick="closeRbxModal()" class="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-200 transition-colors" style="background:rgba(255,255,255,.05)"><i class="fas fa-xmark text-xs"></i></button>
     </div>
-    <div class="p-3 rounded-lg mb-4 text-[11px] text-zinc-500 leading-relaxed" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04)">
+    <div class="p-3 rounded-lg mb-4 text-[11px] text-zinc-500 leading-relaxed" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)">
       <b class="text-zinc-400">Cara mendapatkan API Key:</b><br>
       1. <span class="text-indigo-400">create.roblox.com/manage/api-keys</span> → Create Key → pilih <b>assets</b> → tambah <b>write</b> → Generate Key → salin
     </div>
-    <div class="p-3 rounded-lg mb-3 text-[10px] text-zinc-600 leading-relaxed" style="background:rgba(129,140,248,.04);border:1px solid rgba(129,140,248,.08)">
+    <div class="p-3 rounded-lg mb-3 text-[10px] text-zinc-600 leading-relaxed" style="background:rgba(129,140,248,.05);border:1px solid rgba(129,140,248,.1)">
       <i class="fas fa-circle-info text-indigo-400"></i> Cukup isi API Key & User ID kamu — server relay sudah diatur otomatis.
     </div>
     <div class="mb-3">
@@ -409,151 +356,71 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
       <p class="text-[10px] text-zinc-700 mt-1.5">Ada di profil Roblox → angka di URL</p>
     </div>
     <div class="flex gap-2">
-      <button onclick="saveRbxSettings()" class="btn-primary flex-1 justify-center py-2.5 text-xs">Simpan</button>
-      <button onclick="clearRbxSettings()" class="btn-ghost flex-1 justify-center py-2.5 text-xs">Hapus</button>
+      <button onclick="saveRbxSettings()" class="btn-primary flex-1 justify-center py-2.5 text-xs"><i class="fas fa-save"></i> Simpan</button>
+      <button onclick="clearRbxSettings()" class="btn-ghost flex-1 justify-center py-2.5 text-xs"><i class="fas fa-trash"></i> Hapus</button>
     </div>
   </div>
 </div>
 
 <!-- MODAL UPGRADE -->
 <div class="modal-bg" id="upgradeModal">
-  <div class="modal-box modal-bounce text-center" style="max-width:340px">
-    <div class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center float-icon" style="background:rgba(168,85,247,.08)"><i class="fas fa-cube text-purple-400 text-xl"></i></div>
+  <div class="modal-box scale-in text-center" style="max-width:340px">
+    <div class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:rgba(168,85,247,.1)"><i class="fas fa-cube text-purple-400 text-xl"></i></div>
     <h3 class="text-base font-bold mb-1">Fitur Premium</h3>
     <p class="text-xs text-zinc-500 mb-5 leading-relaxed">Auto upload ke Roblox hanya tersedia untuk paket Unlimited</p>
-    <button onclick="closeUpgradeModal();openPayModal()" class="btn-primary px-8 py-2.5 text-xs">Lihat Paket Unlimited</button>
+    <button onclick="closeUpgradeModal();openPayModal()" class="btn-primary px-8 py-2.5 text-xs"><i class="fas fa-gem"></i> Lihat Paket Unlimited</button>
     <button onclick="closeUpgradeModal()" class="btn-ghost mt-2 text-xs">Kembali</button>
   </div>
 </div>
 
-<!-- MODAL PEMBAYARAN (ENHANCED) -->
+<!-- MODAL PEMBAYARAN -->
 <div class="modal-bg" id="payModal">
-  <div class="modal-box modal-bounce" style="max-width:440px">
-    <div class="flex items-center justify-between mb-1">
+  <div class="modal-box scale-in" style="max-width:420px">
+    <div class="flex items-center justify-between mb-4">
       <h3 class="text-base font-bold flex items-center gap-2"><i class="fas fa-gem text-purple-400 text-sm"></i> Pilih Paket</h3>
-      <button onclick="closePayModal()" class="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-200 transition-colors" style="background:rgba(255,255,255,.04)"><i class="fas fa-xmark text-xs"></i></button>
+      <button onclick="closePayModal()" class="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-200 transition-colors" style="background:rgba(255,255,255,.05)"><i class="fas fa-xmark text-xs"></i></button>
     </div>
-    <p class="text-[11px] text-zinc-600 mb-4">Pilih paket yang sesuai kebutuhan kamu</p>
-    
     <div class="space-y-2">
       <div class="pay-card" data-plan="per_song" onclick="pickPlan(this)">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="plan-icon" style="background:rgba(96,165,250,.08)"><i class="fas fa-music text-blue-400 text-sm"></i></div>
-            <div><div class="text-sm font-semibold">1 Lagu</div><div class="text-[10px] text-zinc-600">Untuk coba sekali</div></div>
-          </div>
-          <div class="text-base font-extrabold">Rp1.200</div>
-        </div>
+        <div class="flex items-center justify-between"><span class="text-sm font-semibold">1 Lagu</span><span class="text-base font-extrabold">Rp1.200</span></div>
       </div>
-      
       <div class="pay-card" data-plan="bundle_65" onclick="pickPlan(this)">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="plan-icon" style="background:rgba(52,211,153,.08)"><i class="fas fa-box text-emerald-400 text-sm"></i></div>
-            <div><div class="text-sm font-semibold flex items-center gap-1.5">65 Lagu <span class="badge" style="background:rgba(52,211,153,.08);color:#4ade80;border:1px solid rgba(52,211,153,.12);font-size:9px">HEMAT</span></div><div class="text-[10px] text-zinc-600">Hemat 35%</div></div>
-          </div>
-          <div class="text-base font-extrabold">Rp50.000</div>
-        </div>
+        <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="text-sm font-semibold">65 Lagu</span><span class="badge" style="background:rgba(52,211,153,.1);color:#4ade80;border:1px solid rgba(52,211,153,.15);font-size:9px">HEMAT</span></div><span class="text-base font-extrabold">Rp50.000</span></div>
       </div>
-      
-      <div class="pay-card relative" data-plan="subscription" onclick="pickPlan(this)">
+      <div class="pay-card relative overflow-hidden" data-plan="subscription" onclick="pickPlan(this)">
         <div class="absolute top-0 right-0 text-[9px] font-bold text-white px-2.5 py-0.5 rounded-bl-lg" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">BEST</div>
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="plan-icon" style="background:rgba(168,85,247,.08)"><i class="fas fa-infinity text-purple-400 text-sm"></i></div>
-            <div><div class="text-sm font-semibold flex items-center gap-1.5">Unlimited <span class="badge badge-pro"><i class="fas fa-cube" style="font-size:8px"></i> ROBLOX</span></div><div class="text-[10px] text-zinc-600">Tanpa batas + auto upload</div></div>
-          </div>
-          <div class="text-right"><div class="text-base font-extrabold">Rp210.000</div><div class="text-[9px] text-zinc-600">/30 hari</div></div>
-        </div>
+        <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="text-sm font-semibold">Unlimited</span><span class="badge badge-pro"><i class="fas fa-cube" style="font-size:8px"></i> ROBLOX</span></div><span class="text-base font-extrabold">Rp210.000</span></div>
+        <p class="text-[10px] text-zinc-600 mt-1.5">Tanpa batas + auto upload Roblox, 30 hari</p>
       </div>
     </div>
-    
-    <div id="payMethodSection" class="hidden mt-4">
-      <div class="section-label mt-4 mb-2">Metode Pembayaran</div>
-      <div class="grid grid-cols-2 gap-2">
-        <div class="pay-method-card chosen" data-method="qris" onclick="pickPayMethod(this)">
-          <div class="pay-method-icon" style="background:rgba(52,211,153,.08)"><i class="fas fa-qrcode text-emerald-400"></i></div>
-          <div><div class="text-xs font-semibold">QRIS</div><div class="text-[9px] text-zinc-600">Semua e-wallet</div></div>
-        </div>
-        <div class="pay-method-card" data-method="va" onclick="pickPayMethod(this)">
-          <div class="pay-method-icon" style="background:rgba(96,165,250,.08)"><i class="fas fa-building-columns text-blue-400"></i></div>
-          <div><div class="text-xs font-semibold">Virtual Account</div><div class="text-[9px] text-zinc-600">BCA, Mandiri, BNI</div></div>
-        </div>
-        <div class="pay-method-card" data-method="gopay" onclick="pickPayMethod(this)">
-          <div class="pay-method-icon" style="background:rgba(52,211,153,.08)"><i class="fas fa-wallet text-emerald-400"></i></div>
-          <div><div class="text-xs font-semibold">GoPay</div><div class="text-[9px] text-zinc-600">Bayar instan</div></div>
-        </div>
-        <div class="pay-method-card" data-method="card" onclick="pickPayMethod(this)">
-          <div class="pay-method-icon" style="background:rgba(168,85,247,.08)"><i class="fas fa-credit-card text-purple-400"></i></div>
-          <div><div class="text-xs font-semibold">Kartu Kredit</div><div class="text-[9px] text-zinc-600">Visa, Mastercard</div></div>
-        </div>
-      </div>
-    </div>
-    
-    <div id="paySummary" class="hidden mt-4 p-3 rounded-lg" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04)">
-      <div class="summary-row"><span class="summary-label">Paket</span><span id="sumPlan" class="summary-value">-</span></div>
-      <div class="summary-row"><span class="summary-label">Metode</span><span id="sumMethod" class="summary-value">-</span></div>
-      <div class="divider" style="margin:8px 0"></div>
-      <div class="flex justify-between items-center"><span class="text-sm font-semibold text-zinc-400">Total</span><span id="sumTotal" class="text-base font-extrabold grad-text">Rp0</span></div>
-    </div>
-    
     <button id="payBtn" disabled onclick="doPayment()" class="btn-primary w-full justify-center mt-4 py-2.5 text-sm">Pilih paket</button>
   </div>
 </div>
 
-<!-- MODAL PROSES PEMBAYARAN (NEW) -->
-<div class="modal-bg" id="payProcessModal">
-  <div class="modal-box modal-bounce text-center" style="max-width:360px">
-    <div class="relative w-20 h-20 mx-auto mb-4">
-      <div class="absolute inset-0 rounded-full border-2 border-zinc-800"></div>
-      <div class="absolute inset-0 rounded-full border-2 border-transparent border-t-indigo-500 rotate-glow"></div>
-      <div class="absolute inset-0 flex items-center justify-center"><i class="fas fa-shield-halved text-indigo-400 text-2xl"></i></div>
-    </div>
-    <h3 class="text-base font-bold mb-1">Memproses Pembayaran</h3>
-    <p class="text-xs text-zinc-500 mb-4">Mohon tunggu sebentar, sedang mengamankan transaksi kamu...</p>
-    <div class="flex items-center justify-center gap-2 text-[11px] text-zinc-600">
-      <span class="status-indicator status-processing"></span>
-      <span id="processStatus">Menghubungkan ke gateway...</span>
-    </div>
-    <div class="mt-4 p-2 rounded-lg" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04)">
-      <div class="flex justify-between text-[10px] text-zinc-600 mb-1"><span>Progress</span><span id="processProgTxt">0%</span></div>
-      <div class="prog-bar"><div class="prog-fill" id="processProgFill" style="width:0%"></div></div>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL SUKSES (ENHANCED) -->
+<!-- MODAL SUKSES -->
 <div class="modal-bg" id="successModal">
-  <div class="modal-box modal-bounce text-center" style="max-width:360px">
-    <div class="success-animation mx-auto mb-4">
-      <svg viewBox="0 0 52 52">
-        <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none" stroke="#4ade80" stroke-width="2"/>
-        <path class="checkmark-check" fill="none" stroke="#4ade80" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M14 27l8 8 16-16"/>
-      </svg>
-    </div>
-    <h3 class="text-base font-bold mb-1 bounce-in">Berhasil!</h3>
+  <div class="modal-box scale-in text-center" style="max-width:340px">
+    <div class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:rgba(52,211,153,.1)"><i class="fas fa-check text-emerald-400 text-xl"></i></div>
+    <h3 class="text-base font-bold mb-1">Berhasil</h3>
     <p id="successMsg" class="text-xs text-zinc-500 mb-5">Kuota ditambahkan.</p>
-    <div class="grid grid-cols-2 gap-2 mb-4">
-      <div class="p-2 rounded-lg" style="background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.1)">
-        <div class="text-[9px] text-zinc-600 uppercase tracking-wide">Status</div>
-        <div class="text-xs font-bold text-emerald-400">Aktif</div>
-      </div>
-      <div class="p-2 rounded-lg" style="background:rgba(129,140,248,.05);border:1px solid rgba(129,140,248,.1)">
-        <div class="text-[9px] text-zinc-600 uppercase tracking-wide">Kuota</div>
-        <div id="successQuota" class="text-xs font-bold text-indigo-400">+0</div>
-      </div>
-    </div>
-    <button onclick="closeSuccessModal()" class="btn-primary px-8 py-2.5 text-xs w-full justify-center">Lanjut</button>
+    <button onclick="closeSuccessModal()" class="btn-primary px-8 py-2.5 text-xs"><i class="fas fa-arrow-right"></i> Lanjut</button>
   </div>
 </div>
 
-<!-- MODAL ERROR (NEW) -->
-<div class="modal-bg" id="errorModal">
-  <div class="modal-box modal-bounce text-center" style="max-width:360px">
-    <div class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center shake" style="background:rgba(248,113,113,.08)"><i class="fas fa-triangle-exclamation text-rose-400 text-xl"></i></div>
-    <h3 class="text-base font-bold mb-1">Transaksi Gagal</h3>
-    <p id="errorMsg" class="text-xs text-zinc-500 mb-5">Terjadi kesalahan saat memproses pembayaran.</p>
-    <button onclick="closeErrorModal()" class="btn-primary px-8 py-2.5 text-xs w-full justify-center">Coba Lagi</button>
+<!-- MODAL RENAME (NEW) -->
+<div class="modal-bg" id="renameModal">
+  <div class="modal-box scale-in" style="max-width:380px">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-base font-bold flex items-center gap-2"><i class="fas fa-pen text-indigo-400 text-sm"></i> Rename File</h3>
+      <button onclick="closeRenameModal()" class="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-200 transition-colors" style="background:rgba(255,255,255,.05)"><i class="fas fa-xmark text-xs"></i></button>
+    </div>
+    <div id="renameWarn" class="hidden p-3 rounded-lg mb-3 text-[10px] text-orange-400 leading-relaxed" style="background:rgba(251,146,60,.05);border:1px solid rgba(251,146,60,.1)">
+      <i class="fas fa-triangle-exclamation"></i> Nama file terlalu panjang (maks 50 karakter termasuk suffix). Silakan ubah nama.
+    </div>
+    <label class="block text-[11px] font-medium text-zinc-400 mb-1.5">Nama File Baru</label>
+    <input type="text" id="renameInput" class="input-f text-sm" placeholder="Masukkan nama file">
+    <p class="text-[10px] text-zinc-600 mt-1.5">Suffix <b>_2.3YL</b> akan ditambahkan otomatis.</p>
+    <button onclick="saveRename()" class="btn-primary w-full justify-center mt-4 py-2.5 text-sm"><i class="fas fa-check"></i> Simpan Nama</button>
   </div>
 </div>
 
@@ -572,7 +439,7 @@ function logLine(tag,msg){
   var cls=String(tag).toLowerCase();
   var time=new Date().toLocaleTimeString('id-ID',{hour12:false});
   var row=document.createElement('div');
-  row.className='log-line';
+  row.className='log-line fade-in';
   row.innerHTML='<span class="log-tag '+cls+'">['+String(tag).toUpperCase()+']</span><span class="log-time">'+time+'</span><span class="log-msg"></span>';
   row.querySelector('.log-msg').textContent=msg;
   $logConsole.appendChild(row);
@@ -695,7 +562,7 @@ function showSuccessModal(p){if(p==='subscription')$successMsg.textContent='Unli
 function closeSuccessModal(){$successModal.classList.remove('show');document.body.style.overflow='';updateQuotaDisplay();}
  $payModal.addEventListener('click',function(e){if(e.target===$payModal)closePayModal();});
  $successModal.addEventListener('click',function(e){if(e.target===$successModal)closeSuccessModal();});
-document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeFmtModal();closePayModal();closeSuccessModal();closeRbxModal();closeUpgradeModal();}});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeFmtModal();closePayModal();closeSuccessModal();closeRbxModal();closeUpgradeModal();closeRenameModal();}});
 
 function doPayment(){
   if(!state.chosenPlan||!state.email)return;
@@ -748,6 +615,7 @@ function handleCredentialResponse(r){
   $loginArea.classList.add('hidden');$userChip.classList.remove('hidden');$mainCard.classList.remove('hidden');if($loggedOutHero)$loggedOutHero.classList.add('hidden');
   loadLocal(state.email);loadRbxLocal();updateQuotaDisplay();
   try{localStorage.setItem('convyl_user',JSON.stringify(p));}catch(e){}
+  toast('Selamat datang, '+(p.name||p.email.split('@')[0])+'!','ok');
 }
 function handleLogout(){
   try{google.accounts.id.disableAutoSelect();}catch(e){}
@@ -782,7 +650,7 @@ document.querySelectorAll('.preset-btn').forEach(function(b){
     document.querySelectorAll('.preset-btn').forEach(function(x){x.classList.remove('active');});
     b.classList.add('active');
     activePreset=parseInt(b.getAttribute('data-i'),10);
-    if(activePreset===4){$customSpeedWrap.classList.remove('hidden');}else{$customSpeedWrap.classList.add('hidden');}
+    if(activePreset===4){$customSpeedWrap.classList.remove('hidden');$customSpeedWrap.classList.add('fade-in');}else{$customSpeedWrap.classList.add('hidden');}
   });
 });
 
@@ -821,10 +689,10 @@ async function boot(){
 }
 boot();
 
- $box.addEventListener('dragover',function(e){e.preventDefault();$box.style.borderColor='rgba(129,140,248,.5)';});
- $box.addEventListener('dragleave',function(e){$box.style.borderColor='';});
+ $box.addEventListener('dragover',function(e){e.preventDefault();$box.style.borderColor='rgba(129,140,248,.6)';$box.style.background='rgba(129,140,248,.05)';});
+ $box.addEventListener('dragleave',function(e){$box.style.borderColor='';$box.style.background='';});
  $box.addEventListener('drop',function(e){
-  e.preventDefault();$box.style.borderColor='';
+  e.preventDefault();$box.style.borderColor='';$box.style.background='';
   var dt=e.dataTransfer;if(!dt||!dt.files||!dt.files.length)return;
   var ev=new Event('change');
   var dtRef=new DataTransfer();
@@ -835,30 +703,96 @@ boot();
  $fileInput.addEventListener('change',function(e){
   var p=Array.from(e.target.files||[]);if(!p.length)return;
   if(p.length>MAX_FILES){toast('Maks '+MAX_FILES+' file.','info');p=p.slice(0,MAX_FILES);}
-  items=p.map(function(f){return{file:f,name:f.name,size:f.size,status:'pending',url:null,blobData:null,dlName:null};});
+  items=p.map(function(f){return{file:f,name:f.name,size:f.size,status:'pending',url:null,blobData:null,dlName:null,customName:null};});
   $boxTitle.innerText=p.length+' file dipilih';$boxSub.innerText='Klik untuk ganti';
   $btn.disabled=false;$status.innerText=loaded?"Siap diedit.":"Tunggu editor...";renderList();
   logLine('info',p.length+' file terdeteksi');
 });
 
+// ===== RENAME LOGIC =====
+var renamingIndex = -1;
+function renameFile(idx) {
+    renamingIndex = idx;
+    var it = items[idx];
+    var baseName = it.customName || it.file.name.replace(/\.[^/.]+$/, "");
+    $('renameInput').value = baseName;
+    
+    var suffix = '_2.3YL';
+    var ext = FORMATS[state.chosenFmt].ext;
+    var isTooLong = (baseName.length + suffix.length + ext.length) > 50;
+    
+    if(isTooLong && !it.customName) {
+        $('renameWarn').classList.remove('hidden');
+    } else {
+        $('renameWarn').classList.add('hidden');
+    }
+    
+    $('renameModal').classList.add('show');
+    document.body.style.overflow = 'hidden';
+    setTimeout(function(){ $('renameInput').focus(); }, 100);
+}
+function closeRenameModal() {
+    $('renameModal').classList.remove('show');
+    document.body.style.overflow = '';
+}
+function saveRename() {
+    if (renamingIndex > -1) {
+        var newName = $('renameInput').value.trim();
+        if (newName) {
+            items[renamingIndex].customName = newName;
+            renderList();
+            toast('Nama file diubah', 'ok');
+        }
+    }
+    closeRenameModal();
+}
+ $('renameModal').addEventListener('click',function(e){if(e.target===$('renameModal'))closeRenameModal();});
+ $('renameInput').addEventListener('keydown', function(e) {
+    if(e.key === 'Enter') saveRename();
+});
+
 function renderList(){
   if($fileCountBadge)$fileCountBadge.textContent=items.length+' Files';
   if(!items.length){
-    $fileList.innerHTML='<div class="text-xs text-zinc-600 text-center py-8"><i class="fas fa-inbox" style="font-size:20px;opacity:.35"></i><div class="mt-2">Belum ada file. Klik "Upload Audio" untuk mulai.</div></div>';
+    $fileList.innerHTML='<div class="text-xs text-zinc-600 text-center py-8"><i class="fas fa-inbox" style="font-size:24px;opacity:.4"></i><div class="mt-2">Belum ada file. Klik "Upload Audio" untuk mulai.</div></div>';
     return;
   }
   $fileList.innerHTML=items.map(function(it,i){
-    var st='Menunggu',sc='text-zinc-600',extra='',icon='<i class="fas fa-circle text-zinc-700" style="font-size:6px"></i>';
-    if(it.status==='processing'){icon='<i class="fas fa-circle-notch fa-spin text-indigo-400" style="font-size:9px"></i>';st='Mengedit...';sc='text-indigo-400';}
-    if(it.status==='done'){
-      icon='<i class="fas fa-circle-check text-emerald-500" style="font-size:9px"></i>';st=FORMATS[state.chosenFmt].label+' — '+formatSize(it.size);sc='text-emerald-500/70';
-      extra='<div class="flex items-center gap-1.5 flex-shrink-0">';
-      extra+='<a class="text-[11px] font-semibold px-2.5 py-1.5 rounded-md text-black" style="background:#4ade80" href="'+it.url+'" download="'+it.dlName+'">Download</a>';
-      extra+='<button id="rbx_'+i+'" class="rbx-btn '+(isPremium()?'idle':'locked')+'" onclick="uploadToRoblox('+i+')">'+(isPremium()?'<i class="fas fa-cloud-arrow-up"></i> Upload Roblox':'<i class="fas fa-lock text-[10px]"></i> Pro')+'</button>';
-      extra+='</div>';
+    var st='Menunggu',sc='text-zinc-600',extra='<div class="flex items-center gap-1.5 flex-shrink-0">',icon='<i class="fas fa-circle text-zinc-700" style="font-size:6px"></i>';
+    
+    // Calculate Name Logic for UI
+    var baseName = it.customName || it.file.name.replace(/\.[^/.]+$/, "");
+    var suffix = '_2.3YL';
+    var ext = FORMATS[state.chosenFmt].ext;
+    var isTooLong = (baseName.length + suffix.length + ext.length) > 50;
+    var displayName = it.customName || it.file.name;
+    
+    if(it.status==='processing'){
+        icon='<i class="fas fa-circle-notch fa-spin text-indigo-400" style="font-size:9px"></i>';st='Mengedit...';sc='text-indigo-400';
     }
-    if(it.status==='error'){icon='<i class="fas fa-circle-xmark text-rose-500" style="font-size:9px"></i>';st='Gagal';sc='text-rose-500/70';}
-    return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row fade-up"><div class="row-index">'+(i+1)+'</div><div class="flex-1 min-w-0"><div class="text-xs font-medium text-zinc-300 truncate">'+it.name+'</div><div class="text-[10px] '+sc+' mt-0.5 flex items-center gap-1.5">'+icon+' '+st+'</div></div>'+extra+'</div>';
+    if(it.status==='done'){
+        icon='<i class="fas fa-circle-check text-emerald-500" style="font-size:9px"></i>';st=FORMATS[state.chosenFmt].label+' — '+formatSize(it.size);sc='text-emerald-500/70';
+        extra+='<a class="rbx-btn done" href="'+it.url+'" download="'+it.dlName+'" title="Download"><i class="fas fa-download" style="font-size:10px"></i></a>';
+        extra+='<button id="rbx_'+i+'" class="rbx-btn '+(isPremium()?'idle':'locked')+'" onclick="uploadToRoblox('+i+')" title="Upload Roblox">'+(isPremium()?'<i class="fas fa-cloud-arrow-up" style="font-size:10px"></i>':'<i class="fas fa-lock" style="font-size:10px"></i>')+'</button>';
+    }
+    if(it.status==='error'){
+        icon='<i class="fas fa-circle-xmark text-rose-500" style="font-size:9px"></i>';st='Gagal';sc='text-rose-500/70';
+    }
+    
+    // Add Rename Button
+    if(it.status!=='processing') {
+        if (isTooLong && !it.customName) {
+            extra += '<button class="rbx-btn idle" style="border-color:rgba(251,146,60,.4);color:#fb923c;background:rgba(251,146,60,.1)" onclick="renameFile('+i+')" title="Nama terlalu panjang, rename disarankan"><i class="fas fa-triangle-exclamation" style="font-size:10px"></i></button>';
+        } else if (it.customName) {
+            extra += '<button class="rbx-btn done" onclick="renameFile('+i+')" title="Edit nama"><i class="fas fa-pen" style="font-size:10px"></i></button>';
+        } else {
+            extra += '<button class="rbx-btn idle" onclick="renameFile('+i+')" title="Rename file"><i class="fas fa-pen" style="font-size:10px"></i></button>';
+        }
+    }
+    
+    extra+='</div>';
+    
+    return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row fade-up"><div class="row-index">'+(i+1)+'</div><div class="flex-1 min-w-0"><div class="text-xs font-medium text-zinc-300 truncate flex items-center gap-2"><i class="fas fa-music text-zinc-500" style="font-size:10px"></i> '+displayName+'</div><div class="text-[10px] '+sc+' mt-0.5 flex items-center gap-1.5">'+icon+' '+st+'</div></div>'+extra+'</div>';
   }).join('');
 }
 function formatSize(b){if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB';}
@@ -903,7 +837,19 @@ async function startProcess(){
       var data=await ffmpeg.readFile(out);
       var blob=new Blob([data.buffer],{type:fmt.mime});
       it.url=URL.createObjectURL(blob);it.blobData=blob;it.size=blob.size;
-      it.dlName=it.file.name.replace(/\.[^/.]+$/,"")+'_speed'+cspeed+'x'+fmt.ext;
+      
+      // NEW NAMING LOGIC
+      var baseName = it.customName || it.file.name.replace(/\.[^/.]+$/, "");
+      var suffix = '_2.3YL';
+      var maxBaseLength = 50 - suffix.length - fmt.ext.length;
+      if (baseName.length > maxBaseLength) {
+          if (!it.customName) {
+              toast('Nama file dipangkas agar <= 50 karakter', 'info');
+          }
+          baseName = baseName.substring(0, maxBaseLength);
+      }
+      it.dlName = baseName + suffix + fmt.ext;
+      
       it.status='done';useQuota(src);updateQuotaDisplay();
       logLine('success',it.file.name+' berhasil dikonversi');
       await ffmpeg.deleteFile(inp).catch(function(){});await ffmpeg.deleteFile(out).catch(function(){});
@@ -920,219 +866,6 @@ async function startProcess(){
   $btn.disabled=false;
 }
 updateQuotaDisplay();
-</script>
-
-<!-- ===== ENHANCEMENT SCRIPT (ADDITIONAL) ===== -->
-<script>
-// Payment method selection
-var PAY_METHOD_LABELS={qris:'QRIS',va:'Virtual Account',gopay:'GoPay',card:'Kartu Kredit'};
-var PLAN_LABELS={per_song:'1 Lagu',bundle_65:'65 Lagu',subscription:'Unlimited'};
-var chosenPayMethod='qris';
-
-function pickPayMethod(el){
-  document.querySelectorAll('.pay-method-card').forEach(function(c){c.classList.remove('chosen');});
-  el.classList.add('chosen');
-  chosenPayMethod=el.getAttribute('data-method');
-  updatePaySummary();
-}
-
-function updatePaySummary(){
-  if(!state.chosenPlan)return;
-  $('sumPlan').textContent=PLAN_LABELS[state.chosenPlan]||'-';
-  $('sumMethod').textContent=PAY_METHOD_LABELS[chosenPayMethod]||'-';
-  $('sumTotal').textContent='Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');
-}
-
-// Override pickPlan to show payment methods
-var originalPickPlan=pickPlan;
-pickPlan=function(el){
-  originalPickPlan(el);
-  $('payMethodSection').classList.remove('hidden');
-  $('paySummary').classList.remove('hidden');
-  updatePaySummary();
-};
-
-// Override openPayModal to reset
-var originalOpenPayModal=openPayModal;
-openPayModal=function(){
-  originalOpenPayModal();
-  chosenPayMethod='qris';
-  $('payMethodSection').classList.add('hidden');
-  $('paySummary').classList.add('hidden');
-  document.querySelectorAll('.pay-method-card').forEach(function(c,i){
-    if(i===0)c.classList.add('chosen');else c.classList.remove('chosen');
-  });
-};
-
-// Confetti animation
-function createConfetti(){
-  var colors=['#6366f1','#8b5cf6','#a78bfa','#4ade80','#fbbf24','#f472b6'];
-  for(var i=0;i<50;i++){
-    (function(idx){
-      setTimeout(function(){
-        var c=document.createElement('div');
-        c.className='confetti';
-        c.style.left=Math.random()*100+'vw';
-        c.style.background=colors[Math.floor(Math.random()*colors.length)];
-        c.style.borderRadius=Math.random()>0.5?'50%':'0';
-        c.style.animation='confettiFall '+(2+Math.random()*2)+'s linear forwards';
-        document.body.appendChild(c);
-        setTimeout(function(){if(c.parentNode)c.remove();},4000);
-      },idx*30);
-    })(i);
-  }
-}
-
-// Override showSuccessModal for confetti
-var originalShowSuccessModal=showSuccessModal;
-showSuccessModal=function(p){
-  originalShowSuccessModal(p);
-  if($('successQuota')){
-    $('successQuota').textContent=p==='subscription'?'∞':'+'+PLAN_CREDITS[p];
-  }
-  createConfetti();
-};
-
-// Payment processing modal
-function openPayProcessModal(){
-  $('payProcessModal').classList.add('show');
-  document.body.style.overflow='hidden';
-  var prog=0;
-  var statuses=['Menghubungkan ke gateway...','Memvalidasi data...','Menunggu konfirmasi...','Memproses pembayaran...','Finalisasi...'];
-  var si=0;
-  $('processStatus').textContent=statuses[0];
-  $('processProgFill').style.width='0%';
-  $('processProgTxt').textContent='0%';
-  var iv=setInterval(function(){
-    prog+=Math.random()*15+5;
-    if(prog>100)prog=100;
-    $('processProgFill').style.width=prog+'%';
-    $('processProgTxt').textContent=Math.floor(prog)+'%';
-    if(prog>20&&si<1){si=1;$('processStatus').textContent=statuses[1];}
-    if(prog>40&&si<2){si=2;$('processStatus').textContent=statuses[2];}
-    if(prog>60&&si<3){si=3;$('processStatus').textContent=statuses[3];}
-    if(prog>80&&si<4){si=4;$('processStatus').textContent=statuses[4];}
-    if(prog>=100){clearInterval(iv);}
-  },300);
-  return iv;
-}
-function closePayProcessModal(){$('payProcessModal').classList.remove('show');document.body.style.overflow='';}
-
-// Error modal
-function showErrorModal(msg){
-  $('errorMsg').textContent=msg||'Terjadi kesalahan saat memproses pembayaran.';
-  $('errorModal').classList.add('show');
-  document.body.style.overflow='hidden';
-}
-function closeErrorModal(){$('errorModal').classList.remove('show');document.body.style.overflow='';}
- $('errorModal').addEventListener('click',function(e){if(e.target===$('errorModal'))closeErrorModal();});
-
-// Override doPayment for processing modal
-var originalDoPayment=doPayment;
-doPayment=function(){
-  if(!state.chosenPlan||!state.email)return;
-  $payBtn.disabled=true;
-  $payBtn.innerHTML='<span class="spinner"></span> Memproses...';
-  
-  if(CONFIG_MODE==='demo'){
-    closePayModal();
-    var iv=openPayProcessModal();
-    setTimeout(function(){
-      clearInterval(iv);
-      $('processProgFill').style.width='100%';
-      $('processProgTxt').textContent='100%';
-      $('processStatus').textContent='Selesai!';
-      setTimeout(function(){
-        closePayProcessModal();
-        if(state.chosenPlan==='subscription'){state.isSubscribed=true;state.subExpiry=Date.now()+30*86400000;}
-        else{state.credits+=PLAN_CREDITS[state.chosenPlan];}
-        saveLocal();updateQuotaDisplay();showSuccessModal(state.chosenPlan);
-        toast('Pembayaran berhasil (demo)','ok');
-        $payBtn.disabled=false;$payBtn.textContent='Pilih paket';
-      },500);
-    },2500);
-    return;
-  }
-  
-  fetch(API_BASE+'/create-transaction',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:state.email,type:state.chosenPlan})})
-    .then(function(r){return r.json();})
-    .then(function(d){
-      if(!d.snap_token)throw new Error('No token');
-      window.snap.pay(d.snap_token,{
-        onSuccess:function(){
-          toast('Verifikasi...','info');
-          var t=0;
-          var p=setInterval(function(){
-            fetch(API_BASE+'/check?email='+encodeURIComponent(state.email)).then(function(r){return r.json();}).then(function(d){
-              state.credits=d.credits||0;state.isSubscribed=d.is_subscribed||false;state.subExpiry=d.subscription_expiry?new Date(d.subscription_expiry).getTime():null;
-              updateQuotaDisplay();
-              var ok=(state.chosenPlan==='subscription'&&state.isSubscribed)||(state.chosenPlan!=='subscription'&&state.credits>0);
-              if(ok||++t>20){clearInterval(p);if(ok){closePayModal();showSuccessModal(state.chosenPlan);}}
-            });
-          },3000);
-        },
-        onPending:function(){toast('Pending.','info');closePayModal();},
-        onError:function(){
-          toast('Gagal.','err');
-          showErrorModal('Pembayaran ditolak atau gagal diproses.');
-          $payBtn.disabled=false;
-          $payBtn.textContent='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');
-        },
-        onClose:function(){
-          $payBtn.disabled=false;
-          $payBtn.textContent='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');
-        }
-      });
-    })
-    .catch(function(e){
-      toast('Gagal.','err');
-      showErrorModal('Tidak dapat terhubung ke server pembayaran.');
-      $payBtn.disabled=false;
-      $payBtn.textContent='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');
-    });
-};
-
-// Add Escape key for new modals
-document.addEventListener('keydown',function(e){
-  if(e.key==='Escape'){
-    closePayProcessModal();
-    closeErrorModal();
-  }
-});
-
-// Enhanced log line with fade-in
-var originalLogLine=logLine;
-logLine=function(tag,msg){
-  if(!$logConsole)return;
-  var cls=String(tag).toLowerCase();
-  var time=new Date().toLocaleTimeString('id-ID',{hour12:false});
-  var row=document.createElement('div');
-  row.className='log-line fade-in';
-  row.innerHTML='<span class="log-tag '+cls+'">['+String(tag).toUpperCase()+']</span><span class="log-time">'+time+'</span><span class="log-msg"></span>';
-  row.querySelector('.log-msg').textContent=msg;
-  $logConsole.appendChild(row);
-  $logConsole.scrollTop=$logConsole.scrollHeight;
-};
-
-// Welcome toast on login
-var originalHandleCredentialResponse=handleCredentialResponse;
-handleCredentialResponse=function(r){
-  originalHandleCredentialResponse(r);
-  var p=decodeJwt(r.credential);
-  if(p){
-    toast('Selamat datang, '+(p.name||p.email.split('@')[0])+'!','ok');
-  }
-};
-
-// Toast feedback on convert complete
-var originalStartProcess=startProcess;
-startProcess=async function(){
-  await originalStartProcess();
-  var done=items.filter(function(x){return x.status==='done';}).length;
-  if(done>0){
-    toast(done+' file berhasil dikonversi!','ok');
-  }
-};
 </script>
 </body>
 </html>
