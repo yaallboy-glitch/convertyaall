@@ -7,7 +7,8 @@ self.addEventListener('fetch', function(e) {
       fetch(e.request).then(function(response) {
         var headers = new Headers(response.headers);
         headers.set('Cross-Origin-Opener-Policy', 'same-origin');
-        headers.set('Cross-Origin-Embedder-Policy', 'require-corp');
+        /* credentialless = SharedArrayBuffer aktif TANPA blokir resource eksternal */
+        headers.set('Cross-Origin-Embedder-Policy', 'credentialless');
         return new Response(response.body, {
           status: response.status,
           statusText: response.statusText,
@@ -15,12 +16,6 @@ self.addEventListener('fetch', function(e) {
         });
       }).catch(function(err) {
         return new Response('COI SW error: ' + err.message, { status: 500 });
-      })
-    );
-  } else if (e.request.mode === 'no-cors' && e.request.method === 'GET') {
-    e.respondWith(
-      fetch(e.request, { mode: 'cors' }).catch(function() {
-        return fetch(e.request);
       })
     );
   } else {
