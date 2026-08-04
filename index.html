@@ -307,10 +307,18 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
 (function(){
   if(!('serviceWorker' in navigator))return;
   if(window.crossOriginIsolated)return;
+  /* Anti infinite reload loop */
+  var rc=parseInt(sessionStorage.getItem('coi_rc')||'0',10);
+  if(rc>3){sessionStorage.removeItem('coi_rc');return;}
+  sessionStorage.setItem('coi_rc',String(rc+1));
   var base=window.location.pathname.replace(/\/[^/]*$/,'/');
   navigator.serviceWorker.register(base+'coi-serviceworker.js',{scope:base}).then(function(){
-    if(!window.crossOriginIsolated)setTimeout(function(){window.location.reload();},300);
+    if(!window.crossOriginIsolated)setTimeout(function(){
+      sessionStorage.removeItem('coi_rc');
+      window.location.reload();
+    },500);
   }).catch(function(err){
+    sessionStorage.removeItem('coi_rc');
     console.warn('[YL] COI SW gagal:',err.message);
   });
 })();
