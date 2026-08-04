@@ -30,11 +30,14 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
 .upload-zone:active{border-color:rgba(129,140,248,.6)}
 .prog-bar{height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
 .prog-fill{height:100%;width:0%;background:linear-gradient(90deg,#818cf8,#a78bfa);border-radius:2px;transition:width .15s}
-.preset-btn{transition:all .2s ease;cursor:pointer}
-.preset-btn.active{background:rgba(129,140,248,.1);border-color:rgba(129,140,248,.3);color:#a5b4fc}
-.preset-btn:not(.active):hover{border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.03)}
-.modal-bg{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center}
-.modal-box{background:#0e0e11;border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:24px;max-width:480px;width:92%;max-height:88vh;overflow-y:auto}
+.preset-btn{transition:all .25s cubic-bezier(.16,1,.3,1);cursor:pointer;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);color:#a1a1aa}
+.preset-btn:hover{border-color:rgba(129,140,248,.25);background:rgba(129,140,248,.05);transform:translateY(-1px)}
+.preset-btn.active{background:linear-gradient(135deg,rgba(129,140,248,.18),rgba(168,85,247,.14));border-color:rgba(129,140,248,.45);color:#c4b5fd;transform:scale(1.04);box-shadow:0 0 18px rgba(129,140,248,.18)}
+.preset-btn:active{transform:scale(.97)}
+.modal-bg{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s ease}
+.modal-bg.show{opacity:1;pointer-events:auto}
+.modal-box{background:#0e0e11;border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:24px;max-width:480px;width:92%;max-height:88vh;overflow-y:auto;transform:scale(.94) translateY(10px);transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.modal-bg.show .modal-box{transform:scale(1) translateY(0)}
 .fmt-card{border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;background:rgba(255,255,255,.02);transition:all .2s ease;cursor:pointer}
 .fmt-card:hover{border-color:rgba(129,140,248,.25);background:rgba(255,255,255,.04)}
 .fmt-card.chosen{border-color:rgba(129,140,248,.4);background:rgba(129,140,248,.06);box-shadow:0 0 20px rgba(129,140,248,.06)}
@@ -75,6 +78,17 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
 .gear-btn:hover{background:rgba(255,255,255,.1);color:#e4e4e7;border-color:rgba(255,255,255,.12)}
 .rbx-nav-btn{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#52525b;transition:all .2s;flex-shrink:0}
 .rbx-nav-btn:hover{background:rgba(255,255,255,.1);color:#e4e4e7;border-color:rgba(255,255,255,.12)}
+@keyframes floatBlob{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(18px,-14px) scale(1.05)}}
+.bg-mesh{animation:floatBlob 14s ease-in-out infinite}
+.btn-primary{position:relative;overflow:hidden}
+.btn-primary::after{content:'';position:absolute;top:0;left:-75%;width:50%;height:100%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.28),transparent);transform:skewX(-20deg)}
+.btn-primary:hover:not(:disabled)::after{animation:shine .9s ease}
+@keyframes shine{from{left:-75%}to{left:130%}}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 0 0 rgba(129,140,248,.35)}50%{box-shadow:0 0 0 7px rgba(129,140,248,0)}}
+.pay-card[data-plan="subscription"]{animation:pulseGlow 2.6s ease-in-out infinite}
+.upgrade-pill{cursor:pointer;transition:all .2s ease}
+.upgrade-pill:hover{transform:translateY(-1px);filter:brightness(1.15)}
+.hidden{display:none!important}
 </style>
 </head>
 <body class="min-h-screen">
@@ -92,7 +106,7 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
     </div>
     <div id="navRight" class="flex items-center gap-2">
       <div id="loginArea" class="flex items-center gap-2"><div id="googleBtnContainer"></div></div>
-      <div id="userChip" style="display:none" class="items-center gap-2">
+      <div id="userChip" class="hidden items-center gap-2">
         <img id="userAvatar" src="" alt="" style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.08)">
         <span id="userName" class="text-xs text-zinc-400 hidden sm:inline max-w-[90px] truncate"></span>
         <div id="creditChip" class="badge" style="background:rgba(255,255,255,.04);color:#52525b;border:1px solid rgba(255,255,255,.06)"><span id="creditText">0</span></div>
@@ -112,32 +126,35 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
     <p class="text-sm text-zinc-500 max-w-md mx-auto leading-relaxed">Edit kecepatan audio, upload langsung ke Roblox. Cepat, bersih, tanpa ribet.</p>
   </div>
 
-  <div id="mainCard" style="display:none" class="glass fade-up" style="border:1px solid rgba(255,255,255,.05);border-radius:16px;padding:20px;margin-bottom:32px">
+  <div id="mainCard" class="glass fade-up hidden" style="border:1px solid rgba(255,255,255,.05);border-radius:16px;padding:20px;margin-bottom:32px">
     <div class="flex items-center justify-between mb-4 px-3 py-2.5 rounded-lg" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04)">
       <div class="flex items-center gap-2">
         <div id="quotaDot" class="w-1.5 h-1.5 rounded-full bg-zinc-600"></div>
         <span id="quotaText" class="text-xs text-zinc-500">1 lagu gratis</span>
       </div>
-      <span id="planBadge" class="badge" style="background:rgba(255,255,255,.04);color:#52525b;border:1px solid rgba(255,255,255,.06);font-size:9px">FREE</span>
+      <div class="flex items-center gap-1.5">
+        <span id="planBadge" class="badge" style="background:rgba(255,255,255,.04);color:#52525b;border:1px solid rgba(255,255,255,.06);font-size:9px">FREE</span>
+        <span onclick="openPayModal()" class="badge upgrade-pill" style="background:linear-gradient(135deg,rgba(129,140,248,.15),rgba(168,85,247,.15));color:#c4b5fd;border:1px solid rgba(129,140,248,.25);font-size:9px"><i class="fas fa-bolt" style="font-size:8px"></i> Upgrade</span>
+      </div>
     </div>
 
     <div class="mb-4">
       <div class="section-label">Speed Preset</div>
       <div class="grid grid-cols-5 gap-1.5" id="presetPicker">
-        <button class="preset-btn active text-xs font-semibold py-2 rounded-lg" style="border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);color:#a1a1aa" data-i="0">2.3x</button>
-        <button class="preset-btn text-xs font-semibold py-2 rounded-lg" style="border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);color:#a1a1aa" data-i="1">2.5x</button>
-        <button class="preset-btn text-xs font-semibold py-2 rounded-lg" style="border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);color:#a1a1aa" data-i="2">2.7x</button>
-        <button class="preset-btn text-xs font-semibold py-2 rounded-lg" style="border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);color:#a1a1aa" data-i="3">4.7x</button>
-        <button class="preset-btn text-xs font-semibold py-2 rounded-lg" style="border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);color:#a1a1aa" data-i="4">Custom</button>
+        <button class="preset-btn active text-xs font-semibold py-2 rounded-lg" data-i="0">2.3x</button>
+        <button class="preset-btn text-xs font-semibold py-2 rounded-lg" data-i="1">2.5x</button>
+        <button class="preset-btn text-xs font-semibold py-2 rounded-lg" data-i="2">2.7x</button>
+        <button class="preset-btn text-xs font-semibold py-2 rounded-lg" data-i="3">4.7x</button>
+        <button class="preset-btn text-xs font-semibold py-2 rounded-lg" data-i="4">Custom</button>
       </div>
-      <div id="customSpeedWrap" style="display:none" class="mt-3 flex items-center justify-center gap-3 py-3 px-4 rounded-lg" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04)">
+      <div id="customSpeedWrap" class="hidden mt-3 flex items-center justify-center gap-3 py-3 px-4 rounded-lg" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04)">
         <span class="text-xs text-zinc-500">Speed:</span>
         <input type="number" id="customSpeedInput" class="speed-input" value="2.5" min="0.1" max="10" step="0.1">
         <span class="text-zinc-600 font-bold">x</span>
       </div>
     </div>
 
-    <div id="warnBanner" style="display:none" class="mb-4 p-3 rounded-lg text-xs text-amber-300/80" style="background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.1)">
+    <div id="warnBanner" class="hidden mb-4 p-3 rounded-lg text-xs text-amber-300/80" style="background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.1)">
       <b class="text-amber-200/90">Mode Tamu</b> — dibuka via in-app browser.
     </div>
 
@@ -150,12 +167,12 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
       <p id="boxSub" class="text-[11px] text-zinc-600">MP3, WAV, OGG, FLAC, M4A — maks 10 file</p>
     </label>
     <input type="file" id="audioFile" accept=".mp3,audio/mpeg,.wav,audio/wav,.ogg,audio/ogg,.flac,audio/flac,.m4a,audio/mp4,.aac,audio/aac,.wma,.opus,audio/opus" multiple style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0">
-    <div id="fileList" style="display:none" class="flex-col gap-1.5 mb-4"></div>
+    <div id="fileList" class="hidden flex-col gap-1.5 mb-4"></div>
     <button id="btn" disabled class="btn-primary w-full justify-center py-3 text-sm" style="border-radius:10px">
       <i class="fas fa-wand-magic-sparkles" style="font-size:11px"></i> Edit Lagu
     </button>
     <div id="status" class="text-center text-[11px] text-zinc-600 mt-2 min-h-[16px]">Menyiapkan editor...</div>
-    <div id="progWrap" style="display:none" class="mt-3">
+    <div id="progWrap" class="hidden mt-3">
       <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
       <div class="text-center text-[10px] text-zinc-600 mt-1" id="progTxt">0%</div>
     </div>
@@ -167,8 +184,8 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
 </main>
 
 <!-- MODAL FORMAT -->
-<div class="modal-bg" id="fmtModal" style="display:none">
-  <div class="modal-box" style="max-width:400px">
+<div class="modal-bg" id="fmtModal">
+  <div class="modal-box scale-in" style="max-width:400px">
     <div class="flex items-center justify-between mb-4">
       <h3 class="text-base font-bold">Format Output</h3>
     </div>
@@ -206,8 +223,8 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
 </div>
 
 <!-- MODAL ROBLOX SETTINGS -->
-<div class="modal-bg" id="rbxModal" style="display:none">
-  <div class="modal-box" style="max-width:420px">
+<div class="modal-bg" id="rbxModal">
+  <div class="modal-box scale-in" style="max-width:420px">
     <div class="flex items-center justify-between mb-4">
       <h3 class="text-base font-bold">Pengaturan Roblox</h3>
       <button onclick="closeRbxModal()" class="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-200 transition-colors" style="background:rgba(255,255,255,.04)"><i class="fas fa-xmark text-xs"></i></button>
@@ -237,8 +254,8 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
 </div>
 
 <!-- MODAL UPGRADE -->
-<div class="modal-bg" id="upgradeModal" style="display:none">
-  <div class="modal-box text-center" style="max-width:340px">
+<div class="modal-bg" id="upgradeModal">
+  <div class="modal-box scale-in text-center" style="max-width:340px">
     <div class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:rgba(168,85,247,.08)"><i class="fas fa-cube text-purple-400 text-xl"></i></div>
     <h3 class="text-base font-bold mb-1">Fitur Premium</h3>
     <p class="text-xs text-zinc-500 mb-5 leading-relaxed">Auto upload ke Roblox hanya tersedia untuk paket Unlimited</p>
@@ -248,8 +265,8 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
 </div>
 
 <!-- MODAL PEMBAYARAN -->
-<div class="modal-bg" id="payModal" style="display:none">
-  <div class="modal-box" style="max-width:420px">
+<div class="modal-bg" id="payModal">
+  <div class="modal-box scale-in" style="max-width:420px">
     <div class="flex items-center justify-between mb-4">
       <h3 class="text-base font-bold">Pilih Paket</h3>
       <button onclick="closePayModal()" class="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-200 transition-colors" style="background:rgba(255,255,255,.04)"><i class="fas fa-xmark text-xs"></i></button>
@@ -272,8 +289,8 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
 </div>
 
 <!-- MODAL SUKSES -->
-<div class="modal-bg" id="successModal" style="display:none">
-  <div class="modal-box text-center" style="max-width:340px">
+<div class="modal-bg" id="successModal">
+  <div class="modal-box scale-in text-center" style="max-width:340px">
     <div class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:rgba(52,211,153,.08)"><i class="fas fa-check text-emerald-400 text-xl"></i></div>
     <h3 class="text-base font-bold mb-1">Berhasil</h3>
     <p id="successMsg" class="text-xs text-zinc-500 mb-5">Kuota ditambahkan.</p>
@@ -328,12 +345,12 @@ function saveLocal(){if(CONFIG_MODE!=='demo')return;try{localStorage.setItem('co
 function loadLocal(em){if(CONFIG_MODE!=='demo')return;try{var d=JSON.parse(localStorage.getItem('convyl_pay'));if(d&&d.email===em){state.credits=d.credits||0;state.isSubscribed=d.isSubscribed||false;state.subExpiry=d.subExpiry||null;}}catch(e){}}
 function saveRbxLocal(){try{localStorage.setItem('convyl_rbx_'+state.email,JSON.stringify({proxy:state.rbxProxy,key:state.rbxKey,uid:state.rbxUserId}));}catch(e){}}
 function loadRbxLocal(){try{var d=JSON.parse(localStorage.getItem('convyl_rbx_'+state.email));if(d){state.rbxProxy=d.proxy||null;state.rbxKey=d.key||null;state.rbxUserId=d.uid||null;}}catch(e){}}
-function openRbxModal(){$rbxProxyInput.value=state.rbxProxy||'';$rbxKeyInput.value=state.rbxKey||'';$rbxUserIdInput.value=state.rbxUserId||'';$rbxModal.style.display='flex';document.body.style.overflow='hidden';}
-function closeRbxModal(){$rbxModal.style.display='none';document.body.style.overflow='';}
+function openRbxModal(){$rbxProxyInput.value=state.rbxProxy||'';$rbxKeyInput.value=state.rbxKey||'';$rbxUserIdInput.value=state.rbxUserId||'';$rbxModal.classList.add('show');document.body.style.overflow='hidden';}
+function closeRbxModal(){$rbxModal.classList.remove('show');document.body.style.overflow='';}
 function saveRbxSettings(){state.rbxProxy=$rbxProxyInput.value.trim()||null;state.rbxKey=$rbxKeyInput.value.trim()||null;state.rbxUserId=$rbxUserIdInput.value.trim()||null;saveRbxLocal();closeRbxModal();toast(state.rbxKey?'Roblox terhubung':'Pengaturan disimpan','ok');}
 function clearRbxSettings(){$rbxProxyInput.value='';$rbxKeyInput.value='';$rbxUserIdInput.value='';state.rbxProxy=null;state.rbxKey=null;state.rbxUserId=null;saveRbxLocal();closeRbxModal();toast('Dihapus','info');}
-function openUpgradeModal(){$upgradeModal.style.display='flex';document.body.style.overflow='hidden';}
-function closeUpgradeModal(){$upgradeModal.style.display='none';document.body.style.overflow='';closePayModal();}
+function openUpgradeModal(){$upgradeModal.classList.add('show');document.body.style.overflow='hidden';}
+function closeUpgradeModal(){$upgradeModal.classList.remove('show');document.body.style.overflow='';}
 $rbxModal.addEventListener('click',function(e){if(e.target===$rbxModal)closeRbxModal();});
 $upgradeModal.addEventListener('click',function(e){if(e.target===$upgradeModal)closeUpgradeModal();});
 
@@ -372,16 +389,16 @@ function canEdit(){
 function useQuota(s){if(s==='free'){state.freeUsed=true;return;}if(s==='credit'){state.credits--;saveLocal();}}
 function refundQuota(s){if(s==='free'){state.freeUsed=false;return;}if(s==='credit'){state.credits++;saveLocal();}}
 
-function openFmtModal(){$fmtModal.style.display='flex';document.body.style.overflow='hidden';}
-function closeFmtModal(){$fmtModal.style.display='none';document.body.style.overflow='';}
+function openFmtModal(){$fmtModal.classList.add('show');document.body.style.overflow='hidden';}
+function closeFmtModal(){$fmtModal.classList.remove('show');document.body.style.overflow='';}
 function pickFmt(el){document.querySelectorAll('.fmt-card').forEach(function(c){c.classList.remove('chosen');});el.classList.add('chosen');state.chosenFmt=el.getAttribute('data-fmt');$fmtBtn.textContent='Mulai Edit — '+FORMATS[state.chosenFmt].label;}
 $fmtModal.addEventListener('click',function(e){if(e.target===$fmtModal)closeFmtModal();});
 
-function openPayModal(){state.chosenPlan=null;document.querySelectorAll('.pay-card').forEach(function(c){c.classList.remove('chosen');});$payBtn.disabled=true;$payBtn.textContent='Pilih paket';$payModal.style.display='flex';document.body.style.overflow='hidden';}
-function closePayModal(){$payModal.style.display='none';document.body.style.overflow='';}
+function openPayModal(){state.chosenPlan=null;document.querySelectorAll('.pay-card').forEach(function(c){c.classList.remove('chosen');});$payBtn.disabled=true;$payBtn.textContent='Pilih paket';$payModal.classList.add('show');document.body.style.overflow='hidden';}
+function closePayModal(){$payModal.classList.remove('show');document.body.style.overflow='';}
 function pickPlan(el){document.querySelectorAll('.pay-card').forEach(function(c){c.classList.remove('chosen');});el.classList.add('chosen');state.chosenPlan=el.getAttribute('data-plan');$payBtn.disabled=false;$payBtn.textContent='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');}
-function showSuccessModal(p){if(p==='subscription')$successMsg.textContent='Unlimited aktif 30 hari. Roblox upload tersedia.';else if(p==='bundle_65')$successMsg.textContent='65 lagu ditambahkan.';else $successMsg.textContent='1 lagu ditambahkan.';$successModal.style.display='flex';document.body.style.overflow='hidden';}
-function closeSuccessModal(){$successModal.style.display='none';document.body.style.overflow='';updateQuotaDisplay();}
+function showSuccessModal(p){if(p==='subscription')$successMsg.textContent='Unlimited aktif 30 hari. Roblox upload tersedia.';else if(p==='bundle_65')$successMsg.textContent='65 lagu ditambahkan.';else $successMsg.textContent='1 lagu ditambahkan.';$successModal.classList.add('show');document.body.style.overflow='hidden';}
+function closeSuccessModal(){$successModal.classList.remove('show');document.body.style.overflow='';updateQuotaDisplay();}
 $payModal.addEventListener('click',function(e){if(e.target===$payModal)closePayModal();});
 $successModal.addEventListener('click',function(e){if(e.target===$successModal)closeSuccessModal();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeFmtModal();closePayModal();closeSuccessModal();closeRbxModal();closeUpgradeModal();}});
@@ -426,7 +443,7 @@ var isInApp=(function(){
   var u=navigator.userAgent||'';
   return['WhatsApp','Instagram','FBAN','FBAV','Line/','MicroMessenger','TikTok','Discord'].some(function(p){return u.indexOf(p)!==-1;});
 })();
-if(isInApp){$warnBanner.style.display='';$loginArea.style.display='none';$mainCard.style.display='';updateQuotaDisplay();}
+if(isInApp){$warnBanner.classList.remove('hidden');$loginArea.classList.add('hidden');$mainCard.classList.remove('hidden');updateQuotaDisplay();}
 
 var GOOGLE_CLIENT_ID="554107557548-o2q25dcsqj07r3hupdkvtes2tujfri9l.apps.googleusercontent.com";
 function decodeJwt(t){try{var p=t.split('.')[1];return JSON.parse(decodeURIComponent(atob(p).split('').map(function(c){return'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2);}).join('')));}catch(e){return null;}}
@@ -434,7 +451,7 @@ function handleCredentialResponse(r){
   var p=decodeJwt(r.credential);if(!p)return;
   state.email=p.email;state.name=p.name||p.email;state.freeUsed=false;
   $userAvatar.src=p.picture||'';$userName.textContent=state.name;
-  $loginArea.style.display='none';$userChip.style.display='flex';$mainCard.style.display='';
+  $loginArea.classList.add('hidden');$userChip.classList.remove('hidden');$mainCard.classList.remove('hidden');
   loadLocal(state.email);loadRbxLocal();updateQuotaDisplay();
   try{localStorage.setItem('convyl_user',JSON.stringify(p));}catch(e){}
 }
@@ -443,7 +460,7 @@ function handleLogout(){
   try{localStorage.removeItem('convyl_user');}catch(e){}
   state.email=null;state.name=null;state.credits=0;state.isSubscribed=false;state.subExpiry=null;state.freeUsed=false;
   state.rbxProxy=null;state.rbxKey=null;state.rbxUserId=null;
-  $loginArea.style.display='';$userChip.style.display='none';$mainCard.style.display='none';
+  $loginArea.classList.remove('hidden');$userChip.classList.add('hidden');$mainCard.classList.add('hidden');
 }
 $logoutBtn.addEventListener('click',handleLogout);
 function initGoogleLogin(){
@@ -457,7 +474,7 @@ function initGoogleLogin(){
       var p=JSON.parse(s);
       state.email=p.email;state.name=p.name||p.email;
       $userAvatar.src=p.picture||'';$userName.textContent=state.name;
-      $loginArea.style.display='none';$userChip.style.display='flex';$mainCard.style.display='';
+      $loginArea.classList.add('hidden');$userChip.classList.remove('hidden');$mainCard.classList.remove('hidden');
       loadLocal(state.email);loadRbxLocal();updateQuotaDisplay();
     }
   }catch(e){}
@@ -471,7 +488,7 @@ document.querySelectorAll('.preset-btn').forEach(function(b){
     document.querySelectorAll('.preset-btn').forEach(function(x){x.classList.remove('active');});
     b.classList.add('active');
     activePreset=parseInt(b.getAttribute('data-i'),10);
-    if(activePreset===4){$customSpeedWrap.style.display='flex';}else{$customSpeedWrap.style.display='none';}
+    if(activePreset===4){$customSpeedWrap.classList.remove('hidden');}else{$customSpeedWrap.classList.add('hidden');}
   });
 });
 
@@ -479,7 +496,7 @@ var ffmpeg=new FFmpegWASM.FFmpeg(),toBlobURL=FFmpegUtil.toBlobURL,fetchFile=FFmp
 var loaded=false,items=[];
 function checkEnv(){if(typeof Worker==='undefined')return'Web Worker tidak didukung.';if(typeof WebAssembly==='undefined')return'WebAssembly tidak didukung.';return null;}
 var envError=checkEnv();
-if(envError){$status.innerText=envError;$warnBanner.style.display='';$warnBanner.querySelector('b').innerText='⚠ Error';}
+if(envError){$status.innerText=envError;$warnBanner.classList.remove('hidden');$warnBanner.querySelector('b').innerText='⚠ Error';}
 ffmpeg.on('log',function(e){console.log("[YL]",e.message);});
 ffmpeg.on('progress',function(e){var p=Math.max(0,Math.min(1,e.progress))*100;$progFill.style.width=p.toFixed(1)+"%";$progTxt.innerText=p.toFixed(1)+"%";});
 function withTimeout(p,m,l){
@@ -501,7 +518,7 @@ async function boot(){
     }),25000,"Load FFmpeg");
     loaded=true;$status.innerText=items.length?"Siap diedit.":"Editor siap.";
   }catch(e){
-    $status.innerText="Gagal — "+describeError(e);$warnBanner.style.display='';
+    $status.innerText="Gagal — "+describeError(e);$warnBanner.classList.remove('hidden');
   }
 }
 boot();
@@ -515,7 +532,7 @@ $fileInput.addEventListener('change',function(e){
 });
 
 function renderList(){
-  if(items.length)$fileList.style.display='flex';else $fileList.style.display='none';
+  if(items.length)$fileList.classList.remove('hidden');else $fileList.classList.add('hidden');
   $fileList.innerHTML=items.map(function(it,i){
     var st='Menunggu',sc='text-zinc-600',extra='',icon='<i class="fas fa-music text-zinc-700 text-xs"></i>';
     if(it.status==='processing'){icon='<i class="fas fa-circle-notch fa-spin text-indigo-400 text-xs"></i>';st='Mengedit...';sc='text-indigo-400';}
@@ -542,7 +559,7 @@ $btn.addEventListener('click',function(){
 async function startProcess(){
   closeFmtModal();
   var fmt=FORMATS[state.chosenFmt];
-  $btn.disabled=true;$progWrap.style.display='';
+  $btn.disabled=true;$progWrap.classList.remove('hidden');
   var total=items.length;
   var cspeed,cresample,cdb;
   if(activePreset===4){cspeed=parseFloat($customSpeedInput.value)||2.5;cresample=cspeed>4?96000:48000;cdb=0;}
