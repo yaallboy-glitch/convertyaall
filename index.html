@@ -3,557 +3,543 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ConverterYL — Pro Audio Converter</title>
+<title>ConverterYL | Editor Audio Cepat</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-client-XXXXX_GANTI"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-*{font-family:'Inter',sans-serif;margin:0;padding:0;box-sizing:border-box}
-body{background:#060608;color:#e4e4e7;overflow-x:hidden}
-::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#27272a;border-radius:3px}::-webkit-scrollbar-thumb:hover{background:#3f3f46}
-.grad-text{background:linear-gradient(135deg,#818cf8,#a78bfa,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.glass{background:rgba(255,255,255,.02);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.05)}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.fade-up{animation:fadeUp .4s cubic-bezier(.16,1,.3,1)}
-.bg-mesh{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 600px 400px at 15% 20%,rgba(99,102,241,.06),transparent),radial-gradient(ellipse 500px 500px at 85% 80%,rgba(168,85,247,.05),transparent),radial-gradient(ellipse 400px 300px at 50% 50%,rgba(129,140,248,.03),transparent)}
-.bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:64px 64px}
-.upload-zone{border:1.5px dashed rgba(255,255,255,.1);transition:all .3s ease;cursor:pointer}
-.upload-zone:hover{border-color:rgba(129,140,248,.4);background:rgba(129,140,248,.03)}
-.upload-zone:active{border-color:rgba(129,140,248,.6)}
-.prog-bar{height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
-.prog-fill{height:100%;width:0%;background:linear-gradient(90deg,#818cf8,#a78bfa);border-radius:2px;transition:width .15s}
-.preset-btn{transition:all .2s ease;cursor:pointer}
-.preset-btn.active{background:rgba(129,140,248,.1);border-color:rgba(129,140,248,.3);color:#a5b4fc}
-.preset-btn:not(.active):hover{border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.03)}
-.modal-bg{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center}
-.modal-box{background:#0e0e11;border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:24px;max-width:480px;width:92%;max-height:88vh;overflow-y:auto}
-.fmt-card{border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px;background:rgba(255,255,255,.02);transition:all .2s ease;cursor:pointer}
-.fmt-card:hover{border-color:rgba(129,140,248,.25);background:rgba(255,255,255,.04)}
-.fmt-card.chosen{border-color:rgba(129,140,248,.4);background:rgba(129,140,248,.06);box-shadow:0 0 20px rgba(129,140,248,.06)}
-.pay-card{border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:18px;background:rgba(255,255,255,.02);transition:all .25s ease;cursor:pointer}
-.pay-card:hover{border-color:rgba(129,140,248,.3);background:rgba(255,255,255,.04)}
-.pay-card.chosen{border-color:rgba(129,140,248,.5);background:rgba(129,140,248,.06);box-shadow:0 0 24px rgba(129,140,248,.08)}
-.toast-wrap{position:fixed;top:72px;right:16px;z-index:99999;display:flex;flex-direction:column;gap:8px}
-.toast-item{padding:10px 16px;border-radius:10px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:8px;min-width:240px;animation:fadeUp .3s ease,toastOut .3s ease 3s forwards;box-shadow:0 8px 32px rgba(0,0,0,.5)}
-.toast-ok{background:#052e16;border:1px solid #14532d;color:#4ade80}
-.toast-err{background:#2a0a0a;border:1px solid #7f1d1d;color:#f87171}
-.toast-info{background:#1a1508;border:1px solid #422006;color:#fbbf24}
-@keyframes toastOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-8px)}}
-.btn-primary{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-weight:600;padding:10px 24px;border-radius:10px;border:none;cursor:pointer;font-size:.875rem;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
-.btn-primary:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 4px 20px rgba(99,102,241,.3)}
-.btn-primary:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
-.btn-ghost{background:transparent;color:#a1a1aa;font-weight:500;padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.06);cursor:pointer;font-size:.8rem;transition:all .2s}
-.btn-ghost:hover{color:#e4e4e7;border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.03)}
-.input-f{width:100%;padding:11px 14px;background:#09090b;border:1px solid rgba(255,255,255,.08);border-radius:8px;color:#e4e4e7;font-size:.85rem;font-family:'Inter',sans-serif;transition:border-color .2s;outline:none}
-.input-f:focus{border-color:rgba(129,140,248,.5);box-shadow:0 0 0 3px rgba(129,140,248,.08)}
-.input-f::placeholder{color:#3f3f46}
-.speed-input{background:transparent;border:none;color:#a5b4fc;font-size:1.3rem;font-weight:700;width:70px;text-align:center;outline:none}
-.speed-input::-webkit-outer-spin-button,.speed-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.speed-input[type=number]{-moz-appearance:textfield}
-.rbx-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid;transition:all .2s;white-space:nowrap}
-.rbx-btn.idle{background:rgba(226,29,72,.08);color:#fb7185;border-color:rgba(226,29,72,.2)}
-.rbx-btn.idle:hover{background:rgba(226,29,72,.15);border-color:rgba(226,29,72,.35)}
-.rbx-btn.locked{background:rgba(255,255,255,.03);color:#52525b;border-color:rgba(255,255,255,.06);cursor:default}
-.rbx-btn.loading{pointer-events:none;background:rgba(129,140,248,.1);color:#a5b4fc;border-color:rgba(129,140,248,.2)}
-.rbx-btn.done{background:rgba(52,211,153,.08);color:#4ade80;border-color:rgba(52,211,153,.2)}
-.rbx-btn.done:hover{background:rgba(52,211,153,.15)}
-.spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.2);border-top-color:currentColor;border-radius:50%;animation:spin .5s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;letter-spacing:.3px}
-.badge-pro{background:rgba(168,85,247,.1);color:#c084fc;border:1px solid rgba(168,85,247,.15)}
-.section-label{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:#52525b;margin-bottom:10px}
-.rbx-nav-btn{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#52525b;transition:all .2s;flex-shrink:0}
-.rbx-nav-btn:hover{background:rgba(255,255,255,.1);color:#e4e4e7;border-color:rgba(255,255,255,.12)}
-.login-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 18px;border-radius:20px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:#a1a1aa;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap}
-.login-btn:hover{background:rgba(255,255,255,.08);color:#e4e4e7;border-color:rgba(255,255,255,.15)}
-.login-loading{display:inline-flex;align-items:center;gap:6px;padding:7px 18px;border-radius:20px;font-size:12px;color:#52525b;white-space:nowrap}
-.inapp-overlay{position:fixed;inset:0;z-index:9998;background:rgba(6,6,8,.97);display:flex;align-items:center;justify-content:center;padding:20px}
-.inapp-box{max-width:380px;width:100%;text-center}
-.inapp-icon{width:64px;height:64px;margin:0 auto 20px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.12)}
-.inapp-box h2{font-size:1.25rem;font-weight:700;margin-bottom:8px;color:#e4e4e7}
-.inapp-box p{font-size:.8rem;color:#71717a;line-height:1.6;margin-bottom:24px}
-.inapp-copy{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:12px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-weight:600;font-size:.875rem;cursor:pointer;border:none;transition:all .2s}
-.inapp-copy:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 4px 20px rgba(99,102,241,.3)}
-.inapp-copy.copied{background:linear-gradient(135deg,#059669,#10b981)}
-.inapp-steps{text-align:left;margin:0 auto 24px;max-width:280px;padding-left:0}
-.inapp-steps li{font-size:.75rem;color:#a1a1aa;margin-bottom:8px;list-style:none;padding-left:20px;position:relative;line-height:1.5}
-.inapp-steps li::before{content:attr(data-step);position:absolute;left:0;color:#818cf8;font-weight:700;font-size:.7rem}
+  * { font-family: 'Inter', sans-serif; }
+  body { background: #0a0a0a; color: #fff; }
+
+  .gradient-text{
+    background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .glow-border{ box-shadow: 0 0 30px rgba(99,102,241,.15); }
+  .feature-card{ transition: all .3s ease; }
+  .feature-card:hover{ border-color: rgba(99,102,241,.5); }
+
+  .upload-zone{ border: 2px dashed #3f3f46; transition: all .3s ease; }
+  .upload-zone:active{ border-color: #6366f1; background: rgba(99,102,241,.05); }
+
+  @keyframes pulse-glow{
+    0%,100%{ box-shadow: 0 0 20px rgba(99,102,241,.3); }
+    50%{ box-shadow: 0 0 40px rgba(99,102,241,.5); }
+  }
+  .pulse-glow{ animation: pulse-glow 2s ease-in-out infinite; }
+
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+  .fade-in{ animation: fadeIn .35s ease; }
+
+  .orb{ position:fixed; border-radius:50%; filter: blur(100px); opacity:.15; pointer-events:none; z-index:0; }
+  .orb-1{ top:-10%; left:-5%; width:400px; height:400px; background:#6366f1; animation: float 15s ease-in-out infinite; }
+  .orb-2{ bottom:-10%; right:-5%; width:350px; height:350px; background:#ec4899; animation: float 20s ease-in-out infinite reverse; }
+  @keyframes float{ 0%,100%{ transform:translate(0,0); } 50%{ transform:translate(30px,30px); } }
+
+  .prog-bar{ height:6px; background:#27272a; border-radius:3px; overflow:hidden; }
+  .prog-fill{ height:100%; width:0%; background:linear-gradient(90deg,#6366f1,#a855f7); border-radius:3px; transition:width .2s; }
+
+  .preset-btn.active{
+    background: rgba(99,102,241,.15); border-color: rgba(99,102,241,.5); color:#a5b4fc;
+  }
+  .hidden{ display:none; }
+
+  /* Styling untuk input speed custom */
+  .speed-custom-input {
+    background: transparent; border: none;
+    color: #a5b4fc; font-size: 1.5rem; font-weight: 700;
+    width: 80px; text-align: center; outline: none; padding: 0;
+  }
+  .speed-custom-input::-webkit-outer-spin-button,
+  .speed-custom-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .speed-custom-input[type=number] { -moz-appearance: textfield; }
 </style>
 </head>
 <body class="min-h-screen">
 
-<div class="bg-mesh"></div>
-<div class="bg-grid"></div>
-<div class="toast-wrap" id="toastWrap"></div>
-
-<!-- OVERLAY IN-APP BROWSER -->
-<div class="inapp-overlay" id="inappOverlay" style="display:none">
-  <div class="inapp-box fade-up">
-    <div class="inapp-icon"><i class="fas fa-arrow-up-right-from-square text-amber-400 text-2xl"></i></div>
-    <h2>Buka di Browser</h2>
-    <p>Editor audio membutuhkan fitur yang tidak tersedia di dalam aplikasi ini. Buka link di Chrome atau Safari.</p>
-    <ol class="inapp-steps">
-      <li data-step="1.">Klik tombol <b style="color:#e4e4e7">Salin Link</b> di bawah</li>
-      <li data-step="2.">Buka <b style="color:#e4e4e7">Chrome</b> atau <b style="color:#e4e4e7">Safari</b></li>
-      <li data-step="3.">Paste link di address bar lalu buka</li>
-    </ol>
-    <button class="inapp-copy" id="inappCopyBtn" onclick="copyLinkForInApp()">
-      <i class="fas fa-link" style="font-size:13px"></i> Salin Link
-    </button>
-  </div>
-</div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
 
 <!-- NAVBAR -->
-<nav class="fixed top-0 left-0 right-0 z-50" style="background:rgba(6,6,8,.85);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.04)">
-  <div class="max-w-3xl mx-auto px-5 h-14 flex items-center justify-between">
+<nav class="relative z-10 border-b border-zinc-800/50 backdrop-blur-md bg-black/30 sticky top-0">
+  <div class="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
     <div class="flex items-center gap-2">
-      <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)"><i class="fas fa-bolt text-[11px] text-white"></i></div>
-      <span class="font-bold text-sm tracking-tight">Converter<span class="grad-text">YL</span></span>
+      <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-sm">YL</div>
+      <span class="font-bold text-lg">Converter<span class="gradient-text">YL</span></span>
     </div>
-    <div id="navRight" class="flex items-center gap-2">
-      <div id="loginArea" class="flex items-center gap-2">
-        <div id="loginLoading" class="login-loading"><span class="spinner" style="width:12px;height:12px;border-width:2px"></span> Memuat...</div>
-        <div id="googleBtnContainer" style="display:none"></div>
-        <div id="loginFallback" style="display:none" class="login-btn" onclick="tryInitGoogle()"><i class="fas fa-right-to-bracket" style="font-size:12px"></i> Masuk</div>
+    
+    <!-- AREA LOGIN DI KANAN ATAS -->
+    <div class="flex items-center gap-3">
+      <div id="loginArea" class="flex items-center gap-3">
+        <div id="googleBtnContainer"></div>
       </div>
-      <div id="userChip" style="display:none" class="items-center gap-2">
-        <img id="userAvatar" src="" alt="" style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.08)">
-        <span id="userName" class="text-xs text-zinc-400 hidden sm:inline max-w-[90px] truncate"></span>
-        <div id="creditChip" class="badge" style="background:rgba(255,255,255,.04);color:#52525b;border:1px solid rgba(255,255,255,.06)"><span id="creditText">0</span></div>
-        <button class="rbx-nav-btn" onclick="openRbxModal()" title="Pengaturan Roblox"><i class="fas fa-cube" style="font-size:13px"></i></button>
-        <button id="logoutBtn" onclick="handleLogout()" class="btn-ghost" style="padding:6px 8px" title="Keluar"><i class="fas fa-right-from-bracket" style="font-size:11px"></i></button>
+      
+      <!-- AREA USER SETELAH LOGIN -->
+      <div id="userChip" class="hidden items-center gap-2.5">
+        <img id="userAvatar" src="" alt="" class="w-8 h-8 rounded-full border border-zinc-700">
+        <span id="userName" class="text-sm text-zinc-300 hidden sm:inline"></span>
+        <button id="logoutBtn" class="text-xs text-zinc-500 hover:text-rose-400 border border-zinc-700 hover:border-rose-500/50 rounded-md px-3 py-1.5 transition-colors">Keluar</button>
       </div>
     </div>
   </div>
 </nav>
 
 <!-- MAIN -->
-<main class="relative z-10 max-w-3xl mx-auto px-5 pt-20 pb-12">
-  <div class="text-center mb-10 fade-up">
-    <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-2.5" style="line-height:1.15">Audio Converter<br><span class="grad-text">Profesional</span></h1>
-    <p class="text-sm text-zinc-500 max-w-md mx-auto leading-relaxed">Edit kecepatan audio, upload langsung ke Roblox. Cepat, bersih, tanpa ribet.</p>
+<main class="relative z-10 max-w-3xl mx-auto px-6 py-12">
+
+  <!-- HERO (Tampilan Awal) -->
+  <div class="text-center mb-10">
+    <div class="inline-block px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-medium mb-4">
+      ✨ Edit langsung dari browser anda, mudah
+    </div>
+    <h1 class="text-4xl md:text-5xl font-extrabold mb-3">
+      Edit Lagu Kamu dengan<br>
+      <span class="gradient-text">Sekali Ketuk</span>
+    </h1>
+    <p class="text-zinc-400 max-w-xl mx-auto">
+      Upload satu atau beberapa lagu sekaligus, pilih preset yang Anda mau, dan biarkan ConverterYL menyiapkan hasil terbaiknya untuk Anda.
+    </p>
   </div>
 
-  <div id="mainCard" style="display:none;border:1px solid rgba(255,255,255,.05);border-radius:16px;padding:20px;margin-bottom:32px" class="glass fade-up">
-    <div class="flex items-center justify-between mb-4 px-3 py-2.5 rounded-lg" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04)">
-      <div class="flex items-center gap-2">
-        <div id="quotaDot" class="w-1.5 h-1.5 rounded-full bg-zinc-600"></div>
-        <span id="quotaText" class="text-xs text-zinc-500">1 lagu gratis</span>
+  <!-- CARD UTAMA (Awalnya Tersembunyi) -->
+  <div id="mainCard" class="hidden bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 md:p-8 glow-border mb-8">
+
+    <!-- Preset -->
+    <div class="mb-6">
+      <div class="text-center mb-4">
+        <span id="presetLabel" class="inline-block px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold tracking-wide">
+          PRESET AKTIF: PRESET 1
+        </span>
       </div>
-      <span id="planBadge" class="badge" style="background:rgba(255,255,255,.04);color:#52525b;border:1px solid rgba(255,255,255,.06);font-size:9px">FREE</span>
-    </div>
-    <div class="mb-4">
-      <div class="section-label">Speed Preset</div>
-      <div class="grid grid-cols-5 gap-1.5" id="presetPicker">
-        <button class="preset-btn active text-xs font-semibold py-2 rounded-lg" style="border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);color:#a1a1aa" data-i="0">2.3x</button>
-        <button class="preset-btn text-xs font-semibold py-2 rounded-lg" style="border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);color:#a1a1aa" data-i="1">2.5x</button>
-        <button class="preset-btn text-xs font-semibold py-2 rounded-lg" style="border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);color:#a1a1aa" data-i="2">2.7x</button>
-        <button class="preset-btn text-xs font-semibold py-2 rounded-lg" style="border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);color:#a1a1aa" data-i="3">4.7x</button>
-        <button class="preset-btn text-xs font-semibold py-2 rounded-lg" style="border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);color:#a1a1aa" data-i="4">Custom</button>
+      
+      <!-- Tombol Preset (Sekarang ada 5) -->
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-2" id="presetPicker">
+        <button class="preset-btn active feature-card px-3 py-2.5 rounded-lg text-sm font-semibold bg-zinc-800/60 border border-zinc-700 text-zinc-200" data-i="0">Preset 1</button>
+        <button class="preset-btn feature-card px-3 py-2.5 rounded-lg text-sm font-semibold bg-zinc-800/60 border border-zinc-700 text-zinc-200" data-i="1">Preset 2</button>
+        <button class="preset-btn feature-card px-3 py-2.5 rounded-lg text-sm font-semibold bg-zinc-800/60 border border-zinc-700 text-zinc-200" data-i="2">Preset 3</button>
+        <button class="preset-btn feature-card px-3 py-2.5 rounded-lg text-sm font-semibold bg-zinc-800/60 border border-zinc-700 text-zinc-200" data-i="3">Preset 4</button>
+        <button class="preset-btn feature-card px-3 py-2.5 rounded-lg text-sm font-semibold bg-zinc-800/60 border border-zinc-700 text-zinc-200" data-i="4">Custom</button>
       </div>
-      <div id="customSpeedWrap" style="display:none;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04)" class="mt-3 flex items-center justify-center gap-3 py-3 px-4 rounded-lg">
-        <span class="text-xs text-zinc-500">Speed:</span>
-        <input type="number" id="customSpeedInput" class="speed-input" value="2.5" min="0.1" max="10" step="0.1">
-        <span class="text-zinc-600 font-bold">x</span>
+
+      <!-- Input Custom Speed (Muncul saat Preset Custom diklik) -->
+      <div id="customSpeedWrap" class="hidden mt-4 flex items-center justify-center gap-3 bg-zinc-800/40 border border-zinc-800 rounded-xl p-4">
+        <label class="text-zinc-400 text-sm font-medium">Masukkan Speed:</label>
+        <input type="number" id="customSpeedInput" class="speed-custom-input" value="2.5" min="0.1" max="10" step="0.1">
+        <span class="text-zinc-400 font-bold text-xl">x</span>
       </div>
     </div>
-    <div id="warnBanner" style="display:none;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.1)" class="mb-4 p-3 rounded-lg text-xs text-amber-300/80">
-      <b class="text-amber-200/90">Perhatian</b> — <span id="warnText"></span>
+
+    <!-- Warning in-app browser (di dalam card) -->
+    <div id="warnBanner" class="hidden mb-6 rounded-xl border border-amber-500/40 bg-amber-500/10 text-amber-300 text-sm leading-relaxed p-4">
+      <b class="block mb-1 text-amber-200">⚠ Mode Tamu (Dibuka via Discord/WA)</b>
+      Anda membuka halaman ini di dalam aplikasi. Fitur <b>Login Google</b> diblokir oleh aplikasi ini, jadi Anda masuk sebagai Tamu. Jika ingin login, buka di browser asli (Chrome/Safari).
     </div>
-    <div class="section-label">Input</div>
-    <label for="audioFile" id="box" class="upload-zone rounded-xl p-8 text-center mb-4 block">
-      <div class="w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:rgba(129,140,248,.06)"><i class="fas fa-music text-indigo-400" style="font-size:18px"></i></div>
-      <p id="boxTitle" class="text-sm font-semibold text-zinc-200 mb-0.5">Upload audio file</p>
-      <p id="boxSub" class="text-[11px] text-zinc-600">MP3, WAV, OGG, FLAC, M4A — maks 10 file</p>
-    </label>
-    <input type="file" id="audioFile" accept=".mp3,audio/mpeg,.wav,audio/wav,.ogg,audio/ogg,.flac,audio/flac,.m4a,audio/mp4,.aac,audio/aac,.wma,.opus,audio/opus" multiple style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0">
-    <div id="fileList" style="display:none" class="flex-col gap-1.5 mb-4"></div>
-    <button id="btn" disabled class="btn-primary w-full justify-center py-3 text-sm" style="border-radius:10px"><i class="fas fa-wand-magic-sparkles" style="font-size:11px"></i> Edit Lagu</button>
-    <div id="status" class="text-center text-[11px] text-zinc-600 mt-2 min-h-[16px]">Menyiapkan editor...</div>
-    <div id="progWrap" style="display:none" class="mt-3">
+
+    <!-- Steps -->
+    <div class="flex justify-between bg-zinc-800/40 border border-zinc-800 rounded-xl p-3 mb-6 text-xs text-zinc-500">
+      <div class="flex-1 text-center relative">
+        <b class="block text-zinc-200 text-[13px] mb-0.5">Step 1</b>Upload lagu
+      </div>
+      <div class="flex-1 text-center relative">
+        <b class="block text-zinc-200 text-[13px] mb-0.5">Step 2</b>Proses edit
+      </div>
+      <div class="flex-1 text-center relative">
+        <b class="block text-zinc-200 text-[13px] mb-0.5">Step 3</b>Download hasil
+      </div>
+    </div>
+
+    <!-- Upload zone -->
+    <div id="box" class="upload-zone rounded-xl p-10 text-center cursor-pointer mb-4">
+      <input type="file" id="file" accept="audio/*" multiple class="hidden">
+      <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-indigo-500/10 flex items-center justify-center">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2">
+          <path d="M9 18V5l12-2v13" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+        </svg>
+      </div>
+      <p id="boxTitle" class="text-white font-semibold text-lg mb-1">Upload Lagu</p>
+      <p id="boxSub" class="text-zinc-500 text-sm">Ketuk untuk pilih satu atau beberapa lagu sekaligus</p>
+    </div>
+
+    <!-- List lagu -->
+    <div id="fileList" class="hidden flex-col gap-2 mb-4"></div>
+
+    <!-- Tombol proses -->
+    <button id="btn" disabled class="w-full py-3.5 rounded-xl font-bold text-white bg-gradient-to-br from-indigo-500 to-purple-600 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity">
+      Edit Lagu
+    </button>
+
+    <div id="status" class="text-center text-zinc-400 text-sm mt-3 min-h-[18px]">Menyiapkan editor lagu...</div>
+
+    <div id="progWrap" class="hidden mt-4">
       <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
-      <div class="text-center text-[10px] text-zinc-600 mt-1" id="progTxt">0%</div>
+      <div class="text-center text-xs text-zinc-500 mt-1.5" id="progTxt">0%</div>
     </div>
   </div>
-  <footer class="text-center pt-6 pb-4"><p class="text-[11px] text-zinc-700">&copy; 2026 ConverterYL</p></footer>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-zinc-800/50 pt-8 pb-4 text-center">
+    <p class="text-zinc-500 text-sm">© 2026 ConverterYL</p>
+    <p class="text-zinc-600 text-xs mt-1">Dibuat untuk para pencinta musik</p>
+  </footer>
+
 </main>
-
-<!-- MODAL FORMAT -->
-<div class="modal-bg" id="fmtModal">
-  <div class="modal-box" style="max-width:400px">
-    <div class="flex items-center justify-between mb-4"><h3 class="text-base font-bold">Format Output</h3></div>
-    <div class="space-y-1.5">
-      <div class="fmt-card chosen" data-fmt="ogg" onclick="pickFmt(this)"><div class="flex items-center justify-between"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg flex items-center justify-center text-[11px] font-bold" style="background:rgba(251,146,60,.08);color:#fb923c">OGG</div><div><div class="text-sm font-semibold text-zinc-200">OGG Vorbis</div><div class="text-[10px] text-zinc-600">Roblox compatible</div></div></div><span class="badge" style="background:rgba(251,146,60,.08);color:#fb923c;border:1px solid rgba(251,146,60,.12);font-size:9px">REC</span></div></div>
-      <div class="fmt-card" data-fmt="mp3" onclick="pickFmt(this)"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg flex items-center justify-center text-[11px] font-bold" style="background:rgba(96,165,250,.08);color:#60a5fa">MP3</div><div><div class="text-sm font-semibold text-zinc-200">MP3</div><div class="text-[10px] text-zinc-600">Kompak, universal</div></div></div></div>
-      <div class="fmt-card" data-fmt="wav" onclick="pickFmt(this)"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg flex items-center justify-center text-[11px] font-bold" style="background:rgba(167,139,250,.08);color:#a78bfa">WAV</div><div><div class="text-sm font-semibold text-zinc-200">WAV</div><div class="text-[10px] text-zinc-600">Lossless, file besar</div></div></div></div>
-      <div class="fmt-card" data-fmt="flac" onclick="pickFmt(this)"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg flex items-center justify-center text-[11px] font-bold" style="background:rgba(244,114,182,.08);color:#f472b6">FLAC</div><div><div class="text-sm font-semibold text-zinc-200">FLAC</div><div class="text-[10px] text-zinc-600">Lossless kompresi</div></div></div></div>
-    </div>
-    <button id="fmtBtn" onclick="startProcess()" class="btn-primary w-full justify-center mt-4 py-2.5 text-sm">Mulai Edit — OGG</button>
-  </div>
-</div>
-
-<!-- MODAL ROBLOX -->
-<div class="modal-bg" id="rbxModal">
-  <div class="modal-box" style="max-width:420px">
-    <div class="flex items-center justify-between mb-4"><h3 class="text-base font-bold">Pengaturan Roblox</h3><button onclick="closeRbxModal()" class="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-200 transition-colors" style="background:rgba(255,255,255,.04)"><i class="fas fa-xmark text-xs"></i></button></div>
-    <div class="p-3 rounded-lg mb-4 text-[11px] text-zinc-500 leading-relaxed" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04)"><b class="text-zinc-400">Cara mendapatkan API Key:</b><br>1. Buka <span class="text-indigo-400">create.roblox.com/manage/api-keys</span><br>2. Create Key &rarr; pilih <b>assets</b> &rarr; tambah <b>write</b><br>3. Generate Key &rarr; salin</div>
-    <div class="mb-3"><label class="block text-[11px] font-medium text-zinc-400 mb-1.5">Proxy URL</label><input type="text" id="rbxProxyInput" class="input-f text-xs" placeholder="https://nama.workers.dev"></div>
-    <div class="mb-3"><label class="block text-[11px] font-medium text-zinc-400 mb-1.5">API Key</label><input type="password" id="rbxKeyInput" class="input-f text-xs" placeholder="Tempel API Key Roblox"></div>
-    <div class="mb-4"><label class="block text-[11px] font-medium text-zinc-400 mb-1.5">User ID</label><input type="text" id="rbxUserIdInput" class="input-f text-xs" placeholder="123456789"><p class="text-[10px] text-zinc-700 mt-1.5">Ada di profil Roblox &rarr; angka di URL</p></div>
-    <div class="flex gap-2"><button onclick="saveRbxSettings()" class="btn-primary flex-1 justify-center py-2.5 text-xs">Simpan</button><button onclick="clearRbxSettings()" class="btn-ghost flex-1 justify-center py-2.5 text-xs">Hapus</button></div>
-  </div>
-</div>
-
-<!-- MODAL UPGRADE -->
-<div class="modal-bg" id="upgradeModal">
-  <div class="modal-box text-center" style="max-width:340px">
-    <div class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:rgba(168,85,247,.08)"><i class="fas fa-cube text-purple-400 text-xl"></i></div>
-    <h3 class="text-base font-bold mb-1">Fitur Premium</h3>
-    <p class="text-xs text-zinc-500 mb-5 leading-relaxed">Auto upload ke Roblox hanya tersedia untuk paket Unlimited</p>
-    <button onclick="closeUpgradeModal();openPayModal()" class="btn-primary px-8 py-2.5 text-xs">Lihat Paket Unlimited</button>
-    <button onclick="closeUpgradeModal()" class="btn-ghost mt-2 text-xs">Kembali</button>
-  </div>
-</div>
-
-<!-- MODAL PEMBAYARAN -->
-<div class="modal-bg" id="payModal">
-  <div class="modal-box" style="max-width:420px">
-    <div class="flex items-center justify-between mb-4"><h3 class="text-base font-bold">Pilih Paket</h3><button onclick="closePayModal()" class="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-200 transition-colors" style="background:rgba(255,255,255,.04)"><i class="fas fa-xmark text-xs"></i></button></div>
-    <div class="space-y-2">
-      <div class="pay-card" data-plan="per_song" onclick="pickPlan(this)"><div class="flex items-center justify-between"><span class="text-sm font-semibold">1 Lagu</span><span class="text-base font-extrabold">Rp1.200</span></div></div>
-      <div class="pay-card" data-plan="bundle_65" onclick="pickPlan(this)"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="text-sm font-semibold">65 Lagu</span><span class="badge" style="background:rgba(52,211,153,.08);color:#4ade80;border:1px solid rgba(52,211,153,.12);font-size:9px">HEMAT</span></div><span class="text-base font-extrabold">Rp50.000</span></div></div>
-      <div class="pay-card relative overflow-hidden" data-plan="subscription" onclick="pickPlan(this)"><div class="absolute top-0 right-0 text-[9px] font-bold text-white px-2.5 py-0.5 rounded-bl-lg" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">BEST</div><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="text-sm font-semibold">Unlimited</span><span class="badge badge-pro"><i class="fas fa-cube" style="font-size:8px"></i> ROBLOX</span></div><span class="text-base font-extrabold">Rp210.000</span></div><p class="text-[10px] text-zinc-600 mt-1.5">Tanpa batas + auto upload Roblox, 30 hari</p></div>
-    </div>
-    <button id="payBtn" disabled onclick="doPayment()" class="btn-primary w-full justify-center mt-4 py-2.5 text-sm">Pilih paket</button>
-  </div>
-</div>
-
-<!-- MODAL SUKSES -->
-<div class="modal-bg" id="successModal">
-  <div class="modal-box text-center" style="max-width:340px">
-    <div class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:rgba(52,211,153,.08)"><i class="fas fa-check text-emerald-400 text-xl"></i></div>
-    <h3 class="text-base font-bold mb-1">Berhasil</h3>
-    <p id="successMsg" class="text-xs text-zinc-500 mb-5">Kuota ditambahkan.</p>
-    <button onclick="closeSuccessModal()" class="btn-primary px-8 py-2.5 text-xs">Lanjut</button>
-  </div>
-</div>
-
-<!-- BERSIHKAN SERVICE WORKKER LAMA -->
-<script>
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.getRegistrations().then(function(regs){
-    for(var i=0;i<regs.length;i++) regs[i].unregister();
-  });
-}
-</script>
 
 <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
 <script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
 <script>
-/* ================================================================
-   KONFIGURASI
-   ================================================================ */
-var CONFIG_MODE='demo',API_BASE='https://backend-kamu.contoh.workers.dev',MAX_FILES=10;
-var FORMATS={
-  ogg:{ext:'.ogg',mime:'audio/ogg',args:['-c:a','libvorbis','-q:a','6'],label:'OGG'},
-  mp3:{ext:'.mp3',mime:'audio/mpeg',args:['-c:a','libmp3lame','-q:a','2'],label:'MP3'},
-  wav:{ext:'.wav',mime:'audio/wav',args:['-c:a','pcm_s16le'],label:'WAV'},
-  flac:{ext:'.flac',mime:'audio/flac',args:['-c:a','flac'],label:'FLAC'}
-};
+const { FFmpeg } = FFmpegWASM;
+const { toBlobURL, fetchFile } = FFmpegUtil;
+const ffmpeg = new FFmpeg();
+let loaded = false;
 
-/* ================================================================
-   ELEMEN DOM
-   ================================================================ */
-var $=function(id){return document.getElementById(id)};
-var $box=$('box'),$boxTitle=$('boxTitle'),$boxSub=$('boxSub'),
-    $fileInput=$('audioFile'),$fileList=$('fileList'),
-    $btn=$('btn'),$status=$('status'),
-    $progWrap=$('progWrap'),$progFill=$('progFill'),$progTxt=$('progTxt'),
-    $warnBanner=$('warnBanner'),$warnText=$('warnText'),
-    $loginArea=$('loginArea'),$mainCard=$('mainCard'),
-    $userChip=$('userChip'),$userAvatar=$('userAvatar'),$userName=$('userName'),
-    $logoutBtn=$('logoutBtn'),$creditChip=$('creditChip'),
-    $creditText=$('creditText'),$quotaText=$('quotaText'),
-    $quotaDot=$('quotaDot'),$planBadge=$('planBadge'),
-    $payModal=$('payModal'),$payBtn=$('payBtn'),
-    $successModal=$('successModal'),$successMsg=$('successMsg'),
-    $customSpeedWrap=$('customSpeedWrap'),$customSpeedInput=$('customSpeedInput'),
-    $fmtModal=$('fmtModal'),$fmtBtn=$('fmtBtn'),
-    $rbxModal=$('rbxModal'),$rbxProxyInput=$('rbxProxyInput'),
-    $rbxKeyInput=$('rbxKeyInput'),$rbxUserIdInput=$('rbxUserIdInput'),
-    $upgradeModal=$('upgradeModal'),
-    $loginLoading=$('loginLoading'),
-    $googleBtnContainer=$('googleBtnContainer'),
-    $loginFallback=$('loginFallback'),
-    $inappOverlay=$('inappOverlay'),$inappCopyBtn=$('inappCopyBtn');
+const box = document.getElementById('box');
+const boxTitle = document.getElementById('boxTitle');
+const boxSub = document.getElementById('boxSub');
+const file = document.getElementById('file');
+const fileListEl = document.getElementById('fileList');
+const btn = document.getElementById('btn');
+const status = document.getElementById('status');
+const progWrap = document.getElementById('progWrap');
+const progFill = document.getElementById('progFill');
+const progTxt = document.getElementById('progTxt');
+const warnBanner = document.getElementById('warnBanner');
+const presetLabel = document.getElementById('presetLabel');
+const loginArea = document.getElementById('loginArea');
+const mainCard = document.getElementById('mainCard');
+const userChip = document.getElementById('userChip');
+const userAvatar = document.getElementById('userAvatar');
+const userName = document.getElementById('userName');
+const logoutBtn = document.getElementById('logoutBtn');
+const customSpeedWrap = document.getElementById('customSpeedWrap');
+const customSpeedInput = document.getElementById('customSpeedInput');
 
-/* ================================================================
-   STATE
-   ================================================================ */
-var state={email:null,name:null,credits:0,isSubscribed:false,subExpiry:null,freeUsed:false,chosenPlan:null,chosenFmt:'ogg',rbxProxy:null,rbxKey:null,rbxUserId:null};
-var PLAN_PRICES={per_song:1200,bundle_65:50000,subscription:210000};
-var PLAN_CREDITS={per_song:1,bundle_65:65,subscription:null};
+let items = [];
 
-/* ================================================================
-   TOAST
-   ================================================================ */
-function toast(m,t){t=t||'info';var w=$('toastWrap'),e=document.createElement('div');var c=t==='ok'?'toast-ok':t==='err'?'toast-err':'toast-info';var i=t==='ok'?'fa-check':t==='err'?'fa-xmark':'fa-info';e.className='toast-item '+c;e.innerHTML='<i class="fas '+i+'" style="font-size:11px"></i><span>'+m+'</span>';w.appendChild(e);setTimeout(function(){if(e.parentNode)e.remove();},3400);}
-
-/* ================================================================
-   QUOTA
-   ================================================================ */
-function updateQuotaDisplay(){
-  if(state.isSubscribed&&state.subExpiry&&Date.now()>=state.subExpiry){state.isSubscribed=false;state.subExpiry=null;saveLocal();}
-  if(state.isSubscribed&&state.subExpiry){var s=Math.ceil((state.subExpiry-Date.now())/86400000);$quotaText.textContent='Unlimited — '+s+' hari lagi';$quotaText.style.color='#c084fc';$quotaDot.style.background='#c084fc';$planBadge.textContent='UNLIMITED';$planBadge.style.background='rgba(168,85,247,.1)';$planBadge.style.color='#c084fc';$planBadge.style.borderColor='rgba(168,85,247,.15)';$creditText.textContent='\u221E';$creditChip.style.background='rgba(168,85,247,.08)';$creditChip.style.color='#c084fc';$creditChip.style.borderColor='rgba(168,85,247,.15)';return;}
-  var t=state.credits+(state.freeUsed?0:1);$planBadge.textContent='FREE';$planBadge.style.background='rgba(255,255,255,.04)';$planBadge.style.color='#52525b';$planBadge.style.borderColor='rgba(255,255,255,.06)';
-  if(t>0){$quotaText.textContent=state.freeUsed?(state.credits+' lagu tersisa'):('1 gratis + '+state.credits+' lagu');$quotaText.style.color='#a1a1aa';$quotaDot.style.background='#4ade80';$creditText.textContent=state.credits;$creditChip.style.background='rgba(52,211,153,.08)';$creditChip.style.color='#4ade80';$creditChip.style.borderColor='rgba(52,211,153,.15)';}
-  else{$quotaText.textContent='Kuota habis';$quotaText.style.color='#f87171';$quotaDot.style.background='#f87171';$creditText.textContent='0';$creditChip.style.background='rgba(255,255,255,.04)';$creditChip.style.color='#52525b';$creditChip.style.borderColor='rgba(255,255,255,.06)';}
+// ================= DETEKSI IN-APP BROWSER (DISCORD/WA) =================
+function detectInAppBrowser() {
+  const ua = navigator.userAgent || '';
+  const patterns = ['WhatsApp', 'Instagram', 'FBAN', 'FBAV', 'Line/', 'MicroMessenger', 'TikTok', 'Discord'];
+  return patterns.some(p => ua.includes(p));
 }
 
-/* ================================================================
-   LOCALSTORAGE
-   ================================================================ */
-function saveLocal(){if(CONFIG_MODE!=='demo')return;try{localStorage.setItem('convyl_pay',JSON.stringify({email:state.email,credits:state.credits,isSubscribed:state.isSubscribed,subExpiry:state.subExpiry}));}catch(e){}}
-function loadLocal(em){if(CONFIG_MODE!=='demo')return;try{var d=JSON.parse(localStorage.getItem('convyl_pay'));if(d&&d.email===em){state.credits=d.credits||0;state.isSubscribed=d.isSubscribed||false;state.subExpiry=d.subExpiry||null;}}catch(e){}}
-function saveRbxLocal(){try{localStorage.setItem('convyl_rbx_'+state.email,JSON.stringify({proxy:state.rbxProxy,key:state.rbxKey,uid:state.rbxUserId}));}catch(e){}}
-function loadRbxLocal(){try{var d=JSON.parse(localStorage.getItem('convyl_rbx_'+state.email));if(d){state.rbxProxy=d.proxy||null;state.rbxKey=d.key||null;state.rbxUserId=d.uid||null;}}catch(e){}}
+const isInApp = detectInAppBrowser();
 
-/* ================================================================
-   MODAL ROBLOX
-   ================================================================ */
-function openRbxModal(){$rbxProxyInput.value=state.rbxProxy||'';$rbxKeyInput.value=state.rbxKey||'';$rbxUserIdInput.value=state.rbxUserId||'';$rbxModal.style.display='flex';document.body.style.overflow='hidden';}
-function closeRbxModal(){$rbxModal.style.display='none';document.body.style.overflow='';}
-function saveRbxSettings(){state.rbxProxy=$rbxProxyInput.value.trim()||null;state.rbxKey=$rbxKeyInput.value.trim()||null;state.rbxUserId=$rbxUserIdInput.value.trim()||null;saveRbxLocal();closeRbxModal();toast(state.rbxKey?'Roblox terhubung':'Pengaturan disimpan','ok');}
-function clearRbxSettings(){$rbxProxyInput.value='';$rbxKeyInput.value='';$rbxUserIdInput.value='';state.rbxProxy=null;state.rbxKey=null;state.rbxUserId=null;saveRbxLocal();closeRbxModal();toast('Dihapus','info');}
+if (isInApp) {
+  // Jika dibuka di Discord/WA: Layar putih dihindari dengan langsung membuka aplikasi tanpa login
+  warnBanner.classList.remove('hidden');
+  loginArea.classList.add('hidden');
+  mainCard.classList.remove('hidden');
+  mainCard.classList.add('fade-in');
+}
 
-/* ================================================================
-   MODAL UPGRADE
-   ================================================================ */
-function openUpgradeModal(){$upgradeModal.style.display='flex';document.body.style.overflow='hidden';}
-function closeUpgradeModal(){$upgradeModal.style.display='none';document.body.style.overflow='';}
- $rbxModal.addEventListener('click',function(e){if(e.target===$rbxModal)closeRbxModal();});
- $upgradeModal.addEventListener('click',function(e){if(e.target===$upgradeModal)closeUpgradeModal();});
-function isPremium(){return state.isSubscribed&&state.subExpiry&&Date.now()<state.subExpiry;}
+// ================= LOGIN GOOGLE =================
+const GOOGLE_CLIENT_ID = "554107557548-o2q25dcsqj07r3hupdkvtes2tujfri9l.apps.googleusercontent.com";
 
-/* ================================================================
-   UPLOAD ROBLOX
-   ================================================================ */
-async function uploadToRoblox(idx){
-  var it=items[idx];if(!it||!it.blobData)return;
-  if(!isPremium()){openUpgradeModal();return;}
-  if(!state.rbxProxy||!state.rbxKey||!state.rbxUserId){openRbxModal();toast('Lengkapi pengaturan Roblox dulu','info');return;}
-  var b=document.getElementById('rbx_'+idx);if(!b||b.disabled)return;
-  b.disabled=true;b.className='rbx-btn loading';b.innerHTML='<span class="spinner"></span> Upload...';
+function decodeJwt(token){
   try{
-    var fd=new FormData();fd.append('api_key',state.rbxKey);
-    fd.append('request',JSON.stringify({assetType:'Audio',displayName:it.file.name.replace(/\.[^/.]+$/,''),description:'Speed '+(activePreset===4?(parseFloat($customSpeedInput.value)||2.5):presets[activePreset].speed)+'x via ConverterYL',creationContext:{creator:{userId:state.rbxUserId}}}));
-    fd.append('file',it.blobData,it.dlName);
-    var res=await fetch(state.rbxProxy,{method:'POST',body:fd});
-    var data=await res.json();if(!res.ok)throw new Error(data.error||data.message||'HTTP '+res.status);
-    var aid=data.assetId||data.path;b.disabled=false;b.className='rbx-btn done';b.innerHTML='<i class="fas fa-check"></i> '+aid;b.title='Klik salin';b.style.cursor='pointer';
-    b.onclick=function(){navigator.clipboard.writeText(String(aid)).then(function(){toast('Asset ID '+aid+' disalin','ok');});};
-    toast('Upload berhasil! ID: '+aid,'ok');
-  }catch(err){b.disabled=false;b.className='rbx-btn idle';b.innerHTML='<i class="fas fa-rotate-right"></i> Coba Lagi';toast('Gagal: '+(err.message||'').substring(0,100),'err');}
+    const payload = token.split('.')[1];
+    const json = decodeURIComponent(atob(payload).split('').map(c =>
+      '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+    ).join(''));
+    return JSON.parse(json);
+  }catch(e){ return null; }
 }
 
-/* ================================================================
-   QUOTA LOGIC
-   ================================================================ */
-function canEdit(){if(isPremium())return{ok:true,src:'sub'};if(state.credits>0)return{ok:true,src:'credit'};if(!state.freeUsed)return{ok:true,src:'free'};return{ok:false,src:null};}
-function useQuota(s){if(s==='free'){state.freeUsed=true;return;}if(s==='credit'){state.credits--;saveLocal();}}
-function refundQuota(s){if(s==='free'){state.freeUsed=false;return;}if(s==='credit'){state.credits++;saveLocal();}}
+function handleCredentialResponse(response){
+  const profile = decodeJwt(response.credential);
+  if (!profile) return;
+  userAvatar.src = profile.picture || '';
+  userName.textContent = profile.name || profile.email || '';
+  
+  // Sembunyikan tombol login, tampilkan chip user
+  loginArea.classList.add('hidden');
+  userChip.classList.remove('hidden');
+  userChip.classList.add('flex');
+  
+  // Tampilkan card utama
+  mainCard.classList.remove('hidden');
+  mainCard.classList.add('fade-in');
 
-/* ================================================================
-   MODAL FORMAT
-   ================================================================ */
-function openFmtModal(){$fmtModal.style.display='flex';document.body.style.overflow='hidden';}
-function closeFmtModal(){$fmtModal.style.display='none';document.body.style.overflow='';}
-function pickFmt(el){document.querySelectorAll('.fmt-card').forEach(function(c){c.classList.remove('chosen');});el.classList.add('chosen');state.chosenFmt=el.getAttribute('data-fmt');$fmtBtn.textContent='Mulai Edit — '+FORMATS[state.chosenFmt].label;}
- $fmtModal.addEventListener('click',function(e){if(e.target===$fmtModal)closeFmtModal();});
-
-/* ================================================================
-   MODAL PEMBAYARAN
-   ================================================================ */
-function openPayModal(){state.chosenPlan=null;document.querySelectorAll('.pay-card').forEach(function(c){c.classList.remove('chosen');});$payBtn.disabled=true;$payBtn.textContent='Pilih paket';$payModal.style.display='flex';document.body.style.overflow='hidden';}
-function closePayModal(){$payModal.style.display='none';document.body.style.overflow='';}
-function pickPlan(el){document.querySelectorAll('.pay-card').forEach(function(c){c.classList.remove('chosen');});el.classList.add('chosen');state.chosenPlan=el.getAttribute('data-plan');$payBtn.disabled=false;$payBtn.textContent='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');}
-function showSuccessModal(p){if(p==='subscription')$successMsg.textContent='Unlimited aktif 30 hari. Roblox upload tersedia.';else if(p==='bundle_65')$successMsg.textContent='65 lagu ditambahkan.';else $successMsg.textContent='1 lagu ditambahkan.';$successModal.style.display='flex';document.body.style.overflow='hidden';}
-function closeSuccessModal(){$successModal.style.display='none';document.body.style.overflow='';updateQuotaDisplay();}
- $payModal.addEventListener('click',function(e){if(e.target===$payModal)closePayModal();});
- $successModal.addEventListener('click',function(e){if(e.target===$successModal)closeSuccessModal();});
-document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeFmtModal();closePayModal();closeSuccessModal();closeRbxModal();closeUpgradeModal();}});
-
-/* ================================================================
-   DO PAYMENT
-   ================================================================ */
-function doPayment(){
-  if(!state.chosenPlan||!state.email)return;$payBtn.disabled=true;$payBtn.innerHTML='<span class="spinner"></span> Memproses...';
-  if(CONFIG_MODE==='demo'){setTimeout(function(){if(state.chosenPlan==='subscription'){state.isSubscribed=true;state.subExpiry=Date.now()+30*86400000;}else{state.credits+=PLAN_CREDITS[state.chosenPlan];}saveLocal();updateQuotaDisplay();closePayModal();showSuccessModal(state.chosenPlan);toast('Pembayaran berhasil (demo)','ok');},1500);return;}
-  fetch(API_BASE+'/create-transaction',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:state.email,type:state.chosenPlan})}).then(function(r){return r.json();}).then(function(d){if(!d.snap_token)throw new Error('No token');window.snap.pay(d.snap_token,{onSuccess:function(){toast('Verifikasi...','info');var t=0;var p=setInterval(function(){fetch(API_BASE+'/check?email='+encodeURIComponent(state.email)).then(function(r){return r.json();}).then(function(d){state.credits=d.credits||0;state.isSubscribed=d.is_subscribed||false;state.subExpiry=d.subscription_expiry?new Date(d.subscription_expiry).getTime():null;updateQuotaDisplay();var ok=(state.chosenPlan==='subscription'&&state.isSubscribed)||(state.chosenPlan!=='subscription'&&state.credits>0);if(ok||++t>20){clearInterval(p);if(ok){closePayModal();showSuccessModal(state.chosenPlan);}}});},3000);},onPending:function(){toast('Pending.','info');closePayModal();},onError:function(){toast('Gagal.','err');$payBtn.disabled=false;$payBtn.textContent='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');},onClose:function(){$payBtn.disabled=false;$payBtn.textContent='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');}});}).catch(function(e){toast('Gagal.','err');$payBtn.disabled=false;$payBtn.textContent='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');});
+  try{ localStorage.setItem('convyl_user', JSON.stringify(profile)); }catch(e){}
 }
 
-/* ================================================================
-   IN-APP BROWSER
-   ================================================================ */
-var isInApp=(function(){var u=navigator.userAgent||'';return['WhatsApp','Instagram','FBAN','FBAV','Line/','MicroMessenger','TikTok','Discord'].some(function(p){return u.indexOf(p)!==-1;});})();
-if(isInApp){$inappOverlay.style.display='flex';document.body.style.overflow='hidden';}
+function showGate(){
+  if (isInApp) return; // Jangan tampilkan gate login kalau di in-app browser
+  // Tampilkan tombol login di kanan atas
+  loginArea.classList.remove('hidden');
+  
+  // Sembunyikan chip user dan card utama
+  userChip.classList.add('hidden');
+  userChip.classList.remove('flex');
+  mainCard.classList.add('hidden');
+}
 
-function copyLinkForInApp(){var url=window.location.href;if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(function(){onCopyOk();}).catch(function(){fallbackCopy(url);});}else{fallbackCopy(url);}}
-function fallbackCopy(url){try{var ta=document.createElement('textarea');ta.value=url;ta.style.cssText='position:fixed;left:-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);onCopyOk();}catch(e){onCopyFail();}}
-function onCopyOk(){$inappCopyBtn.innerHTML='<i class="fas fa-check" style="font-size:13px"></i> Tersalin!';$inappCopyBtn.classList.add('copied');setTimeout(function(){$inappCopyBtn.innerHTML='<i class="fas fa-link" style="font-size:13px"></i> Salin Link';$inappCopyBtn.classList.remove('copied');},2500);}
-function onCopyFail(){$inappCopyBtn.innerHTML='<i class="fas fa-xmark" style="font-size:13px"></i> Gagal';setTimeout(function(){$inappCopyBtn.innerHTML='<i class="fas fa-link" style="font-size:13px"></i> Salin Link';},2000);}
-
-/* ================================================================
-   GOOGLE LOGIN
-   ================================================================ */
-var GOOGLE_CLIENT_ID='554107557548-o2q25dcsqj07r3hupdkvtes2tujfri9l.apps.googleusercontent.com';
-var googleInitDone=false,googleRetryCount=0;
-
-function decodeJwt(t){try{var p=t.split('.')[1];return JSON.parse(decodeURIComponent(atob(p).split('').map(function(c){return'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2);}).join('')));}catch(e){return null;}}
-
-function showLoggedInUI(p){state.email=p.email;state.name=p.name||p.email;state.freeUsed=false;$userAvatar.src=p.picture||'';$userName.textContent=state.name;$loginArea.style.display='none';$userChip.style.display='flex';$mainCard.style.display='';loadLocal(state.email);loadRbxLocal();updateQuotaDisplay();}
-function showGoogleButton(){$loginLoading.style.display='none';$googleBtnContainer.style.display='block';$loginFallback.style.display='none';}
-function showFallbackButton(){$loginLoading.style.display='none';$googleBtnContainer.style.display='none';$loginFallback.style.display='inline-flex';}
-
-function handleCredentialResponse(r){var p=decodeJwt(r.credential);if(!p)return;showLoggedInUI(p);try{localStorage.setItem('convyl_user',JSON.stringify(p));}catch(e){}}
-
-function handleLogout(){try{google.accounts.id.disableAutoSelect();}catch(e){}try{localStorage.removeItem('convyl_user');}catch(e){}state.email=null;state.name=null;state.credits=0;state.isSubscribed=false;state.subExpiry=null;state.freeUsed=false;state.rbxProxy=null;state.rbxKey=null;state.rbxUserId=null;$loginArea.style.display='flex';$userChip.style.display='none';$mainCard.style.display='none';$loginLoading.style.display='inline-flex';$googleBtnContainer.style.display='none';$loginFallback.style.display='none';googleInitDone=false;googleRetryCount=0;initGoogleLogin();}
- $logoutBtn.addEventListener('click',handleLogout);
-
-function tryInitGoogle(){googleRetryCount=0;$loginFallback.style.display='none';$loginLoading.style.display='inline-flex';initGoogleLogin();}
+logoutBtn.addEventListener('click', () => {
+  try{ google.accounts.id.disableAutoSelect(); }catch(e){}
+  try{ localStorage.removeItem('convyl_user'); }catch(e){}
+  showGate();
+});
 
 function initGoogleLogin(){
-  if(isInApp)return;if(googleInitDone)return;
-  try{
-    if(typeof google!=='undefined'&&google&&google.accounts&&google.accounts.id){
-      google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:handleCredentialResponse});
-      google.accounts.id.renderButton($googleBtnContainer,{type:"standard",theme:"filled_black",size:"medium",shape:"pill",text:"signin_with",width:160});
-      try{var s=localStorage.getItem('convyl_user');if(s){var p=JSON.parse(s);if(p&&p.email){showLoggedInUI(p);googleInitDone=true;return;}}}catch(e){}
-      showGoogleButton();googleInitDone=true;return;
+  // Jangan inisialisasi google login kalau di in-app browser (mencegah error console)
+  if (isInApp) return;
+
+  if (typeof google === 'undefined' || !google.accounts){
+    setTimeout(initGoogleLogin, 300);
+    return;
+  }
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: handleCredentialResponse,
+  });
+  // Render tombol login di kanan atas
+  google.accounts.id.renderButton(
+    document.getElementById('googleBtnContainer'),
+    { 
+      type: "standard",
+      theme: "filled_black", 
+      size: "medium", 
+      shape: "pill", 
+      text: "signin_with", 
+      width: 180 
     }
-  }catch(err){console.warn('[YL] Google belum siap:',err.message||err);}
-  googleRetryCount++;
-  if(googleRetryCount>=100){showFallbackButton();return;}
-  setTimeout(initGoogleLogin,300);
+  );
+
+  // Cek apakah sebelumnya sudah login
+  try{
+    const saved = localStorage.getItem('convyl_user');
+    if (saved){
+      const profile = JSON.parse(saved);
+      userAvatar.src = profile.picture || '';
+      userName.textContent = profile.name || profile.email || '';
+      
+      loginArea.classList.add('hidden');
+      userChip.classList.remove('hidden');
+      userChip.classList.add('flex');
+      mainCard.classList.remove('hidden');
+    }
+  }catch(e){}
 }
 initGoogleLogin();
 
-/* ================================================================
-   PRESETS
-   ================================================================ */
-var presets=[{speed:2.3,db:0,resample:48000},{speed:2.5,db:0,resample:48000},{speed:2.7,db:0,resample:48000},{speed:4.7,db:0,resample:96000}];
-var activePreset=0;
-document.querySelectorAll('.preset-btn').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.preset-btn').forEach(function(x){x.classList.remove('active');});b.classList.add('active');activePreset=parseInt(b.getAttribute('data-i'),10);if(activePreset===4){$customSpeedWrap.style.display='flex';}else{$customSpeedWrap.style.display='none';}});});
+// ================= PRESET LOGIC =================
+const presets = [
+  { speed: 2.3, db: 0, resample: 48000 },
+  { speed: 2.5, db: 0, resample: 48000 },
+  { speed: 2.7, db: 0, resample: 48000 },
+  { speed: 4.7, db: 0, resample: 96000 },
+];
+let activePreset = 0;
 
-/* ================================================================
-   FFMPEG — SINGLE THREADED (tanpa SharedArrayBuffer)
-   ================================================================ */
-var ffmpeg=null,toBlobURL=null,fetchFile=null;
-var loaded=false,items=[];
-try{ffmpeg=new FFmpegWASM.FFmpeg();toBlobURL=FFmpegUtil.toBlobURL;fetchFile=FFmpegUtil.fetchFile;}catch(e){console.warn('[YL] FFmpeg gagal:',e.message);$status.innerText='Editor audio gagal dimuat.';}
+document.querySelectorAll('.preset-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.preset-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    activePreset = parseInt(b.dataset.i, 10);
+    
+    if (activePreset === 4) {
+      customSpeedWrap.classList.remove('hidden');
+      customSpeedWrap.classList.add('flex');
+      presetLabel.textContent = "PRESET AKTIF: CUSTOM SPEED";
+    } else {
+      customSpeedWrap.classList.add('hidden');
+      customSpeedWrap.classList.remove('flex');
+      presetLabel.textContent = `PRESET AKTIF: PRESET ${activePreset + 1}`;
+    }
+  });
+});
 
-function checkEnv(){
-  if(typeof Worker==='undefined')return'Web Worker tidak didukung.';
-  if(typeof WebAssembly==='undefined')return'WebAssembly tidak didukung.';
+// ================= CEK DUKUNGAN =================
+function checkEnvSupport() {
+  if (typeof Worker === 'undefined') return 'Browser ini tidak mendukung Web Worker.';
+  if (typeof WebAssembly === 'undefined') return 'Browser ini tidak mendukung WebAssembly.';
   return null;
 }
-var envError=checkEnv();
-if(envError&&!isInApp){$status.innerText=envError;$warnBanner.style.display='';$warnText.innerText='Browser tidak kompatibel.';}
-if(ffmpeg){ffmpeg.on('log',function(e){console.log("[YL]",e.message);});ffmpeg.on('progress',function(e){var p=Math.max(0,Math.min(1,e.progress))*100;$progFill.style.width=p.toFixed(1)+"%";$progTxt.innerText=p.toFixed(1)+"%";});}
+const envError = checkEnvSupport();
+if (envError) {
+  status.innerText = envError + ' Coba buka di Chrome/Safari versi terbaru.';
+  warnBanner.classList.remove('hidden');
+  warnBanner.querySelector('b').innerText = '⚠ Browser tidak didukung';
+}
 
-function withTimeout(p,m,l){return Promise.race([p,new Promise(function(_,r){setTimeout(function(){r(new Error(l+' timeout'));},m);})]);}
-function describeError(e){try{if(!e)return'kosong';if(typeof e==='string')return e;if(e.message)return e.message;if(e.reason)return describeError(e.reason);if(e.error)return describeError(e.error);return JSON.stringify(e);}catch(_){return String(e);}}
-window.addEventListener('error',function(e){console.error(e);});
-window.addEventListener('unhandledrejection',function(e){console.error(e.reason);});
+function appendLog(msg){ console.log("[ConverterYL]", msg); }
+ffmpeg.on('log', ({ message }) => appendLog(message));
+ffmpeg.on('progress', ({ progress }) => {
+  let p = Math.max(0, Math.min(1, progress)) * 100;
+  progFill.style.width = p.toFixed(1) + "%";
+  progTxt.innerText = p.toFixed(1) + "%";
+});
 
-async function boot(){
-  if(envError||!ffmpeg)return;
+function withTimeout(promise, ms, label) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error(`${label} timeout setelah ${ms/1000}s`)), ms))
+  ]);
+}
+
+function describeError(e){
   try{
-    $status.innerText="Memuat editor...";
-    /* @ffmpeg/core-st = SINGLE THREADED, tidak butuh SharedArrayBuffer */
-    var b="https://unpkg.com/@ffmpeg/core-st@0.12.6/dist/esm";
+    if (!e) return 'tidak ada detail (error kosong)';
+    if (typeof e === 'string') return e;
+    if (e.message) return e.message;
+    if (e.reason) return describeError(e.reason);
+    if (e.error) return describeError(e.error);
+    return JSON.stringify(e, Object.getOwnPropertyNames(e));
+  }catch(_){ return String(e); }
+}
+
+async function diagnoseFile(url, label){
+  try{
+    const res = await fetch(url);
+    appendLog(`${label} → status ${res.status}, content-type: ${res.headers.get('content-type') || '(kosong)'}`);
+  }catch(err){ appendLog(`${label} GAGAL fetch`); }
+}
+
+window.addEventListener('error', ev => appendLog('[WINDOW ERROR] ' + describeError(ev)));
+window.addEventListener('unhandledrejection', ev => appendLog('[UNHANDLED REJECTION] ' + describeError(ev.reason)));
+
+// ================= LOAD FFMPEG =================
+async function boot(){
+  if (envError) return;
+  try{
+    status.innerText = "Menyiapkan editor lagu...";
+    const base = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm";
+
+    await diagnoseFile(`${base}/ffmpeg-core.js`, 'ffmpeg-core.js');
+    await diagnoseFile(`${base}/ffmpeg-core.wasm`, 'ffmpeg-core.wasm');
+
     await withTimeout(ffmpeg.load({
-      coreURL:await toBlobURL(b+'/ffmpeg-core.js',"text/javascript"),
-      wasmURL:await toBlobURL(b+'/ffmpeg-core.wasm',"application/wasm")
-    }),30000,"Load FFmpeg");
-    loaded=true;
-    $status.innerText=items.length?"Siap diedit.":"Editor siap.";
+      coreURL: await toBlobURL(`${base}/ffmpeg-core.js`, "text/javascript"),
+      wasmURL: await toBlobURL(`${base}/ffmpeg-core.wasm`, "application/wasm"),
+      classWorkerURL: await toBlobURL("https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js", "text/javascript"),
+    }), 25000, "Load FFmpeg");
+
+    loaded = true;
+    status.innerText = items.length ? "Lagu siap diedit. Tekan tombol di bawah untuk mulai." : "Editor siap. Silakan upload lagu Anda.";
   }catch(e){
-    $status.innerText="Gagal memuat editor — "+describeError(e);
-    if(!isInApp)$warnBanner.style.display='';
-    $warnText.innerText='Gagal memuat FFmpeg. Coba refresh atau ganti browser.';
+    status.innerText = "Editor gagal disiapkan — " + describeError(e);
+    warnBanner.classList.remove('hidden');
   }
 }
 boot();
 
-/* ================================================================
-   FILE INPUT
-   ================================================================ */
- $fileInput.addEventListener('change',function(e){
-  var p=Array.from(e.target.files||[]);if(!p.length)return;
-  if(p.length>MAX_FILES){toast('Maks '+MAX_FILES+' file.','info');p=p.slice(0,MAX_FILES);}
-  items=p.map(function(f){return{file:f,name:f.name,size:f.size,status:'pending',url:null,blobData:null,dlName:null};});
-  $boxTitle.innerText=p.length+' file dipilih';$boxSub.innerText='Klik untuk ganti';
-  $btn.disabled=false;$status.innerText=loaded?"Siap diedit.":"Tunggu editor...";renderList();
+// ================= UPLOAD & LIST LAGU =================
+box.addEventListener('click', ()=> file.click());
+
+file.addEventListener('change', e=>{
+  const picked = Array.from(e.target.files || []);
+  if (!picked.length) return;
+  items = picked.map(f => ({ file: f, name: f.name, status: 'pending', url: null, dlName: null }));
+  boxTitle.innerText = "✅ " + items.length + " lagu dipilih";
+  boxSub.innerText = "Ketuk lagi untuk mengganti pilihan lagu";
+  btn.disabled = false;
+  status.innerText = loaded ? "Lagu siap diedit. Tekan tombol di bawah untuk mulai." : "Lagu terpilih, tunggu editor siap...";
+  renderList();
 });
 
-/* ================================================================
-   RENDER FILE LIST
-   ================================================================ */
 function renderList(){
-  if(items.length)$fileList.style.display='flex';else $fileList.style.display='none';
-  $fileList.innerHTML=items.map(function(it,i){
-    var st='Menunggu',sc='text-zinc-600',extra='',icon='<i class="fas fa-music text-zinc-700 text-xs"></i>';
-    if(it.status==='processing'){icon='<i class="fas fa-circle-notch fa-spin text-indigo-400 text-xs"></i>';st='Mengedit...';sc='text-indigo-400';}
-    if(it.status==='done'){
-      icon='<i class="fas fa-circle-check text-emerald-500 text-xs"></i>';st=FORMATS[state.chosenFmt].label+' — '+formatSize(it.size);sc='text-emerald-500/70';
-      extra='<div class="flex items-center gap-1.5 flex-shrink-0">';
-      extra+='<a class="text-[11px] font-semibold px-2.5 py-1.5 rounded-md text-black" style="background:#4ade80" href="'+it.url+'" download="'+it.dlName+'">Download</a>';
-      extra+='<button id="rbx_'+i+'" class="rbx-btn '+(isPremium()?'idle':'locked')+'" onclick="uploadToRoblox('+i+')">';
-      extra+=isPremium()?'<i class="fas fa-cloud-arrow-up"></i> Upload Roblox':'<i class="fas fa-lock" style="font-size:10px"></i> Pro';
-      extra+='</button></div>';
+  if (items.length){
+    fileListEl.classList.remove('hidden');
+    fileListEl.classList.add('flex');
+  } else {
+    fileListEl.classList.add('hidden');
+    fileListEl.classList.remove('flex');
+  }
+
+  fileListEl.innerHTML = items.map((it) => {
+    let icon = '🎵', statusText = 'Menunggu diproses', statusColor = 'text-zinc-500', extra = '';
+    if (it.status === 'processing'){ icon = '⏳'; statusText = 'Sedang diedit...'; statusColor = 'text-indigo-400'; }
+    if (it.status === 'done'){
+      icon = '✅'; statusText = 'Selesai'; statusColor = 'text-emerald-400';
+      extra = `<a class="px-3 py-1.5 rounded-lg bg-emerald-500 text-black text-xs font-bold flex-shrink-0" href="${it.url}" download="${it.dlName}">Download</a>`;
     }
-    if(it.status==='error'){icon='<i class="fas fa-circle-xmark text-rose-500 text-xs"></i>';st='Gagal';sc='text-rose-500/70';}
-    return '<div class="flex items-center gap-3 px-3 py-2.5 rounded-lg fade-up" style="background:rgba(255,255,255,.015);border:1px solid rgba(255,255,255,.03)"><div class="w-7 flex-shrink-0 text-center">'+icon+'</div><div class="flex-1 min-w-0"><div class="text-xs font-medium text-zinc-300 truncate">'+it.name+'</div><div class="text-[10px] '+sc+' mt-0.5">'+st+'</div></div>'+extra+'</div>';
+    if (it.status === 'error'){ icon = '⚠️'; statusText = 'Gagal diproses'; statusColor = 'text-rose-400'; }
+    return `
+      <div class="flex items-center gap-3 bg-zinc-800/40 border border-zinc-800 rounded-xl px-4 py-3 fade-in">
+        <div class="text-lg flex-shrink-0">${icon}</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-sm font-semibold text-zinc-100 truncate">${it.name}</div>
+          <div class="text-xs ${statusColor} mt-0.5">${statusText}</div>
+        </div>
+        ${extra}
+      </div>`;
   }).join('');
 }
-function formatSize(b){if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB';}
 
-/* ================================================================
-   MAIN BUTTON & PROCESS
-   ================================================================ */
- $btn.addEventListener('click',function(){if(!items.length)return;if(!loaded){$status.innerText="Editor belum siap.";return;}var c=canEdit();if(!c.ok){toast('Kuota habis.','info');openPayModal();return;}openFmtModal();});
+// ================= PROSES SEMUA LAGU =================
+btn.addEventListener('click', async ()=>{
+  if(!items.length) return;
+  if(!loaded){
+    status.innerText = "Editor belum siap, mohon tunggu sebentar lagi.";
+    warnBanner.classList.remove('hidden');
+    return;
+  }
 
-async function startProcess(){
-  closeFmtModal();var fmt=FORMATS[state.chosenFmt];$btn.disabled=true;$progWrap.style.display='';
-  var total=items.length;var cspeed,cresample,cdb;
-  if(activePreset===4){cspeed=parseFloat($customSpeedInput.value)||2.5;cresample=cspeed>4?96000:48000;cdb=0;}else{var pr=presets[activePreset];cspeed=pr.speed;cresample=pr.resample;cdb=pr.db;}
-  for(var i=0;i<total;i++){
-    var it=items[i];if(it.status==='done')continue;
-    if(i>0){var re=canEdit();if(!re.ok){$btn.disabled=false;$status.innerText='Kuota habis setelah '+i+' lagu.';(function(s){setTimeout(function(){toast(s+' tersisa.','info');openPayModal();},150);})(total-i);break;}}
-    var src=canEdit().src;it.status='processing';renderList();
-    $status.innerText=total>1?'Lagu '+(i+1)+'/'+total+' \u2192 '+fmt.label:'Mengedit \u2192 '+fmt.label;
-    $progFill.style.width="0%";$progTxt.innerText="0%";
+  btn.disabled = true;
+  progWrap.classList.remove('hidden');
+
+  const total = items.length;
+
+  let currentSpeed, currentResample, currentDb;
+  if (activePreset === 4) {
+    currentSpeed = parseFloat(customSpeedInput.value) || 2.5;
+    currentResample = currentSpeed > 4 ? 96000 : 48000;
+    currentDb = 0;
+  } else {
+    const p = presets[activePreset];
+    currentSpeed = p.speed;
+    currentResample = p.resample;
+    currentDb = p.db;
+  }
+
+  for (let i = 0; i < total; i++){
+    const it = items[i];
+    if (it.status === 'done') continue;
+
+    it.status = 'processing';
+    renderList();
+    status.innerText = total > 1 ? `Mengedit lagu ${i+1} dari ${total}: ${it.name}` : `Mengedit lagu Anda dengan hasil terbaik...`;
+    progFill.style.width = "0%";
+    progTxt.innerText = "0%";
+
     try{
-      var ext=it.file.name.substring(it.file.name.lastIndexOf('.')),inp='in_'+i+ext,out='out_'+i+fmt.ext;
-      var ff=['-i',inp,'-filter:a','asetrate=44100*'+cspeed+',aresample='+cresample+',volume='+cdb+'dB'].concat(fmt.args,[out]);
-      await ffmpeg.writeFile(inp,await fetchFile(it.file));
-      await withTimeout(ffmpeg.exec(ff),120000,"Encode "+fmt.label);
-      var data=await ffmpeg.readFile(out);var blob=new Blob([data.buffer],{type:fmt.mime});
-      it.url=URL.createObjectURL(blob);it.blobData=blob;it.size=blob.size;
-      it.dlName=it.file.name.replace(/\.[^/.]+$/,"")+'_speed'+cspeed+'x'+fmt.ext;
-      it.status='done';useQuota(src);updateQuotaDisplay();
-      await ffmpeg.deleteFile(inp).catch(function(){});await ffmpeg.deleteFile(out).catch(function(){});
-    }catch(err){it.status='error';refundQuota(src);updateQuotaDisplay();console.error('[YL] Error file '+i+':',err);}
+      const ext = it.file.name.substring(it.file.name.lastIndexOf('.'));
+      const inp = `in_${i}${ext}`, out = `out_${i}.ogg`;
+
+      await ffmpeg.writeFile(inp, await fetchFile(it.file));
+
+      await withTimeout(ffmpeg.exec([
+        '-i', inp,
+        '-filter:a', `asetrate=44100*${currentSpeed},aresample=${currentResample},volume=${currentDb}dB`,
+        '-c:a', 'libvorbis',
+        '-q:a','6',
+        out
+      ]), 60000, "Proses encode");
+
+      const data = await ffmpeg.readFile(out);
+      const blob = new Blob([data.buffer], {type:'audio/ogg'});
+      it.url = URL.createObjectURL(blob);
+      it.dlName = it.name.replace(/\.[^/.]+$/,"") + `_speed${currentSpeed}x_converteryl.ogg`;
+      it.status = 'done';
+
+      await ffmpeg.deleteFile(inp).catch(()=>{});
+      await ffmpeg.deleteFile(out).catch(()=>{});
+    }catch(err){
+      it.status = 'error';
+    }
+
     renderList();
   }
-  $progFill.style.width="100%";$progTxt.innerText="100%";var done=items.filter(function(x){return x.status==='done';}).length;
-  $status.innerText=done?done+'/'+total+' selesai':'Gagal semua.';$btn.disabled=false;
-}
 
-updateQuotaDisplay();
+  progFill.style.width = "100%";
+  progTxt.innerText = "100% selesai ✓";
+  const doneCount = items.filter(it => it.status === 'done').length;
+  status.innerText = doneCount
+    ? `Selesai! ${doneCount} dari ${total} lagu siap diunduh.`
+    : "Semua lagu gagal diproses, silakan coba lagi.";
+  btn.disabled = false;
+});
 </script>
 </body>
 </html>
