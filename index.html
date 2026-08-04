@@ -13,7 +13,7 @@
 *{font-family:'Inter',sans-serif;margin:0;padding:0;box-sizing:border-box}
 body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
 ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#27272a;border-radius:3px}::-webkit-scrollbar-thumb:hover{background:#3f3f46}
-.grad-text{background:linear-gradient(135deg,#818cf8,#a78bfa,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.grad-text{background:linear-gradient(135deg,#818cf8,#a78bfa,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;color:#818cf8}
 .glass{background:rgba(20,20,25,.6);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.08)}
 .glass-hover{transition:all .25s ease}
 .glass-hover:hover{border-color:rgba(129,140,248,.2);background:rgba(255,255,255,.04);transform:translateY(-1px)}
@@ -739,6 +739,8 @@ function saveRename() {
     if (renamingIndex > -1) {
         var newName = $('renameInput').value.trim();
         if (newName) {
+            // Remove any file extension from custom name to prevent double extension
+            newName = newName.replace(/\.[^/.]+$/, "");
             items[renamingIndex].customName = newName;
             renderList();
             toast('Nama file diubah', 'ok');
@@ -838,8 +840,10 @@ async function startProcess(){
       var blob=new Blob([data.buffer],{type:fmt.mime});
       it.url=URL.createObjectURL(blob);it.blobData=blob;it.size=blob.size;
       
-      // NEW NAMING LOGIC
+      // NEW NAMING LOGIC - Fixed to prevent double extension
       var baseName = it.customName || it.file.name.replace(/\.[^/.]+$/, "");
+      // Ensure baseName has no extension to prevent double extension like .ogg.ogg
+      baseName = baseName.replace(/\.[^/.]+$/, "");
       var suffix = '_2.3YL';
       var maxBaseLength = 50 - suffix.length - fmt.ext.length;
       if (baseName.length > maxBaseLength) {
