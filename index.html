@@ -23,7 +23,7 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
 .fade-in{animation:fadeIn .3s ease}
 @keyframes scaleIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
 .scale-in{animation:scaleIn .25s ease}
-.bg-mesh{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 600px 400px at 15% 20%,rgba(99,102,241,.06),transparent),radial-gradient(ellipse 500px 500px at 85% 80%,rgba(168,85,247,.05),radial-gradient(ellipse 400px 300px at 50% 50%,rgba(129,140,248,.03),transparent);pointer-events:none}
+.bg-mesh{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 600px 400px at 15% 20%,rgba(99,102,241,.06),transparent),radial-gradient(ellipse 500px 500px at 85% 80%,rgba(168,85,247,.05),transparent),radial-gradient(ellipse 400px 300px at 50% 50%,rgba(129,140,248,.03),transparent)}
 .bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:64px 64px;}
 .upload-zone{border:1.5px dashed rgba(255,255,255,.1);transition:all .3s ease;cursor:pointer}
 .upload-zone:hover{border-color:rgba(129,140,248,.4);background:rgba(129,140,248,.03)}
@@ -73,9 +73,7 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
 .divider{height:1px;background:rgba(255,255,255,.04);margin:16px 0}
 .gear-btn{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#52525b;transition:all .2s}
 .gear-btn:hover{background:rgba(255,255,255,.1);color:#e4e4e7;border-color:rgba(255,255,255,.12)}
-/* ===== TOMBOL ROBLOX YANG JELASAN DI SINI ===== */
 .rbx-nav-btn{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#52525b;transition:all .2s;flex-shrink:0}
-.rbx-nav-btn:hover{background:rgba(255,255,255,.1);color:#e4e4e7;border-color:rgba(255,255,255,.12)}
 .rbx-nav-btn:hover{background:rgba(255,255,255,.1);color:#e4e4e7;border-color:rgba(255,255,255,.12)}
 </style>
 </head>
@@ -86,7 +84,7 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
 <div class="toast-wrap" id="toastWrap"></div>
 
 <!-- NAVBAR -->
-<nav class="fixed top-0 left-0;right:0; z-index:50" style="background:rgba(6,6,8,.85);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.04)">
+<nav class="fixed top-0 left-0 right-0 z-50" style="background:rgba(6,6,8,.85);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.04)">
   <div class="max-w-3xl mx-auto px-5 h-14 flex items-center justify-between">
     <div class="flex items-center gap-2">
       <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)"><i class="fas fa-bolt text-[11px] text-white"></i></div>
@@ -98,9 +96,7 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
         <img id="userAvatar" src="" alt="" style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.08)">
         <span id="userName" class="text-xs text-zinc-400 hidden sm:inline max-w-[90px] truncate"></span>
         <div id="creditChip" class="badge" style="background:rgba(255,255,255,.04);color:#52525b;border:1px solid rgba(255,255,255,.06)"><span id="creditText">0</span></div>
-        <!-- ===== INI TOMBOL ROBLOX ===== -->
         <button class="rbx-nav-btn" onclick="openRbxModal()" title="Pengaturan Roblox"><i class="fas fa-cube" style="font-size:13px"></i></button>
-        <!-- AKHIR TOMBOL ROBLOX -->
         <button id="logoutBtn" onclick="handleLogout()" class="btn-ghost" style="padding:6px 8px" title="Keluar"><i class="fas fa-right-from-bracket" style="font-size:11px"></i></button>
       </div>
     </div>
@@ -116,7 +112,7 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
     <p class="text-sm text-zinc-500 max-w-md mx-auto leading-relaxed">Edit kecepatan audio, upload langsung ke Roblox. Cepat, bersih, tanpa ribet.</p>
   </div>
 
-  <div id="mainCard" style="display:none" class="glass fade-up" style="border:1px solid rgba(255,255,255,.05);border-radius:16px;padding:20px;margin-bottom:32px">
+  <div id="mainCard" style="display:none;border:1px solid rgba(255,255,255,.05);border-radius:16px;padding:20px;margin-bottom:32px" class="glass fade-up">
     <div class="flex items-center justify-between mb-4 px-3 py-2.5 rounded-lg" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04)">
       <div class="flex items-center gap-2">
         <div id="quotaDot" class="w-1.5 h-1.5 rounded-full bg-zinc-600"></div>
@@ -134,14 +130,14 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
         <button class="preset-btn text-xs font-semibold py-2 rounded-lg" style="border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);color:#a1a1aa" data-i="3">4.7x</button>
         <button class="preset-btn text-xs font-semibold py-2 rounded-lg" style="border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);color:#a1a1aa" data-i="4">Custom</button>
       </div>
-      <div id="customSpeedWrap" style="display:none" class="mt-3 flex items-center justify-center gap-3 py-3 px-4 rounded-lg" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04)">
+      <div id="customSpeedWrap" style="display:none;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04)" class="mt-3 flex items-center justify-center gap-3 py-3 px-4 rounded-lg">
         <span class="text-xs text-zinc-500">Speed:</span>
         <input type="number" id="customSpeedInput" class="speed-input" value="2.5" min="0.1" max="10" step="0.1">
         <span class="text-zinc-600 font-bold">x</span>
       </div>
     </div>
 
-    <div id="warnBanner" style="display:none" class="mb-4 p-3 rounded-lg text-xs text-amber-300/80" style="background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.1)">
+    <div id="warnBanner" style="display:none;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.1)" class="mb-4 p-3 rounded-lg text-xs text-amber-300/80">
       <b class="text-amber-200/90">Mode Tamu</b> — dibuka via in-app browser.
     </div>
 
@@ -267,7 +263,7 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
       </div>
       <div class="pay-card relative overflow-hidden" data-plan="subscription" onclick="pickPlan(this)">
         <div class="absolute top-0 right-0 text-[9px] font-bold text-white px-2.5 py-0.5 rounded-bl-lg" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">BEST</div>
-        <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="text-sm font-semibold">Unlimited</span><span class="badge badge-pro"><i class="fas fa-cube" style="font-size:8px"></i> ROBLOX</span></div></div><span class="text-base font-extrabold">Rp210.000</span></div>
+        <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="text-sm font-semibold">Unlimited</span><span class="badge badge-pro"><i class="fas fa-cube" style="font-size:8px"></i> ROBLOX</span></div><span class="text-base font-extrabold">Rp210.000</span></div>
         <p class="text-[10px] text-zinc-600 mt-1.5">Tanpa batas + auto upload Roblox, 30 hari</p>
       </div>
     </div>
@@ -289,7 +285,7 @@ body{background:#060608;color:#e4e4e7;overflow-x:hidden}
 <script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
 <script>
 var CONFIG_MODE='demo',API_BASE='https://backend-kamu.contoh.workers.dev',MAX_FILES=10;
-var FORMATS={ogg:{ext:'.ogg',mime:'audio/ogg',args:['-c:a','libvorbis','-q:a','6'],label:'OGG'},mp3:{ext:'.mp3',mime:'text/mpeg',args:['-c:a','libmp3lame','-q:a','2'],label:'MP3'},wav:{ext:'.wav',mime:'text/wav',args:['-c:a','pcm_s16le'],label:'WAV'},flac:{ext:'.flac',mime:'audio/flac',args:['-c:a','flac'],label:'FLAC'}};
+var FORMATS={ogg:{ext:'.ogg',mime:'audio/ogg',args:['-c:a','libvorbis','-q:a','6'],label:'OGG'},mp3:{ext:'.mp3',mime:'audio/mpeg',args:['-c:a','libmp3lame','-q:a','2'],label:'MP3'},wav:{ext:'.wav',mime:'audio/wav',args:['-c:a','pcm_s16le'],label:'WAV'},flac:{ext:'.flac',mime:'audio/flac',args:['-c:a','flac'],label:'FLAC'}};
 var $=function(id){return document.getElementById(id)};
 var $box=$('box'),$boxTitle=$('boxTitle'),$boxSub=$('boxSub'),$fileInput=$('audioFile'),$fileList=$('fileList'),$btn=$('btn'),$status=$('status'),$progWrap=$('progWrap'),$progFill=$('progFill'),$progTxt=$('progTxt'),$warnBanner=$('warnBanner'),$loginArea=$('loginArea'),$mainCard=$('mainCard'),$userChip=$('userChip'),$userAvatar=$('userAvatar'),$userName=$('userName'),$logoutBtn=$('logoutBtn'),$creditChip=$('creditChip'),$creditText=$('creditText'),$quotaText=$('quotaText'),$quotaDot=$('quotaDot'),$planBadge=$('planBadge'),$payModal=$('payModal'),$payBtn=$('payBtn'),$successModal=$('successModal'),$successMsg=$('successMsg'),$customSpeedWrap=$('customSpeedWrap'),$customSpeedInput=$('customSpeedInput'),$fmtModal=$('fmtModal'),$fmtBtn=$('fmtBtn'),$rbxModal=$('rbxModal'),$rbxProxyInput=$('rbxProxyInput'),$rbxKeyInput=$('rbxKeyInput'),$rbxUserIdInput=$('rbxUserIdInput'),$upgradeModal=$('upgradeModal');
 
@@ -313,11 +309,13 @@ function closeRbxModal(){$rbxModal.style.display='none';document.body.style.over
 function saveRbxSettings(){state.rbxProxy=$rbxProxyInput.value.trim()||null;state.rbxKey=$rbxKeyInput.value.trim()||null;state.rbxUserId=$rbxUserIdInput.value.trim()||null;saveRbxLocal();closeRbxModal();toast(state.rbxKey?'Roblox terhubung':'Pengaturan disimpan','ok');}
 function clearRbxSettings(){$rbxProxyInput.value='';$rbxKeyInput.value='';$rbxUserIdInput.value='';state.rbxProxy=null;state.rbxKey=null;state.rbxUserId=null;saveRbxLocal();closeRbxModal();toast('Dihapus','info');}
 function openUpgradeModal(){$upgradeModal.style.display='flex';document.body.style.overflow='hidden';}
-function closeUpgradeModal(){$upgradeModal.style.display='none';document.body.style.overflow='none';closePayModal();}
+function closeUpgradeModal(){$upgradeModal.style.display='none';document.body.style.overflow='';}
  $rbxModal.addEventListener('click',function(e){if(e.target===$rbxModal)closeRbxModal();});
  $upgradeModal.addEventListener('click',function(e){if(e.target===$upgradeModal)closeUpgradeModal();});
 function isPremium(){return state.isSubscribed&&state.subExpiry&&Date.now()<state.subExpiry;}
-function uploadToRoblox(idx){
+
+/* FIX #9: tambah async */
+async function uploadToRoblox(idx){
   var it=items[idx];if(!it||!it.blobData)return;
   if(!isPremium()){openUpgradeModal();return;}
   if(!state.rbxProxy||!state.rbxKey||!state.rbxUserId){openRbxModal();toast('Lengkapi pengaturan Roblox dulu','info');return;}
@@ -336,7 +334,14 @@ function uploadToRoblox(idx){
     toast('Upload berhasil! ID: '+aid,'ok');
   }catch(err){b.disabled=false;b.className='rbx-btn idle';b.innerHTML='<i class="fas fa-rotate-right"></i> Coba Lagi';toast('Gagal: '+(err.message||'').substring(0,100),'err');}
 }
-function canEdit(){if(isPremium())return{ok:true,src:'sub'};};if(state.credits>0)return{ok:true,src:'credit'};if(!state.freeUsed)return{ok:true,src:'free'};return{ok:false,src:null};}
+
+/* FIX #3: hapus }; ekstra yang menutup fungsi terlalu cepat */
+function canEdit(){
+  if(isPremium())return{ok:true,src:'sub'};
+  if(state.credits>0)return{ok:true,src:'credit'};
+  if(!state.freeUsed)return{ok:true,src:'free'};
+  return{ok:false,src:null};
+}
 function useQuota(s){if(s==='free'){state.freeUsed=true;return;}if(s==='credit'){state.credits--;saveLocal();}}
 function refundQuota(s){if(s==='free'){state.freeUsed=false;return;}if(s==='credit'){state.credits++;saveLocal();}}
 function openFmtModal(){$fmtModal.style.display='flex';document.body.style.overflow='hidden';}
@@ -344,22 +349,24 @@ function closeFmtModal(){$fmtModal.style.display='none';document.body.style.over
 function pickFmt(el){document.querySelectorAll('.fmt-card').forEach(function(c){c.classList.remove('chosen');});el.classList.add('chosen');state.chosenFmt=el.getAttribute('data-fmt');$fmtBtn.textContent='Mulai Edit — '+FORMATS[state.chosenFmt].label;}
  $fmtModal.addEventListener('click',function(e){if(e.target===$fmtModal)closeFmtModal();});
 function openPayModal(){state.chosenPlan=null;document.querySelectorAll('.pay-card').forEach(function(c){c.classList.remove('chosen');});$payBtn.disabled=true;$payBtn.textContent='Pilih paket';$payModal.style.display='flex';document.body.style.overflow='hidden';}
-function closePayModal(){$payModal.style.display='none';document.body.style.overflow='none';}
+/* FIX #11: overflow='none' → overflow='' */
+function closePayModal(){$payModal.style.display='none';document.body.style.overflow='';}
 function pickPlan(el){document.querySelectorAll('.pay-card').forEach(function(c){c.classList.remove('chosen');});el.classList.add('chosen');state.chosenPlan=el.getAttribute('data-plan');$payBtn.disabled=false;$payBtn.textContent='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');}
 function showSuccessModal(p){if(p==='subscription')$successMsg.textContent='Unlimited aktif 30 hari. Roblox upload tersedia.';else if(p==='bundle_65')$successMsg.textContent='65 lagu ditambahkan.';else $successMsg.textContent='1 lagu ditambahkan.';$successModal.style.display='flex';document.body.style.overflow='hidden';}
-function closeSuccessModal(){$successModal.style.display='none';document.body.style.overflow='none';updateQuotaDisplay();}
+/* FIX #11: overflow='none' → overflow='' */
+function closeSuccessModal(){$successModal.style.display='none';document.body.style.overflow='';updateQuotaDisplay();}
  $payModal.addEventListener('click',function(e){if(e.target===$payModal)closePayModal();});
  $successModal.addEventListener('click',function(e){if(e.target===$successModal)closeSuccessModal();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeFmtModal();closePayModal();closeSuccessModal();closeRbxModal();closeUpgradeModal();}});
 
 function doPayment(){if(!state.chosenPlan||!state.email)return;$payBtn.disabled=true;$payBtn.innerHTML='<span class="spinner"></span> Memproses...';
 if(CONFIG_MODE==='demo'){setTimeout(function(){if(state.chosenPlan==='subscription'){state.isSubscribed=true;state.subExpiry=Date.now()+30*86400000;}else{state.credits+=PLAN_CREDITS[state.chosenPlan];}saveLocal();updateQuotaDisplay();closePayModal();showSuccessModal(state.chosenPlan);toast('Pembayaran berhasil (demo)','ok');},1500);return;}
-fetch(API_BASE+'/create-transaction',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:state.email,type:state.chosenPlan})}).then(function(r){return r.json();}).then(function(d){if(!d.snap_token)throw new Error('No token');window.snap.pay(d.snap_token,{onSuccess:function(){toast('Verifikasi...','info');var t=0;var p=setInterval(function(){fetch(API_BASE+'/check?email='+encodeURIComponent(state.email)).then(function(r){return r.json();}).then(function(d){state.credits=d.credits||0;state.isSubscribed=d.is_subscribed||false;state.subExpiry=d.subscription_expiry?new Date(d.subscription_expiry).getTime():null;updateQuotaDisplay();var ok=(state.chosenPlan==='subscription'&&state.isSubscribed)||(state.chosenPlan!=='subscription'&&state.credits>0);if(ok||++t>20){clearInterval(p);if(ok){closePayModal();showSuccessModal(state.chosenPlan);}}});},3000);},onPending:function(){toast('Pending.','info');closePayModal();},onError:function(){toast('Gagal.','err');$payBtn.disabled=false;$payBtn.textContent='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');},onClose:function(){$payBtn.disabled=false;$payBtn.textContent='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');}});}).catch(function(e){toast('Gagal.','err');$payBtn.disabled=false;$payBtn.textContent='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');});}}
+fetch(API_BASE+'/create-transaction',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:state.email,type:state.chosenPlan})}).then(function(r){return r.json();}).then(function(d){if(!d.snap_token)throw new Error('No token');window.snap.pay(d.snap_token,{onSuccess:function(){toast('Verifikasi...','info');var t=0;var p=setInterval(function(){fetch(API_BASE+'/check?email='+encodeURIComponent(state.email)).then(function(r){return r.json();}).then(function(d){state.credits=d.credits||0;state.isSubscribed=d.is_subscribed||false;state.subExpiry=d.subscription_expiry?new Date(d.subscription_expiry).getTime():null;updateQuotaDisplay();var ok=(state.chosenPlan==='subscription'&&state.isSubscribed)||(state.chosenPlan!=='subscription'&&state.credits>0);if(ok||++t>20){clearInterval(p);if(ok){closePayModal();showSuccessModal(state.chosenPlan);}}});},3000);},onPending:function(){toast('Pending.','info');closePayModal();},onError:function(){toast('Gagal.','err');$payBtn.disabled=false;$payBtn.textContent='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');},onClose:function(){$payBtn.disabled=false;$payBtn.textContent='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');}});}).catch(function(e){toast('Gagal.','err');$payBtn.disabled=false;$payBtn.textContent='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');});}
 
 var isInApp=(function(){var u=navigator.userAgent||'';return['WhatsApp','Instagram','FBAN','FBAV','Line/','MicroMessenger','TikTok','Discord'].some(function(p){return u.indexOf(p)!==-1;})();})();
 if(isInApp){$warnBanner.style.display='';$loginArea.style.display='none';$mainCard.style.display='';updateQuotaDisplay();}
 
-var GOOGLE_CLIENT_ID="554107557548-o2q25dcsqj07r3hupdkvtes2tujfri9l.apps.googleusercontent.com';
+var GOOGLE_CLIENT_ID="554107557548-o2q25dcsqj07r3hupdkvtes2tujfri9l.apps.googleusercontent.com";
 function decodeJwt(t){try{var p=t.split('.')[1];return JSON.parse(decodeURIComponent(atob(p).split('').map(function(c){return'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2);}).join('')));}catch(e){return null;}}
 function handleCredentialResponse(r){var p=decodeJwt(r.credential);if(!p)return;state.email=p.email;state.name=p.name||p.email;state.freeUsed=false;$userAvatar.src=p.picture||'';$userName.textContent=state.name;$loginArea.style.display='none';$userChip.style.display='flex';$mainCard.style.display='';loadLocal(state.email);loadRbxLocal();updateQuotaDisplay();try{localStorage.setItem('convyl_user',JSON.stringify(p));}catch(e){}}
 function handleLogout(){try{google.accounts.id.disableAutoSelect();}catch(e){}try{localStorage.removeItem('convyl_user');}catch(e){}state.email=null;state.name=null;state.credits=0;state.isSubscribed=false;state.subExpiry=null;state.freeUsed=false;state.rbxProxy=null;state.rbxKey=null;state.rbxUserId=null;$loginArea.style.display='';$userChip.style.display='none';$mainCard.style.display='none';}
@@ -372,7 +379,7 @@ initGoogleLogin();
 
 var presets=[{speed:2.3,db:0,resample:48000},{speed:2.5,db:0,resample:48000},{speed:2.7,db:0,resample:48000},{speed:4.7,db:0,resample:96000}];
 var activePreset=0;
-document.querySelectorAll('.preset-btn').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.preset-btn').forEach(function(x){x.classList.remove('active');});b.classList.add('active');activePreset=parseInt(b.getAttribute('data-i'),10);if(activePreset===4){$customSpeedWrap.style.display='flex';$customSpeedWrap.style.border='1px solid rgba(255,255,255,.04)';$customSpeedWrap.style.background='rgba(255,255,255,.02)';}else{$customSpeedWrap.style.display='none';}});});
+document.querySelectorAll('.preset-btn').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.preset-btn').forEach(function(x){x.classList.remove('active');});b.classList.add('active');activePreset=parseInt(b.getAttribute('data-i'),10);if(activePreset===4){$customSpeedWrap.style.display='flex';}else{$customSpeedWrap.style.display='none';}});});
 var ffmpeg=new FFmpegWASM.FFmpeg(),toBlobURL=FFmpegUtil.toBlobURL,fetchFile=FFmpegUtil.fetchFile;
 var loaded=false,items=[];
 function checkEnv(){if(typeof Worker==='undefined')return'Web Worker tidak didukung.';if(typeof WebAssembly==='undefined')return'WebAssembly tidak didukung.';return null;}
@@ -407,9 +414,11 @@ function renderList(){
     if(it.status==='processing'){icon='<i class="fas fa-circle-notch fa-spin text-indigo-400 text-xs"></i>';st='Mengedit...';sc='text-indigo-400';}
     if(it.status==='done'){
       icon='<i class="fas fa-circle-check text-emerald-500 text-xs"></i>';st=FORMATS[state.chosenFmt].label+' — '+formatSize(it.size);sc='text-emerald-500/70';
+      /* FIX #4: HTML rusak — kurung quote hilang, tag tidak ditutup */
       extra='<div class="flex items-center gap-1.5 flex-shrink-0">';
       extra+='<a class="text-[11px] font-semibold px-2.5 py-1.5 rounded-md text-black" style="background:#4ade80" href="'+it.url+'" download="'+it.dlName+'">Download</a>';
-      extra+='<button id="rbx_'+i+'" class="rbx-btn '+(isPremium()?'idle':'locked')+'" onclick="uploadToRoblox('+i+')">'+(isPremium()?'<i class="fas fa-cloud-arrow-up"></i> Upload Roblox':'<i class="fas fa-lock text-[10px]></i> Pro')
+      extra+='<button id="rbx_'+i+'" class="rbx-btn '+(isPremium()?'idle':'locked')+'" onclick="uploadToRoblox('+i+')">'+(isPremium()?'<i class="fas fa-cloud-arrow-up"></i> Upload Roblox':'<i class="fas fa-lock" style="font-size:10px"></i> Pro')+'</button>';
+      extra+='</div>';
     }
     if(it.status==='error'){icon='<i class="fas fa-circle-xmark text-rose-500 text-xs"></i>';st='Gagal';sc='text-rose-500/70';}
     return '<div class="flex items-center gap-3 px-3 py-2.5 rounded-lg fade-up" style="background:rgba(255,255,255,.015);border:1px solid rgba(255,255,255,.03)"><div class="w-7 flex-shrink-0 text-center">'+icon+'</div><div class="flex-1 min-w-0"><div class="text-xs font-medium text-zinc-300 truncate">'+it.name+'</div><div class="text-[10px] '+sc+' mt-0.5">'+st+'</div></div>'+extra+'</div>';
@@ -422,20 +431,32 @@ function formatSize(b){if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixe
   openFmtModal();
 });
 async function startProcess(){
-  closeFmtModal();var fmt=FORMATS[state.chosenFormt];$btn.disabled=true;$progWrap.style.display='';var total=total=total;var cspeed,cresample,cdb;
+  closeFmtModal();
+  /* FIX #5: typo chosenFormt → chosenFmt */
+  var fmt=FORMATS[state.chosenFmt];
+  $btn.disabled=true;$progWrap.style.display='';
+  /* FIX #6: total=total=total → items.length */
+  var total=items.length;
+  var cspeed,cresample,cdb;
   if(activePreset===4){cspeed=parseFloat($customSpeedInput.value)||2.5;cresample=cspeed>4?96000:48000;cdb=0;}else{var pr=presets[activePreset];cspeed=pr.speed;cresample=pr.resample;cdb=pr.db;}
   for(var i=0;i<total;i++){
-    var it=0;it.file.items[i];if(it.status==='done')continue;
+    /* FIX #7: it=0;it.file.items[i] → it=items[i] */
+    var it=items[i];
+    if(it.status==='done')continue;
     if(i>0){var re=canEdit();if(!re.ok){$btn.disabled=false;$status.innerText='Kuota habis setelah '+i+' lagu.';(function(s){setTimeout(function(){toast(s+' tersisa.','info');openPayModal();},150);})(total-i);break;}}
     var src=canEdit().src;it.status='processing';renderList();
     $status.innerText=total>1?'Lagu '+(i+1)+'/'+total+' → '+fmt.label:'Mengedit → '+fmt.label;
     $progFill.style.width="0%";$progTxt.innerText="0%";
     try{
       var ext=it.file.name.substring(it.file.name.lastIndexOf('.')),inp='in_'+i+ext,out='out_'+i+fmt.ext;
-      var ff=['-i',inp,'-filter:a','asetrate=44100*'+cspeed+',aresample='+cresample+',volume='+cdb+'dB','-c:a',...fmt.args,'-q:a','6',out;
+      /* FIX #8: kurung ] hilang, hapus -c:a dan -q:a duplikat, langsung spread fmt.args */
+      var ff=['-i',inp,'-filter:a','asetrate=44100*'+cspeed+',aresample='+cresample+',volume='+cdb+'dB'].concat(fmt.args,[out]);
       await ffmpeg.writeFile(inp,await fetchFile(it.file));
       var res=await withTimeout(ffmpeg.exec(ff),90000,"Encode "+fmt.label);
-      var data=await ffmpeg.readFile(out);var blob=new Blob([data.buffer],{type:fmt.mime});it.url=it.blobData||URL.createObjectURL(blob);it.blobData=blob;it.size=blob.size;
+      var data=await ffmpeg.readFile(out);var blob=new Blob([data.buffer],{type:fmt.mime});
+      /* FIX #10: it.blobData||URL... → langsung URL.createObjectURL */
+      it.url=URL.createObjectURL(blob);
+      it.blobData=blob;it.size=blob.size;
       it.dlName=it.file.name.replace(/\.[^/.]+$/,"")+'_speed'+cspeed+'x'+fmt.ext;it.status='done';useQuota(src);updateQuotaDisplay();
       await ffmpeg.deleteFile(inp).catch(function(){});await ffmpeg.deleteFile(out).catch(function(){});
     }catch(err){it.status='error';refundQuota(src);updateQuotaDisplay();}
