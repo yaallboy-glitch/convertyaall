@@ -9,6 +9,28 @@
 <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-client-XXXXX_GANTI"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/all.min.css">
+<script>
+(function(){
+  // Deteksi apakah font ikon berhasil termuat; kalau gagal, coba CDN cadangan
+  function ensureIcons(){
+    try{
+      if(document.fonts && document.fonts.check && document.fonts.check('900 1em "Font Awesome 6 Free"')){
+        return;
+      }
+    }catch(e){}
+    var alt=document.createElement('link');
+    alt.rel='stylesheet';
+    alt.href='https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css';
+    document.head.appendChild(alt);
+  }
+  if(document.fonts && document.fonts.ready){
+    document.fonts.ready.then(ensureIcons);
+    setTimeout(ensureIcons,2000);
+  }else{
+    window.addEventListener('load',ensureIcons);
+  }
+})();
+</script>
 <style>
 *{font-family:'Inter',sans-serif;margin:0;padding:0;box-sizing:border-box}
 body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
@@ -111,6 +133,8 @@ body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
 .panel-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#e4e4e7}
 .upload-row{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:10px;transition:all .2s ease}
 .upload-row:hover{background:rgba(255,255,255,.04)}
+.upload-row.moderating{border-color:rgba(192,132,252,.35);animation:moderatePulse 1.8s ease-in-out infinite}
+@keyframes moderatePulse{0%,100%{box-shadow:0 0 0 0 rgba(192,132,252,.28)}50%{box-shadow:0 0 0 6px rgba(192,132,252,0)}}
 .row-index{width:22px;height:22px;border-radius:6px;background:rgba(129,140,248,.15);color:#a5b4fc;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .log-console{background:#000;border-radius:10px;padding:12px;font-family:'SFMono-Regular',Consolas,monospace;font-size:10.5px;line-height:1.7;max-height:280px;overflow-y:auto;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,.04)}
 .log-line{display:flex;gap:8px;white-space:pre-wrap;word-break:break-word}
@@ -208,7 +232,10 @@ body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
       <div class="panel">
         <div class="panel-head">
           <span class="panel-title"><i class="fas fa-list text-indigo-400" style="font-size:12px"></i> Upload List</span>
-          <span class="badge" style="background:rgba(255,255,255,.05);color:#71717a;border:1px solid rgba(255,255,255,.08)" id="fileCountBadge">0 Files</span>
+          <div class="flex items-center gap-1.5">
+            <button onclick="copyAllAssetIds()" class="btn-ghost" style="padding:4px 10px;font-size:10px" title="Salin semua Asset ID yang sudah selesai"><i class="fas fa-copy" style="font-size:9px"></i> Copy All ID</button>
+            <span class="badge" style="background:rgba(255,255,255,.05);color:#71717a;border:1px solid rgba(255,255,255,.08)" id="fileCountBadge">0 Files</span>
+          </div>
         </div>
         <div id="fileList" class="flex flex-col gap-1.5"></div>
       </div>
@@ -598,6 +625,11 @@ function copyRbxId(id){
   var full='rbxassetid://'+id;
   navigator.clipboard.writeText(full).then(function(){toast(full+' disalin','ok');});
 }
+function copyAllAssetIds(){
+  var ids=items.filter(function(x){return x.rbxState==='done'&&x.rbxAssetId;}).map(function(x){return 'rbxassetid://'+x.rbxAssetId;});
+  if(!ids.length){toast('Belum ada Asset ID yang berhasil.','info');return;}
+  navigator.clipboard.writeText(ids.join('\n')).then(function(){toast(ids.length+' Asset ID disalin','ok');});
+}
 
 function canEdit(){
   if(isPremium())return{ok:true,src:'sub'};
@@ -760,11 +792,13 @@ boot();
 });
  $fileInput.addEventListener('change',function(e){
   var p=Array.from(e.target.files||[]);if(!p.length)return;
-  if(p.length>MAX_FILES){toast('Maks '+MAX_FILES+' file.','info');p=p.slice(0,MAX_FILES);}
-  items=p.map(function(f){return{file:f,name:f.name,size:f.size,status:'pending',url:null,blobData:null,dlName:null,customName:null,rbxState:null,rbxAssetId:null,rbxOperationPath:null,rbxError:null};});
-  $boxTitle.innerText=p.length+' file dipilih';$boxSub.innerText='Klik untuk ganti';
+  if(p.length>MAX_FILES){toast('Maks '+MAX_FILES+' file per batch.','info');p=p.slice(0,MAX_FILES);}
+  var newItems=p.map(function(f){return{file:f,name:f.name,size:f.size,status:'pending',url:null,blobData:null,dlName:null,customName:null,rbxState:null,rbxAssetId:null,rbxOperationPath:null,rbxError:null};});
+  items=items.concat(newItems);
+  $boxTitle.innerText=p.length+' file baru ditambahkan';$boxSub.innerText='Total '+items.length+' file — klik untuk tambah lagi';
   $btn.disabled=false;$status.innerText=loaded?"Siap diedit.":"Tunggu editor...";renderList();
-  logLine('info',p.length+' file terdeteksi');
+  logLine('info',p.length+' file baru ditambahkan (total '+items.length+')');
+  $fileInput.value='';
 });
 
 // ===== RENAME LOGIC =====
@@ -824,6 +858,7 @@ function renderList(){
   }
   $fileList.innerHTML=items.map(function(it,i){
     var st='Menunggu',sc='text-zinc-600',extra='<div class="flex items-center gap-1.5 flex-shrink-0">',icon='<i class="fas fa-circle text-zinc-700" style="font-size:6px"></i>';
+    var rState=it.rbxState||'idle';
     
     var baseName = it.customName || it.file.name.replace(/\.[^/.]+$/, "");
     var suffix = '_2.3YL';
@@ -837,7 +872,6 @@ function renderList(){
     if(it.status==='done'){
         icon='<i class="fas fa-circle-check text-emerald-500" style="font-size:9px"></i>';st=FORMATS[state.chosenFmt].label+' — '+formatSize(it.size);sc='text-emerald-500/70';
         extra+='<a class="rbx-btn done" href="'+it.url+'" download="'+it.dlName+'" title="Download"><i class="fas fa-download" style="font-size:10px"></i></a>';
-        var rState=it.rbxState||'idle';
         if(!isPremium()){
           extra+='<button class="rbx-btn locked" onclick="uploadToRoblox('+i+')" title="Fitur Premium"><i class="fas fa-lock" style="font-size:10px"></i></button>';
         }else if(rState==='uploading'){
@@ -880,7 +914,7 @@ function renderList(){
     
     extra+='</div>';
     
-    return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row fade-up"><div class="row-index">'+(i+1)+'</div><div class="flex-1 min-w-0"><div class="text-xs font-medium text-zinc-300 truncate flex items-center gap-2"><i class="fas fa-music text-zinc-500" style="font-size:10px"></i> '+displayName+'</div><div class="text-[10px] '+sc+' mt-0.5 flex items-center gap-1.5">'+icon+' '+st+'</div>'+rbxLine+'</div>'+extra+'</div>';
+    return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row fade-up'+(rState==='moderating'?' moderating':'')+'"><div class="row-index">'+(i+1)+'</div><div class="flex-1 min-w-0"><div class="text-xs font-medium text-zinc-300 truncate flex items-center gap-2"><i class="fas fa-music text-zinc-500" style="font-size:10px"></i> '+displayName+'</div><div class="text-[10px] '+sc+' mt-0.5 flex items-center gap-1.5">'+icon+' '+st+'</div>'+rbxLine+'</div>'+extra+'</div>';
   }).join('');
 }
 function formatSize(b){if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB';}
@@ -957,3 +991,4 @@ updateQuotaDisplay();
 </script>
 </body>
 </html>
+
