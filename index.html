@@ -644,28 +644,27 @@ async function uploadToRoblox(idx){
   var b=document.getElementById('rbx_'+idx);if(!b||b.disabled)return;
   b.disabled=true;b.className='rbx-btn loading';b.innerHTML='<span class="spinner"></span> Upload...';
   try{
-    var fd=new FormData();fd.append('api_key',state.rbxKey);
-    var speedUsed=it.speedUsed||2.3;
+    var fd=new FormData();
+    fd.append('api_key',state.rbxKey);
     var rawName = it.customName || it.file.name.replace(/\.[^/.]+$/,'');
     var safeName = truncateName(rawName, 50);
-    fd.append('request',JSON.stringify({assetType:'Audio',displayName:safeName,description:'Speed '+speedUsed+'x via ConverterYL',creationContext:{creator:{userId:state.rbxUserId}}}));
+    fd.append('request',JSON.stringify({
+      assetType:'Audio',
+      displayName:safeName,
+      description:'Uploaded via ConverterYL',
+      creator:{userId:state.rbxUserId}
+    }));
     fd.append('file',it.blobData,it.dlName);
     var res=await fetch(ROBLOX_PROXY_URL,{method:'POST',body:fd});
     var data=await res.json();
     if(!res.ok)throw new Error(data.error||data.message||'HTTP '+res.status);
-    var rawId = data.assetId || data.path || data.operationId;
-    var aid = rawId;
-    if (typeof rawId === 'string' && rawId.indexOf('assets/') !== -1) {
-        aid = rawId.split('/')[1];
-    }
-    b.disabled=false;b.className='rbx-btn done';b.innerHTML='<i class="fa-solid fa-check"></i> '+aid;b.title='Klik salin';b.style.cursor='pointer';
+    var aid=data.assetId||data.path;
+    b.disabled=false;b.className='rbx-btn done';b.innerHTML='<i class="fas fa-check"></i> '+aid;b.title='Klik salin';b.style.cursor='pointer';
     b.onclick=function(){navigator.clipboard.writeText(String(aid)).then(function(){toast('Asset ID '+aid+' disalin','ok');});};
     toast('Upload berhasil! ID: '+aid,'ok');
     logLine('upload','Roblox upload berhasil, ID: '+aid);
-    rbxAssets.push({name:safeName, assetId:aid});
-    renderRbxAssets();
   }catch(err){
-    b.disabled=false;b.className='rbx-btn idle';b.innerHTML='<i class="fa-solid fa-rotate-right"></i> Coba Lagi';
+    b.disabled=false;b.className='rbx-btn idle';b.innerHTML='<i class="fas fa-rotate-right"></i> Coba Lagi';
     toast('Gagal: '+(err.message||'').substring(0,100),'err');
     logLine('error','Roblox upload gagal: '+(err.message||''));
   }
