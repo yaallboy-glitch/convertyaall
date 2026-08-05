@@ -854,22 +854,26 @@ async function boot(){
 }
 boot();
 
- $box.addEventListener('dragover',function(e){e.preventDefault();$box.style.borderColor='rgba(129,140,248,.6)';$box.style.background='rgba(129,140,248,.05)';});
- $box.addEventListener('dragleave',function(e){$box.style.borderColor='';$box.style.background='';});
- $box.addEventListener('drop',function(e){
-  e.preventDefault();$box.style.borderColor='';$box.style.background='';
-  var dt=e.dataTransfer;if(!dt||!dt.files||!dt.files.length)return;
-  var ev=new Event('change');
-  var dtRef=new DataTransfer();
-  Array.from(dt.files).forEach(function(f){dtRef.items.add(f);});
-  $fileInput.files=dtRef.files;
-  $fileInput.dispatchEvent(ev);
-});
+if($box){
+  $box.addEventListener('dragover',function(e){e.preventDefault();$box.style.borderColor='rgba(129,140,248,.6)';$box.style.background='rgba(129,140,248,.05)';});
+  $box.addEventListener('dragleave',function(e){$box.style.borderColor='';$box.style.background='';});
+  $box.addEventListener('drop',function(e){
+    e.preventDefault();$box.style.borderColor='';$box.style.background='';
+    var dt=e.dataTransfer;if(!dt||!dt.files||!dt.files.length)return;
+    var ev=new Event('change');
+    var dtRef=new DataTransfer();
+    Array.from(dt.files).forEach(function(f){dtRef.items.add(f);});
+    $fileInput.files=dtRef.files;
+    $fileInput.dispatchEvent(ev);
+  });
+}
+
  $fileInput.addEventListener('change',function(e){
   var p=Array.from(e.target.files||[]);if(!p.length)return;
   if(p.length>MAX_FILES){toast('Maks '+MAX_FILES+' file.','info');p=p.slice(0,MAX_FILES);}
   items=p.map(function(f){return{id:Date.now()+Math.random(),file:f,name:f.name,size:f.size,status:'pending',url:null,blobData:null,dlName:null,customName:null,checked:false,eq:null,speedUsed:null,assetId:null};});
-  $boxTitle.innerText=p.length+' file dipilih';$boxSub.innerText='Klik untuk ganti';
+  if($boxTitle)$boxTitle.innerText=p.length+' file dipilih';
+  if($boxSub)$boxSub.innerText='Klik untuk ganti';
   $btn.disabled=false;$status.innerText=loaded?"Siap diedit.":"Tunggu editor...";renderList();
   logLine('info',p.length+' file terdeteksi');
   $('askEditModal').classList.add('show');
@@ -883,6 +887,46 @@ function closeAskEdit(editFirst) {
     if(items.length>0) playPmSong(0);
   }
 }
+
+// ===== RENAME LOGIC (RESTORED) =====
+var renamingIndex = -1;
+function renameFile(idx) {
+    renamingIndex = idx;
+    var it = items[idx];
+    var baseName = it.customName || it.file.name.replace(/\.[^/.]+$/, "");
+    $('renameInput').value = baseName;
+    var suffix = '_2.3YL';
+    var ext = FORMATS[state.chosenFmt].ext;
+    var isTooLong = (baseName.length + suffix.length + ext.length) > 50;
+    if(isTooLong && !it.customName) {
+        $('renameWarn').classList.remove('hidden');
+    } else {
+        $('renameWarn').classList.add('hidden');
+    }
+    $('renameModal').classList.add('show');
+    document.body.style.overflow = 'hidden';
+    setTimeout(function(){ $('renameInput').focus(); }, 100);
+}
+function closeRenameModal() {
+    $('renameModal').classList.remove('show');
+    document.body.style.overflow = '';
+}
+function saveRename() {
+    if (renamingIndex > -1) {
+        var newName = $('renameInput').value.trim();
+        if (newName) {
+            newName = newName.replace(/\.[^/.]+$/, "");
+            items[renamingIndex].customName = truncateName(newName, 50);
+            renderList();
+            toast('Nama file diubah', 'ok');
+        }
+    }
+    closeRenameModal();
+}
+ $('renameModal').addEventListener('click',function(e){if(e.target===$('renameModal'))closeRenameModal();});
+ $('renameInput').addEventListener('keydown', function(e) {
+    if(e.key === 'Enter') saveRename();
+});
 
 // ===== PLAYMODE (EQ) =====
 var pmAudioCtx, pmSource, pmLow, pmMid, pmHigh, pmDens;
@@ -990,7 +1034,13 @@ function renderList(){
     return;
   }
   $fileList.innerHTML=items.map(function(it,i){
-    var st='Menunggu',sc='text-zinc-600',extra='',icon='<i class="fa-solid fa-circle text-zinc-700" style="font-size:6px"></i>';
+    var st='Menunggu',sc='text-zinc-600',extra='<div class="flex items-center gap-1.5 flex-shrink-0">',icon='<i class="fa-solid fa-circle text-zinc-700" style="font-size:6px"></i>';
+    
+    var baseName = it.customName || it.file.name.replace(/\.[^/.]+$/, "");
+    var suffix = '_2.3YL';
+    var ext = FORMATS[state.chosenFmt].ext;
+    var isTooLong = (baseName.length + suffix.length + ext.length) > 50;
+    var displayName = it.customName || it.file.name;
     
     if(it.status==='pending'){
         st = it.eq ? 'Siap Convert (EQ Applied)' : 'Siap Convert';
@@ -1001,16 +1051,29 @@ function renderList(){
     if(it.status==='done'){
         icon='<input type="checkbox" '+(it.checked?'checked':'')+' onchange="toggleCheck('+i+')">';
         st=FORMATS[state.chosenFmt].label+' — '+formatSize(it.size);sc='text-emerald-500/70';
-        extra='<span class="text-[10px] text-emerald-500/70 ml-2">Siap Upload</span>';
+        extra+='<a class="rbx-btn done" href="'+it.url+'" download="'+it.dlName+'" title="Download"><i class="fa-solid fa-download" style="font-size:10px"></i></a>';
+        extra+='<button id="rbx_'+i+'" class="rbx-btn '+(isPremium()?'idle':'locked')+'" onclick="uploadToRoblox('+i+')" title="Upload Roblox">'+(isPremium()?'<i class="fa-solid fa-cloud-arrow-up" style="font-size:10px"></i>':'<i class="fa-solid fa-lock" style="font-size:10px"></i>')+'</button>';
     }
     if(it.status==='uploading'){icon='<i class="fa-solid fa-circle-notch fa-spin text-indigo-400" style="font-size:9px"></i>';st='Uploading...';sc='text-indigo-400';}
     if(it.status==='uploaded'){
         icon='<i class="fa-solid fa-check-circle text-emerald-400" style="font-size:10px"></i>';
         st='rbxassetid://'+it.assetId; sc='text-purple-400 font-mono';
-        extra='<button class="rbx-btn done ml-2" onclick="copyText(\''+it.assetId+'\')"><i class="fa-solid fa-copy"></i> Copy</button>';
+        extra+='<button class="rbx-btn done" onclick="copyText(\''+it.assetId+'\')"><i class="fa-solid fa-copy"></i> Copy</button>';
     }
     
-    return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row fade-up"><div class="row-index w-6">'+icon+'</div><div class="flex-1 min-w-0"><div class="text-xs font-medium text-zinc-300 truncate flex items-center gap-2"><i class="fa-solid fa-music text-zinc-500" style="font-size:10px"></i> '+(it.customName||it.name)+'</div><div class="text-[10px] '+sc+' mt-0.5 flex items-center">'+st+' '+extra+'</div></div></div>';
+    if(it.status!=='processing') {
+        if (isTooLong && !it.customName) {
+            extra += '<button class="rbx-btn idle" style="border-color:rgba(251,146,60,.4);color:#fb923c;background:rgba(251,146,60,.1)" onclick="renameFile('+i+')" title="Nama terlalu panjang, rename disarankan"><i class="fa-solid fa-triangle-exclamation" style="font-size:10px"></i></button>';
+        } else if (it.customName) {
+            extra += '<button class="rbx-btn done" onclick="renameFile('+i+')" title="Edit nama"><i class="fa-solid fa-pen" style="font-size:10px"></i></button>';
+        } else {
+            extra += '<button class="rbx-btn idle" onclick="renameFile('+i+')" title="Rename file"><i class="fa-solid fa-pen" style="font-size:10px"></i></button>';
+        }
+    }
+    
+    extra+='</div>';
+    
+    return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row fade-up"><div class="row-index w-6">'+icon+'</div><div class="flex-1 min-w-0"><div class="text-xs font-medium text-zinc-300 truncate flex items-center gap-2"><i class="fa-solid fa-music text-zinc-500" style="font-size:10px"></i> '+displayName+'</div><div class="text-[10px] '+sc+' mt-0.5 flex items-center gap-1.5">'+st+'</div></div>'+extra+'</div>';
   }).join('');
 }
 function formatSize(b){if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB';}
@@ -1031,6 +1094,9 @@ function copyText(t) {
 }
 
  $btn.addEventListener('click',function(){
+  if(!items.length)return;
+  if(!loaded){$status.innerText="Editor belum siap.";return;}
+  var c=canEdit();if(!c.ok){toast('Kuota habis.','info');openPayModal();return;}
   var checked = items.filter(x => x.checked && x.status === 'pending');
   if(checked.length === 0) { toast('Centang file dulu','info'); return; }
   openFmtModal();
