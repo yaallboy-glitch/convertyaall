@@ -545,7 +545,16 @@ async function uploadToRoblox(idx){
     var res=await fetch(ROBLOX_PROXY_URL,{method:'POST',body:fd});
     var data=await res.json();
     if(!res.ok)throw new Error(data.error||data.message||'HTTP '+res.status);
-    var aid=data.assetId||data.path;
+    
+    // ===== PERBAIKAN: EKSTRAK ANGKA ID DARI PATH ASSETS/ =====
+    var rawId = data.assetId || data.path || data.operationId;
+    var aid = rawId;
+    if (typeof rawId === 'string' && rawId.indexOf('assets/') !== -1) {
+        // Mengambil angka setelah 'assets/'
+        aid = rawId.split('/')[1];
+    }
+    // ============================================================
+    
     b.disabled=false;b.className='rbx-btn done';b.innerHTML='<i class="fas fa-check"></i> '+aid;b.title='Klik salin';b.style.cursor='pointer';
     b.onclick=function(){navigator.clipboard.writeText(String(aid)).then(function(){toast('Asset ID '+aid+' disalin','ok');});};
     toast('Upload berhasil! ID: '+aid,'ok');
