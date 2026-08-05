@@ -11,16 +11,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/all.min.css">
 <style>
 *{font-family:'Inter',sans-serif;margin:0;padding:0;box-sizing:border-box}
-
-/* ===== PERBAIKAN TOTAL IKON TIDAK MUNCUL ===== */
-[class^="fa-"], [class*=" fa-"] {
-    font-family: "Font Awesome 6 Free" !important;
-    font-weight: 900;
-}
-.fa-brands { font-family: "Font Awesome 6 Brands" !important; }
-.fa-regular { font-weight: 400; }
-/* ========================================== */
-
 body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
 ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#27272a;border-radius:3px}::-webkit-scrollbar-thumb:hover{background:#3f3f46}
 .grad-text{background:linear-gradient(135deg,#818cf8,#a78bfa,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;color:#818cf8}
@@ -133,14 +123,11 @@ body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
 .log-tag.error{color:#f87171}
 .log-time{color:#3f3f46;flex-shrink:0}
 .log-msg{color:#a1a1aa}
-
-/* ===== PERBAIKAN TOMBOL HORIZONTAL (TIDAK BERANTAKAN) ===== */
-.action-row{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);cursor:pointer;transition:all .2s ease;text-align:left;overflow:hidden}
+.action-row{display:flex;align-items:center;gap:12px;width:100%;padding:12px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);cursor:pointer;transition:all .2s ease;text-align:left}
 .action-row:hover:not(:disabled){border-color:rgba(129,140,248,.3);background:rgba(255,255,255,.05);transform:translateY(-1px)}
 .action-row:disabled{opacity:.4;cursor:not-allowed;transform:none}
-.action-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:12px}
-.action-row .action-chev{display:none} /* Sembunyikan chevron di layout compact */
-/* ============================================================ */
+.action-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:14px}
+.action-row .action-chev{margin-left:auto;color:#52525b;font-size:11px}
 
 @media(max-width:900px){
   .hamburger-btn{display:flex}
@@ -161,9 +148,9 @@ body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
 
 <!-- TOPBAR -->
 <header class="topbar">
-  <button class="hamburger-btn" onclick="toggleSidebar()" title="Menu"><i class="fa-solid fa-bars"></i></button>
+  <button class="hamburger-btn" onclick="toggleSidebar()" title="Menu"><i class="fas fa-bars"></i></button>
   <div class="flex items-center gap-2">
-    <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)"><i class="fa-solid fa-bolt text-[11px] text-white"></i></div>
+    <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)"><i class="fas fa-bolt text-[11px] text-white"></i></div>
     <div class="leading-tight">
       <div class="font-bold text-sm tracking-tight">Converter<span class="grad-text">YL</span></div>
       <div class="text-[9px] text-zinc-600 hidden sm:block">Pro Audio Converter</div>
@@ -175,8 +162,8 @@ body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
       <img id="userAvatar" src="" alt="" style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.1)">
       <span id="userName" class="text-xs text-zinc-400 hidden sm:inline max-w-[90px] truncate"></span>
       <div id="creditChip" class="badge" style="background:rgba(255,255,255,.05);color:#71717a;border:1px solid rgba(255,255,255,.08)"><span id="creditText">0</span></div>
-      <button class="rbx-nav-btn" onclick="openRbxModal()" title="Pengaturan Roblox"><i class="fa-solid fa-cube" style="font-size:13px"></i></button>
-      <button id="logoutBtn" onclick="handleLogout()" class="btn-ghost" style="padding:6px 8px" title="Keluar"><i class="fa-solid fa-right-from-bracket" style="font-size:11px"></i></button>
+      <button class="rbx-nav-btn" onclick="openRbxModal()" title="Pengaturan Roblox"><i class="fas fa-cube" style="font-size:13px"></i></button>
+      <button id="logoutBtn" onclick="handleLogout()" class="btn-ghost" style="padding:6px 8px" title="Keluar"><i class="fas fa-right-from-bracket" style="font-size:11px"></i></button>
     </div>
   </div>
 </header>
@@ -186,8 +173,8 @@ body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
 
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
-    <div class="nav-item active"><i class="fa-solid fa-music"></i> Converter</div>
-    <div class="nav-item disabled" onclick="toast('Segera hadir','info')"><i class="fa-solid fa-sliders"></i> Equalizer</div>
+    <div class="nav-item active"><i class="fas fa-music"></i> Converter</div>
+    <div class="nav-item disabled" onclick="toast('Segera hadir','info')"><i class="fas fa-sliders"></i> Equalizer</div>
 
     <div class="side-quota-card">
       <div class="flex items-center justify-between mb-1.5">
@@ -201,9 +188,9 @@ body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
     </div>
 
     <div class="side-upgrade-card">
-      <div class="flex items-center gap-2 mb-1.5"><i class="fa-solid fa-gem text-purple-300" style="font-size:13px"></i><span class="text-xs font-bold text-zinc-200">Upgrade ke Premium</span></div>
+      <div class="flex items-center gap-2 mb-1.5"><i class="fas fa-gem text-purple-300" style="font-size:13px"></i><span class="text-xs font-bold text-zinc-200">Upgrade ke Premium</span></div>
       <p class="text-[10px] text-zinc-500 leading-relaxed mb-2.5">Dapatkan fitur tanpa batas dan upload otomatis ke Roblox.</p>
-      <button onclick="openPayModal()" class="btn-primary w-full justify-center py-2 text-[11px]">Upgrade Sekarang <i class="fa-solid fa-arrow-right" style="font-size:9px"></i></button>
+      <button onclick="openPayModal()" class="btn-primary w-full justify-center py-2 text-[11px]">Upgrade Sekarang <i class="fas fa-arrow-right" style="font-size:9px"></i></button>
     </div>
 
     <div class="side-footer">
@@ -220,7 +207,7 @@ body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
 
       <div class="panel">
         <div class="panel-head">
-          <span class="panel-title"><i class="fa-solid fa-list text-indigo-400" style="font-size:12px"></i> Upload List</span>
+          <span class="panel-title"><i class="fas fa-list text-indigo-400" style="font-size:12px"></i> Upload List</span>
           <span class="badge" style="background:rgba(255,255,255,.05);color:#71717a;border:1px solid rgba(255,255,255,.08)" id="fileCountBadge">0 Files</span>
         </div>
         <div id="fileList" class="flex flex-col gap-1.5"></div>
@@ -228,8 +215,8 @@ body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
 
       <div class="panel">
         <div class="panel-head">
-          <span class="panel-title"><i class="fa-solid fa-terminal text-indigo-400" style="font-size:12px"></i> Log Console</span>
-          <button onclick="clearLogConsole()" class="btn-ghost" style="padding:4px 10px;font-size:10px"><i class="fa-solid fa-trash" style="font-size:9px"></i> Clear</button>
+          <span class="panel-title"><i class="fas fa-terminal text-indigo-400" style="font-size:12px"></i> Log Console</span>
+          <button onclick="clearLogConsole()" class="btn-ghost" style="padding:4px 10px;font-size:10px"><i class="fas fa-trash" style="font-size:9px"></i> Clear</button>
         </div>
         <div id="logConsole" class="log-console"></div>
       </div>
@@ -254,49 +241,39 @@ body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
 
       <div class="panel">
         <div class="panel-head">
-          <span class="panel-title"><i class="fa-solid fa-cloud-arrow-up text-indigo-400" style="font-size:12px"></i> Upload Audio</span>
+          <span class="panel-title"><i class="fas fa-cloud-arrow-up text-indigo-400" style="font-size:12px"></i> Upload Audio</span>
         </div>
         <label for="audioFile" id="box" class="upload-zone rounded-xl p-6 text-center block mb-3">
           <div class="w-11 h-11 mx-auto mb-2.5 rounded-xl flex items-center justify-center" style="background:rgba(129,140,248,.1)">
-            <i class="fa-solid fa-music text-indigo-400" style="font-size:16px"></i>
+            <i class="fas fa-music text-indigo-400" style="font-size:16px"></i>
           </div>
           <p id="boxTitle" class="text-sm font-semibold text-zinc-200 mb-0.5">Drag & drop audio file here</p>
           <p id="boxSub" class="text-[11px] text-zinc-600">or click to browse &mdash; maks 10 file</p>
         </label>
         <input type="file" id="audioFile" accept=".mp3,audio/mpeg,.wav,audio/wav,.ogg,audio/ogg,.flac,audio/flac,.m4a,audio/mp4,.aac,audio/aac,.wma,.opus,audio/opus" multiple style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0">
 
-        <!-- ===== LAYOUT TOMBOL HORIZONTAL RAPI ===== -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
+        <div class="flex flex-col gap-2">
           <button class="action-row" onclick="$fileInput.click()">
-            <div class="action-icon" style="background:linear-gradient(135deg,#818cf8,#a78bfa)"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-            <div class="min-w-0 flex-1">
-              <div class="text-xs font-semibold text-zinc-200 truncate">Upload</div>
-              <div class="text-[10px] text-zinc-600 truncate hidden lg:block">Pilih file audio</div>
-            </div>
+            <div class="action-icon" style="background:linear-gradient(135deg,#818cf8,#a78bfa)"><i class="fas fa-cloud-arrow-up"></i></div>
+            <div class="min-w-0"><div class="text-xs font-semibold text-zinc-200">Upload Audio</div><div class="text-[10px] text-zinc-600">Pilih file audio dari perangkat</div></div>
+            <i class="fas fa-chevron-right action-chev"></i>
           </button>
           <button id="btn" disabled class="action-row">
-            <div class="action-icon" style="background:linear-gradient(135deg,#60a5fa,#818cf8)"><i class="fa-solid fa-rotate"></i></div>
-            <div class="min-w-0 flex-1">
-              <div class="text-xs font-semibold text-zinc-200 truncate">Convert</div>
-              <div class="text-[10px] text-zinc-600 truncate hidden lg:block">Proses format</div>
-            </div>
+            <div class="action-icon" style="background:linear-gradient(135deg,#60a5fa,#818cf8)"><i class="fas fa-rotate"></i></div>
+            <div class="min-w-0"><div class="text-xs font-semibold text-zinc-200">Convert</div><div class="text-[10px] text-zinc-600">Proses file ke format pilihan</div></div>
+            <i class="fas fa-chevron-right action-chev"></i>
           </button>
           <button class="action-row" onclick="downloadAllFiles()">
-            <div class="action-icon" style="background:linear-gradient(135deg,#34d399,#4ade80)"><i class="fa-solid fa-download"></i></div>
-            <div class="min-w-0 flex-1">
-              <div class="text-xs font-semibold text-zinc-200 truncate">Download</div>
-              <div class="text-[10px] text-zinc-600 truncate hidden lg:block">Unduh semua</div>
-            </div>
+            <div class="action-icon" style="background:linear-gradient(135deg,#34d399,#4ade80)"><i class="fas fa-download"></i></div>
+            <div class="min-w-0"><div class="text-xs font-semibold text-zinc-200">Download All</div><div class="text-[10px] text-zinc-600">Unduh semua file hasil convert</div></div>
+            <i class="fas fa-chevron-right action-chev"></i>
           </button>
           <button class="action-row" onclick="uploadAllToRoblox()">
-            <div class="action-icon" style="background:linear-gradient(135deg,#fb7185,#e11d48)"><i class="fa-solid fa-cube"></i></div>
-            <div class="min-w-0 flex-1">
-              <div class="text-xs font-semibold text-zinc-200 truncate">Roblox</div>
-              <div class="text-[10px] text-zinc-600 truncate hidden lg:block">Upload langsung</div>
-            </div>
+            <div class="action-icon" style="background:linear-gradient(135deg,#fb7185,#e11d48)"><i class="fas fa-cube"></i></div>
+            <div class="min-w-0"><div class="text-xs font-semibold text-zinc-200">Upload ke Roblox</div><div class="text-[10px] text-zinc-600">Upload audio langsung ke Roblox</div></div>
+            <i class="fas fa-chevron-right action-chev"></i>
           </button>
         </div>
-        <!-- ========================================== -->
 
         <div id="status" class="text-center text-[11px] text-zinc-600 mt-3 min-h-[16px]">Menyiapkan editor...</div>
         <div id="progWrap" class="hidden mt-2">
@@ -320,7 +297,7 @@ body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
 <div class="modal-bg" id="fmtModal">
   <div class="modal-box scale-in" style="max-width:400px">
     <div class="flex items-center justify-between mb-4">
-      <h3 class="text-base font-bold flex items-center gap-2"><i class="fa-solid fa-file-audio text-indigo-400 text-sm"></i> Format Output</h3>
+      <h3 class="text-base font-bold flex items-center gap-2"><i class="fas fa-file-audio text-indigo-400 text-sm"></i> Format Output</h3>
     </div>
     <div class="space-y-1.5">
       <div class="fmt-card chosen" data-fmt="ogg" onclick="pickFmt(this)">
@@ -359,15 +336,15 @@ body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
 <div class="modal-bg" id="rbxModal">
   <div class="modal-box scale-in" style="max-width:420px">
     <div class="flex items-center justify-between mb-4">
-      <h3 class="text-base font-bold flex items-center gap-2"><i class="fa-solid fa-cube text-rose-400 text-sm"></i> Pengaturan Roblox</h3>
-      <button onclick="closeRbxModal()" class="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-200 transition-colors" style="background:rgba(255,255,255,.05)"><i class="fa-solid fa-xmark text-xs"></i></button>
+      <h3 class="text-base font-bold flex items-center gap-2"><i class="fas fa-cube text-rose-400 text-sm"></i> Pengaturan Roblox</h3>
+      <button onclick="closeRbxModal()" class="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-200 transition-colors" style="background:rgba(255,255,255,.05)"><i class="fas fa-xmark text-xs"></i></button>
     </div>
     <div class="p-3 rounded-lg mb-4 text-[11px] text-zinc-500 leading-relaxed" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)">
       <b class="text-zinc-400">Cara mendapatkan API Key:</b><br>
       1. <span class="text-indigo-400">create.roblox.com/manage/api-keys</span> → Create Key → pilih <b>assets</b> → tambah <b>write</b> → Generate Key → salin
     </div>
     <div class="p-3 rounded-lg mb-3 text-[10px] text-zinc-600 leading-relaxed" style="background:rgba(129,140,248,.05);border:1px solid rgba(129,140,248,.1)">
-      <i class="fa-solid fa-circle-info text-indigo-400"></i> Cukup isi API Key & User ID kamu — server relay sudah diatur otomatis.
+      <i class="fas fa-circle-info text-indigo-400"></i> Cukup isi API Key & User ID kamu — server relay sudah diatur otomatis.
     </div>
     <div class="mb-3">
       <label class="block text-[11px] font-medium text-zinc-400 mb-1.5">API Key</label>
@@ -379,8 +356,8 @@ body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
       <p class="text-[10px] text-zinc-700 mt-1.5">Ada di profil Roblox → angka di URL</p>
     </div>
     <div class="flex gap-2">
-      <button onclick="saveRbxSettings()" class="btn-primary flex-1 justify-center py-2.5 text-xs"><i class="fa-solid fa-save"></i> Simpan</button>
-      <button onclick="clearRbxSettings()" class="btn-ghost flex-1 justify-center py-2.5 text-xs"><i class="fa-solid fa-trash"></i> Hapus</button>
+      <button onclick="saveRbxSettings()" class="btn-primary flex-1 justify-center py-2.5 text-xs"><i class="fas fa-save"></i> Simpan</button>
+      <button onclick="clearRbxSettings()" class="btn-ghost flex-1 justify-center py-2.5 text-xs"><i class="fas fa-trash"></i> Hapus</button>
     </div>
   </div>
 </div>
@@ -388,10 +365,10 @@ body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
 <!-- MODAL UPGRADE -->
 <div class="modal-bg" id="upgradeModal">
   <div class="modal-box scale-in text-center" style="max-width:340px">
-    <div class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:rgba(168,85,247,.1)"><i class="fa-solid fa-cube text-purple-400 text-xl"></i></div>
+    <div class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:rgba(168,85,247,.1)"><i class="fas fa-cube text-purple-400 text-xl"></i></div>
     <h3 class="text-base font-bold mb-1">Fitur Premium</h3>
     <p class="text-xs text-zinc-500 mb-5 leading-relaxed">Auto upload ke Roblox hanya tersedia untuk paket Unlimited</p>
-    <button onclick="closeUpgradeModal();openPayModal()" class="btn-primary px-8 py-2.5 text-xs"><i class="fa-solid fa-gem"></i> Lihat Paket Unlimited</button>
+    <button onclick="closeUpgradeModal();openPayModal()" class="btn-primary px-8 py-2.5 text-xs"><i class="fas fa-gem"></i> Lihat Paket Unlimited</button>
     <button onclick="closeUpgradeModal()" class="btn-ghost mt-2 text-xs">Kembali</button>
   </div>
 </div>
@@ -400,8 +377,8 @@ body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
 <div class="modal-bg" id="payModal">
   <div class="modal-box scale-in" style="max-width:420px">
     <div class="flex items-center justify-between mb-4">
-      <h3 class="text-base font-bold flex items-center gap-2"><i class="fa-solid fa-gem text-purple-400 text-sm"></i> Pilih Paket</h3>
-      <button onclick="closePayModal()" class="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-200 transition-colors" style="background:rgba(255,255,255,.05)"><i class="fa-solid fa-xmark text-xs"></i></button>
+      <h3 class="text-base font-bold flex items-center gap-2"><i class="fas fa-gem text-purple-400 text-sm"></i> Pilih Paket</h3>
+      <button onclick="closePayModal()" class="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-200 transition-colors" style="background:rgba(255,255,255,.05)"><i class="fas fa-xmark text-xs"></i></button>
     </div>
     <div class="space-y-2">
       <div class="pay-card" data-plan="per_song" onclick="pickPlan(this)">
@@ -412,7 +389,7 @@ body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
       </div>
       <div class="pay-card relative overflow-hidden" data-plan="subscription" onclick="pickPlan(this)">
         <div class="absolute top-0 right-0 text-[9px] font-bold text-white px-2.5 py-0.5 rounded-bl-lg" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">BEST</div>
-        <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="text-sm font-semibold">Unlimited</span><span class="badge badge-pro"><i class="fa-solid fa-cube" style="font-size:8px"></i> ROBLOX</span></div><span class="text-base font-extrabold">Rp210.000</span></div>
+        <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="text-sm font-semibold">Unlimited</span><span class="badge badge-pro"><i class="fas fa-cube" style="font-size:8px"></i> ROBLOX</span></div><span class="text-base font-extrabold">Rp210.000</span></div>
         <p class="text-[10px] text-zinc-600 mt-1.5">Tanpa batas + auto upload Roblox, 30 hari</p>
       </div>
     </div>
@@ -423,27 +400,27 @@ body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
 <!-- MODAL SUKSES -->
 <div class="modal-bg" id="successModal">
   <div class="modal-box scale-in text-center" style="max-width:340px">
-    <div class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:rgba(52,211,153,.1)"><i class="fa-solid fa-check text-emerald-400 text-xl"></i></div>
+    <div class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:rgba(52,211,153,.1)"><i class="fas fa-check text-emerald-400 text-xl"></i></div>
     <h3 class="text-base font-bold mb-1">Berhasil</h3>
     <p id="successMsg" class="text-xs text-zinc-500 mb-5">Kuota ditambahkan.</p>
-    <button onclick="closeSuccessModal()" class="btn-primary px-8 py-2.5 text-xs"><i class="fa-solid fa-arrow-right"></i> Lanjut</button>
+    <button onclick="closeSuccessModal()" class="btn-primary px-8 py-2.5 text-xs"><i class="fas fa-arrow-right"></i> Lanjut</button>
   </div>
 </div>
 
-<!-- MODAL RENAME -->
+<!-- MODAL RENAME (NEW) -->
 <div class="modal-bg" id="renameModal">
   <div class="modal-box scale-in" style="max-width:380px">
     <div class="flex items-center justify-between mb-4">
-      <h3 class="text-base font-bold flex items-center gap-2"><i class="fa-solid fa-pen text-indigo-400 text-sm"></i> Rename File</h3>
-      <button onclick="closeRenameModal()" class="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-200 transition-colors" style="background:rgba(255,255,255,.05)"><i class="fa-solid fa-xmark text-xs"></i></button>
+      <h3 class="text-base font-bold flex items-center gap-2"><i class="fas fa-pen text-indigo-400 text-sm"></i> Rename File</h3>
+      <button onclick="closeRenameModal()" class="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-200 transition-colors" style="background:rgba(255,255,255,.05)"><i class="fas fa-xmark text-xs"></i></button>
     </div>
     <div id="renameWarn" class="hidden p-3 rounded-lg mb-3 text-[10px] text-orange-400 leading-relaxed" style="background:rgba(251,146,60,.05);border:1px solid rgba(251,146,60,.1)">
-      <i class="fa-solid fa-triangle-exclamation"></i> Nama file terlalu panjang (maks 50 karakter termasuk suffix). Silakan ubah nama.
+      <i class="fas fa-triangle-exclamation"></i> Nama file terlalu panjang (maks 50 karakter termasuk suffix). Silakan ubah nama.
     </div>
     <label class="block text-[11px] font-medium text-zinc-400 mb-1.5">Nama File Baru</label>
     <input type="text" id="renameInput" class="input-f text-sm" placeholder="Masukkan nama file">
     <p class="text-[10px] text-zinc-600 mt-1.5">Suffix <b>_2.3YL</b> akan ditambahkan otomatis.</p>
-    <button onclick="saveRename()" class="btn-primary w-full justify-center mt-4 py-2.5 text-sm"><i class="fa-solid fa-check"></i> Simpan Nama</button>
+    <button onclick="saveRename()" class="btn-primary w-full justify-center mt-4 py-2.5 text-sm"><i class="fas fa-check"></i> Simpan Nama</button>
   </div>
 </div>
 
@@ -451,7 +428,7 @@ body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
 <script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
 <script>
 var CONFIG_MODE='demo',API_BASE='https://backend-kamu.contoh.workers.dev',MAX_FILES=10;
-var ROBLOX_PROXY_URL='https://ganti-dengan-worker-kamu.workers.dev';
+var ROBLOX_PROXY_URL='https://convertyaall-proxy.binomo2b.workers.dev';
 var FORMATS={ogg:{ext:'.ogg',mime:'audio/ogg',args:['-c:a','libvorbis'],label:'OGG'},mp3:{ext:'.mp3',mime:'audio/mpeg',args:['-c:a','libmp3lame'],label:'MP3'},wav:{ext:'.wav',mime:'audio/wav',args:['-c:a','pcm_s16le'],label:'WAV'},flac:{ext:'.flac',mime:'audio/flac',args:['-c:a','flac'],label:'FLAC'}};
 var $=function(id){return document.getElementById(id)};
 var $box=$('box'),$boxTitle=$('boxTitle'),$boxSub=$('boxSub'),$fileInput=$('audioFile'),$fileList=$('fileList'),$btn=$('btn'),$status=$('status'),$progWrap=$('progWrap'),$progFill=$('progFill'),$progTxt=$('progTxt'),$warnBanner=$('warnBanner'),$loginArea=$('loginArea'),$mainCard=$('mainCard'),$userChip=$('userChip'),$userAvatar=$('userAvatar'),$userName=$('userName'),$logoutBtn=$('logoutBtn'),$creditChip=$('creditChip'),$creditText=$('creditText'),$quotaText=$('quotaText'),$quotaDot=$('quotaDot'),$planBadge=$('planBadge'),$payModal=$('payModal'),$payBtn=$('payBtn'),$successModal=$('successModal'),$successMsg=$('successMsg'),$customSpeedWrap=$('customSpeedWrap'),$customSpeedInput=$('customSpeedInput'),$fmtModal=$('fmtModal'),$fmtBtn=$('fmtBtn'),$rbxModal=$('rbxModal'),$rbxKeyInput=$('rbxKeyInput'),$rbxUserIdInput=$('rbxUserIdInput'),$upgradeModal=$('upgradeModal'),$sidebar=$('sidebar'),$sidebarOverlay=$('sidebarOverlay'),$logConsole=$('logConsole'),$fileCountBadge=$('fileCountBadge'),$loggedOutHero=$('loggedOutHero');
@@ -497,7 +474,7 @@ function toast(m,t){
   var c=t==='ok'?'toast-ok':t==='err'?'toast-err':'toast-info';
   var i=t==='ok'?'fa-check':t==='err'?'fa-xmark':'fa-info';
   e.className='toast-item '+c;
-  e.innerHTML='<i class="fa-solid '+i+'" style="font-size:11px"></i><span>'+m+'</span>';
+  e.innerHTML='<i class="fas '+i+'" style="font-size:11px"></i><span>'+m+'</span>';
   w.appendChild(e);
   setTimeout(function(){if(e.parentNode)e.remove();},3400);
 }
@@ -681,6 +658,15 @@ document.querySelectorAll('.preset-btn').forEach(function(b){
 
 var ffmpeg=new FFmpegWASM.FFmpeg(),toBlobURL=FFmpegUtil.toBlobURL,fetchFile=FFmpegUtil.fetchFile;
 var loaded=false,items=[];
+
+// ===== RENAME LOGIC (didefinisikan di awal supaya selalu tersedia sebelum dipakai) =====
+function truncateName(name, maxLen){
+  if(name.length<=maxLen) return name;
+  var cut=name.substring(0,maxLen);
+  var lastSpace=cut.lastIndexOf(' ');
+  return lastSpace>0 ? cut.substring(0,lastSpace) : cut;
+}
+
 function checkEnv(){if(typeof Worker==='undefined')return'Web Worker tidak didukung.';if(typeof WebAssembly==='undefined')return'WebAssembly tidak didukung.';return null;}
 var envError=checkEnv();
 if(envError){$status.innerText=envError;$warnBanner.classList.remove('hidden');$warnBanner.querySelector('b').innerText='⚠ Error';}
@@ -734,7 +720,6 @@ boot();
   logLine('info',p.length+' file terdeteksi');
 });
 
-// ===== RENAME LOGIC =====
 var renamingIndex = -1;
 function renameFile(idx) {
     renamingIndex = idx;
@@ -766,7 +751,7 @@ function saveRename() {
         if (newName) {
             // Remove any file extension from custom name to prevent double extension
             newName = newName.replace(/\.[^/.]+$/, "");
-            items[renamingIndex].customName = newName;
+            items[renamingIndex].customName = truncateName(newName, 50);
             renderList();
             toast('Nama file diubah', 'ok');
         }
@@ -781,11 +766,11 @@ function saveRename() {
 function renderList(){
   if($fileCountBadge)$fileCountBadge.textContent=items.length+' Files';
   if(!items.length){
-    $fileList.innerHTML='<div class="text-xs text-zinc-600 text-center py-8"><i class="fa-solid fa-inbox" style="font-size:24px;opacity:.4"></i><div class="mt-2">Belum ada file. Klik "Upload Audio" untuk mulai.</div></div>';
+    $fileList.innerHTML='<div class="text-xs text-zinc-600 text-center py-8"><i class="fas fa-inbox" style="font-size:24px;opacity:.4"></i><div class="mt-2">Belum ada file. Klik "Upload Audio" untuk mulai.</div></div>';
     return;
   }
   $fileList.innerHTML=items.map(function(it,i){
-    var st='Menunggu',sc='text-zinc-600',extra='<div class="flex items-center gap-1.5 flex-shrink-0">',icon='<i class="fa-solid fa-circle text-zinc-700" style="font-size:6px"></i>';
+    var st='Menunggu',sc='text-zinc-600',extra='<div class="flex items-center gap-1.5 flex-shrink-0">',icon='<i class="fas fa-circle text-zinc-700" style="font-size:6px"></i>';
     
     // Calculate Name Logic for UI
     var baseName = it.customName || it.file.name.replace(/\.[^/.]+$/, "");
@@ -795,31 +780,31 @@ function renderList(){
     var displayName = it.customName || it.file.name;
     
     if(it.status==='processing'){
-        icon='<i class="fa-solid fa-circle-notch fa-spin text-indigo-400" style="font-size:9px"></i>';st='Mengedit...';sc='text-indigo-400';
+        icon='<i class="fas fa-circle-notch fa-spin text-indigo-400" style="font-size:9px"></i>';st='Mengedit...';sc='text-indigo-400';
     }
     if(it.status==='done'){
-        icon='<i class="fa-solid fa-circle-check text-emerald-500" style="font-size:9px"></i>';st=FORMATS[state.chosenFmt].label+' — '+formatSize(it.size);sc='text-emerald-500/70';
-        extra+='<a class="rbx-btn done" href="'+it.url+'" download="'+it.dlName+'" title="Download"><i class="fa-solid fa-download" style="font-size:10px"></i></a>';
-        extra+='<button id="rbx_'+i+'" class="rbx-btn '+(isPremium()?'idle':'locked')+'" onclick="uploadToRoblox('+i+')" title="Upload Roblox">'+(isPremium()?'<i class="fa-solid fa-cloud-arrow-up" style="font-size:10px"></i>':'<i class="fa-solid fa-lock" style="font-size:10px"></i>')+'</button>';
+        icon='<i class="fas fa-circle-check text-emerald-500" style="font-size:9px"></i>';st=FORMATS[state.chosenFmt].label+' — '+formatSize(it.size);sc='text-emerald-500/70';
+        extra+='<a class="rbx-btn done" href="'+it.url+'" download="'+it.dlName+'" title="Download"><i class="fas fa-download" style="font-size:10px"></i></a>';
+        extra+='<button id="rbx_'+i+'" class="rbx-btn '+(isPremium()?'idle':'locked')+'" onclick="uploadToRoblox('+i+')" title="Upload Roblox">'+(isPremium()?'<i class="fas fa-cloud-arrow-up" style="font-size:10px"></i>':'<i class="fas fa-lock" style="font-size:10px"></i>')+'</button>';
     }
     if(it.status==='error'){
-        icon='<i class="fa-solid fa-circle-xmark text-rose-500" style="font-size:9px"></i>';st='Gagal';sc='text-rose-500/70';
+        icon='<i class="fas fa-circle-xmark text-rose-500" style="font-size:9px"></i>';st='Gagal';sc='text-rose-500/70';
     }
     
     // Add Rename Button
     if(it.status!=='processing') {
         if (isTooLong && !it.customName) {
-            extra += '<button class="rbx-btn idle" style="border-color:rgba(251,146,60,.4);color:#fb923c;background:rgba(251,146,60,.1)" onclick="renameFile('+i+')" title="Nama terlalu panjang, rename disarankan"><i class="fa-solid fa-triangle-exclamation" style="font-size:10px"></i></button>';
+            extra += '<button class="rbx-btn idle" style="border-color:rgba(251,146,60,.4);color:#fb923c;background:rgba(251,146,60,.1)" onclick="renameFile('+i+')" title="Nama terlalu panjang, rename disarankan"><i class="fas fa-triangle-exclamation" style="font-size:10px"></i></button>';
         } else if (it.customName) {
-            extra += '<button class="rbx-btn done" onclick="renameFile('+i+')" title="Edit nama"><i class="fa-solid fa-pen" style="font-size:10px"></i></button>';
+            extra += '<button class="rbx-btn done" onclick="renameFile('+i+')" title="Edit nama"><i class="fas fa-pen" style="font-size:10px"></i></button>';
         } else {
-            extra += '<button class="rbx-btn idle" onclick="renameFile('+i+')" title="Rename file"><i class="fa-solid fa-pen" style="font-size:10px"></i></button>';
+            extra += '<button class="rbx-btn idle" onclick="renameFile('+i+')" title="Rename file"><i class="fas fa-pen" style="font-size:10px"></i></button>';
         }
     }
     
     extra+='</div>';
     
-    return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row fade-up"><div class="row-index">'+(i+1)+'</div><div class="flex-1 min-w-0"><div class="text-xs font-medium text-zinc-300 truncate flex items-center gap-2"><i class="fa-solid fa-music text-zinc-500" style="font-size:10px"></i> '+displayName+'</div><div class="text-[10px] '+sc+' mt-0.5 flex items-center gap-1.5">'+icon+' '+st+'</div></div>'+extra+'</div>';
+    return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row fade-up"><div class="row-index">'+(i+1)+'</div><div class="flex-1 min-w-0"><div class="text-xs font-medium text-zinc-300 truncate flex items-center gap-2"><i class="fas fa-music text-zinc-500" style="font-size:10px"></i> '+displayName+'</div><div class="text-[10px] '+sc+' mt-0.5 flex items-center gap-1.5">'+icon+' '+st+'</div></div>'+extra+'</div>';
   }).join('');
 }
 function formatSize(b){if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB';}
