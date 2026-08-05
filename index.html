@@ -213,6 +213,16 @@ body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
         <div id="fileList" class="flex flex-col gap-1.5"></div>
       </div>
 
+      <!-- ===== PANEL ROBLOX ASSETS LIST (BARU) ===== -->
+      <div class="panel hidden" id="rbxAssetsPanel">
+        <div class="panel-head">
+          <span class="panel-title"><i class="fas fa-list-check text-emerald-400" style="font-size:12px"></i> Roblox Assets</span>
+          <button onclick="clearRbxAssets()" class="btn-ghost" style="padding:4px 10px;font-size:10px"><i class="fas fa-check" style="font-size:9px"></i> Selesai</button>
+        </div>
+        <div id="rbxAssetsList" class="flex flex-col gap-1.5"></div>
+      </div>
+      <!-- =============================================== -->
+
       <div class="panel">
         <div class="panel-head">
           <span class="panel-title"><i class="fas fa-terminal text-indigo-400" style="font-size:12px"></i> Log Console</span>
@@ -407,7 +417,7 @@ body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
   </div>
 </div>
 
-<!-- MODAL RENAME (NEW) -->
+<!-- MODAL RENAME -->
 <div class="modal-bg" id="renameModal">
   <div class="modal-box scale-in" style="max-width:380px">
     <div class="flex items-center justify-between mb-4">
@@ -432,6 +442,10 @@ var ROBLOX_PROXY_URL='https://convertyaall-proxy.binomo2b.workers.dev';
 var FORMATS={ogg:{ext:'.ogg',mime:'audio/ogg',args:['-c:a','libvorbis'],label:'OGG'},mp3:{ext:'.mp3',mime:'audio/mpeg',args:['-c:a','libmp3lame'],label:'MP3'},wav:{ext:'.wav',mime:'audio/wav',args:['-c:a','pcm_s16le'],label:'WAV'},flac:{ext:'.flac',mime:'audio/flac',args:['-c:a','flac'],label:'FLAC'}};
 var $=function(id){return document.getElementById(id)};
 var $box=$('box'),$boxTitle=$('boxTitle'),$boxSub=$('boxSub'),$fileInput=$('audioFile'),$fileList=$('fileList'),$btn=$('btn'),$status=$('status'),$progWrap=$('progWrap'),$progFill=$('progFill'),$progTxt=$('progTxt'),$warnBanner=$('warnBanner'),$loginArea=$('loginArea'),$mainCard=$('mainCard'),$userChip=$('userChip'),$userAvatar=$('userAvatar'),$userName=$('userName'),$logoutBtn=$('logoutBtn'),$creditChip=$('creditChip'),$creditText=$('creditText'),$quotaText=$('quotaText'),$quotaDot=$('quotaDot'),$planBadge=$('planBadge'),$payModal=$('payModal'),$payBtn=$('payBtn'),$successModal=$('successModal'),$successMsg=$('successMsg'),$customSpeedWrap=$('customSpeedWrap'),$customSpeedInput=$('customSpeedInput'),$fmtModal=$('fmtModal'),$fmtBtn=$('fmtBtn'),$rbxModal=$('rbxModal'),$rbxKeyInput=$('rbxKeyInput'),$rbxUserIdInput=$('rbxUserIdInput'),$upgradeModal=$('upgradeModal'),$sidebar=$('sidebar'),$sidebarOverlay=$('sidebarOverlay'),$logConsole=$('logConsole'),$fileCountBadge=$('fileCountBadge'),$loggedOutHero=$('loggedOutHero');
+
+// ===== ARRAY ROBLOX ASSETS (BARU) =====
+var rbxAssets=[];
+// =======================================
 
 function toggleSidebar(){$sidebar.classList.toggle('open');$sidebarOverlay.classList.toggle('show');}
 function logLine(tag,msg){
@@ -536,12 +550,47 @@ async function uploadToRoblox(idx){
     b.onclick=function(){navigator.clipboard.writeText(String(aid)).then(function(){toast('Asset ID '+aid+' disalin','ok');});};
     toast('Upload berhasil! ID: '+aid,'ok');
     logLine('upload','Roblox upload berhasil, ID: '+aid);
+    
+    // ===== TAMBAHKAN KE LIST ROBLOX ASSETS =====
+    rbxAssets.push({name:safeName, assetId:aid});
+    renderRbxAssets();
+    // ===========================================
+    
   }catch(err){
     b.disabled=false;b.className='rbx-btn idle';b.innerHTML='<i class="fas fa-rotate-right"></i> Coba Lagi';
     toast('Gagal: '+(err.message||'').substring(0,100),'err');
     logLine('error','Roblox upload gagal: '+(err.message||''));
   }
 }
+
+// ===== FUNGSI RENDER & CLEAR ROBLOX ASSETS LIST (BARU) =====
+function renderRbxAssets(){
+  var $p=$('rbxAssetsPanel'),$l=$('rbxAssetsList');
+  if(!$p||!$l)return;
+  if(rbxAssets.length===0){$p.classList.add('hidden');$l.innerHTML='';return;}
+  $p.classList.remove('hidden');
+  $l.innerHTML=rbxAssets.map(function(a,i){
+    var u='rbxassetid://'+a.assetId;
+    return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row fade-up">'+
+      '<div class="row-index" style="background:rgba(52,211,153,.15);color:#4ade80">'+(i+1)+'</div>'+
+      '<div class="flex-1 min-w-0">'+
+        '<div class="text-xs font-medium text-zinc-300 truncate flex items-center gap-2"><i class="fas fa-music text-emerald-500" style="font-size:10px"></i> '+a.name+'</div>'+
+        '<div class="text-[10px] text-emerald-500/70 mt-0.5 flex items-center gap-1.5 truncate"><i class="fas fa-circle-check" style="font-size:9px"></i> '+u+'</div>'+
+      '</div>'+
+      '<div class="flex items-center gap-1.5 flex-shrink-0">'+
+        '<button class="rbx-btn done" onclick="copyRbxAsset('+i+')" title="Copy Asset ID"><i class="fas fa-copy" style="font-size:10px"></i> Copy</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+function copyRbxAsset(i){
+  if(rbxAssets[i]){
+    var u='rbxassetid://'+rbxAssets[i].assetId;
+    navigator.clipboard.writeText(u).then(function(){toast('Disalin: '+u,'ok');});
+  }
+}
+function clearRbxAssets(){rbxAssets=[];renderRbxAssets();toast('List dibersihkan','info');}
+// ============================================================
 
 function canEdit(){
   if(isPremium())return{ok:true,src:'sub'};
@@ -659,7 +708,7 @@ document.querySelectorAll('.preset-btn').forEach(function(b){
 var ffmpeg=new FFmpegWASM.FFmpeg(),toBlobURL=FFmpegUtil.toBlobURL,fetchFile=FFmpegUtil.fetchFile;
 var loaded=false,items=[];
 
-// ===== RENAME LOGIC (didefinisikan di awal supaya selalu tersedia sebelum dipakai) =====
+// ===== RENAME LOGIC =====
 function truncateName(name, maxLen){
   if(name.length<=maxLen) return name;
   var cut=name.substring(0,maxLen);
@@ -749,7 +798,6 @@ function saveRename() {
     if (renamingIndex > -1) {
         var newName = $('renameInput').value.trim();
         if (newName) {
-            // Remove any file extension from custom name to prevent double extension
             newName = newName.replace(/\.[^/.]+$/, "");
             items[renamingIndex].customName = truncateName(newName, 50);
             renderList();
@@ -772,7 +820,6 @@ function renderList(){
   $fileList.innerHTML=items.map(function(it,i){
     var st='Menunggu',sc='text-zinc-600',extra='<div class="flex items-center gap-1.5 flex-shrink-0">',icon='<i class="fas fa-circle text-zinc-700" style="font-size:6px"></i>';
     
-    // Calculate Name Logic for UI
     var baseName = it.customName || it.file.name.replace(/\.[^/.]+$/, "");
     var suffix = '_2.3YL';
     var ext = FORMATS[state.chosenFmt].ext;
@@ -791,7 +838,6 @@ function renderList(){
         icon='<i class="fas fa-circle-xmark text-rose-500" style="font-size:9px"></i>';st='Gagal';sc='text-rose-500/70';
     }
     
-    // Add Rename Button
     if(it.status!=='processing') {
         if (isTooLong && !it.customName) {
             extra += '<button class="rbx-btn idle" style="border-color:rgba(251,146,60,.4);color:#fb923c;background:rgba(251,146,60,.1)" onclick="renameFile('+i+')" title="Nama terlalu panjang, rename disarankan"><i class="fas fa-triangle-exclamation" style="font-size:10px"></i></button>';
@@ -850,9 +896,7 @@ async function startProcess(){
       var blob=new Blob([data.buffer],{type:fmt.mime});
       it.url=URL.createObjectURL(blob);it.blobData=blob;it.size=blob.size;
       
-      // NEW NAMING LOGIC - Fixed to prevent double extension
       var baseName = it.customName || it.file.name.replace(/\.[^/.]+$/, "");
-      // Ensure baseName has no extension to prevent double extension like .ogg.ogg
       baseName = baseName.replace(/\.[^/.]+$/, "");
       var suffix = '_2.3YL';
       var maxBaseLength = 50 - suffix.length - fmt.ext.length;
