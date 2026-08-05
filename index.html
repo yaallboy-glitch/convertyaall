@@ -227,14 +227,11 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
 
       <div class="panel">
         <div class="panel-head">
-          <span class="panel-title"><i class="fa-solid fa-list-check text-indigo-400" style="font-size:12px"></i> Evolution List</span>
+          <span class="panel-title"><i class="fa-solid fa-list text-indigo-400" style="font-size:12px"></i> Evolution List</span>
           <button onclick="selectAllItems()" class="btn-ghost" style="padding:4px 10px;font-size:10px"><i class="fa-solid fa-check-double"></i> Pilih Semua</button>
         </div>
+        <div class="text-[10px] text-zinc-500 mb-2">Centang file, lalu gunakan tombol Convert/Upload di panel kanan.</div>
         <div id="fileList" class="flex flex-col gap-1.5"></div>
-        <div class="mt-3 flex flex-col gap-2">
-          <button id="bulkConvertBtn" class="btn-primary w-full justify-center py-2.5 text-sm hidden" onclick="processCheckedItems('convert')"><i class="fa-solid fa-rotate"></i> Convert yang Dicentang</button>
-          <button id="bulkUploadBtn" class="btn-primary w-full justify-center py-2.5 text-sm hidden" onclick="processCheckedItems('upload')"><i class="fa-solid fa-cube"></i> Upload Roblox yang Dicentang</button>
-        </div>
       </div>
 
       <!-- PANEL ROBLOX ASSETS LIST -->
@@ -274,15 +271,8 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
 
       <div class="panel">
         <div class="panel-head">
-          <span class="panel-title"><i class="fa-solid fa-cloud-arrow-up text-indigo-400" style="font-size:12px"></i> Upload Audio</span>
+          <span class="panel-title"><i class="fa-solid fa-cloud-arrow-up text-indigo-400" style="font-size:12px"></i> Menu Aksi</span>
         </div>
-        <label for="audioFile" id="box" class="upload-zone rounded-xl p-6 text-center block mb-3">
-          <div class="w-11 h-11 mx-auto mb-2.5 rounded-xl flex items-center justify-center" style="background:rgba(129,140,248,.1)">
-            <i class="fa-solid fa-music text-indigo-400" style="font-size:16px"></i>
-          </div>
-          <p id="boxTitle" class="text-sm font-semibold text-zinc-200 mb-0.5">Drag & drop audio file here</p>
-          <p id="boxSub" class="text-[11px] text-zinc-600">or click to browse &mdash; maks 10 file</p>
-        </label>
         <input type="file" id="audioFile" accept=".mp3,audio/mpeg,.wav,audio/wav,.ogg,audio/ogg,.flac,audio/flac,.m4a,audio/mp4,.aac,audio/aac,.wma,.opus,audio/opus" multiple style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0">
 
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
@@ -401,14 +391,14 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
   <p class="text-sm text-zinc-500 max-w-md mx-auto leading-relaxed fade-up">Edit kecepatan audio, upload langsung ke Roblox. Masuk dengan Google untuk mulai.</p>
 </div>
 
-<!-- MODAL ASK EDIT -->
+<!-- MODAL ASK EDIT (SIMPLIFIED) -->
 <div class="modal-bg" id="askEditModal">
-  <div class="modal-box scale-in text-center" style="max-width:360px">
-    <div class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:rgba(129,140,248,.1)"><i class="fa-solid fa-wand-magic-sparkles text-indigo-400 text-xl"></i></div>
-    <h3 class="text-base font-bold mb-1">Ingin edit dulu?</h3>
-    <p class="text-xs text-zinc-500 mb-5 leading-relaxed">Kualitas audio lebih bagus dan proses lebih cepat karena EQ dan Speed di-render sekaligus.</p>
-    <button onclick="closeAskEdit(true)" class="btn-primary px-8 py-2.5 text-xs w-full mb-2"><i class="fa-solid fa-sliders"></i> Ya, Edit Dulu (PlayMode)</button>
-    <button onclick="closeAskEdit(false)" class="btn-ghost px-8 py-2.5 text-xs w-full">Skip, Langsung Convert</button>
+  <div class="modal-box scale-in text-center" style="max-width:300px">
+    <h3 class="text-base font-bold mb-4">Ingin edit dulu?</h3>
+    <div class="flex gap-2">
+      <button onclick="closeAskEdit(false)" class="btn-ghost flex-1 py-2.5 text-sm">Tidak</button>
+      <button onclick="closeAskEdit(true)" class="btn-primary flex-1 py-2.5 text-sm">Ya</button>
+    </div>
   </div>
 </div>
 
@@ -590,8 +580,8 @@ function downloadAllFiles(){
 }
 function uploadAllToRoblox(){
   var idxs=[];
-  for(var i=0;i<items.length;i++){if(items[i].status==='done'&&items[i].blobData)idxs.push(i);}
-  if(!idxs.length){toast('Belum ada file siap diupload.','info');return;}
+  for(var i=0;i<items.length;i++){if(items[i].status==='done'&&items[i].blobData&&items[i].checked)idxs.push(i);}
+  if(!idxs.length){toast('Centang file siap upload dulu','info');return;}
   if(!isPremium()){openUpgradeModal();return;}
   if(!state.rbxKey||!state.rbxUserId){openRbxModal();toast('Lengkapi API Key & User ID dulu','info');return;}
   idxs.forEach(function(i){uploadToRoblox(i);});
@@ -997,13 +987,8 @@ function renderList(){
   if($fileCountBadge)$fileCountBadge.textContent=items.length+' Files';
   if(!items.length){
     $fileList.innerHTML='<div class="text-xs text-zinc-600 text-center py-8"><i class="fa-solid fa-inbox" style="font-size:24px;opacity:.4"></i><div class="mt-2">Belum ada file. Klik "Upload Audio" untuk mulai.</div></div>';
-    $('bulkConvertBtn').classList.add('hidden');
-    $('bulkUploadBtn').classList.add('hidden');
     return;
   }
-  var hasRaw = items.some(x => x.status === 'pending');
-  var hasConverted = items.some(x => x.status === 'done');
-  
   $fileList.innerHTML=items.map(function(it,i){
     var st='Menunggu',sc='text-zinc-600',extra='',icon='<i class="fa-solid fa-circle text-zinc-700" style="font-size:6px"></i>';
     
@@ -1025,13 +1010,8 @@ function renderList(){
         extra='<button class="rbx-btn done ml-2" onclick="copyText(\''+it.assetId+'\')"><i class="fa-solid fa-copy"></i> Copy</button>';
     }
     
-    var displayStatus = it.status === 'done' ? st : st;
-    
-    return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row fade-up"><div class="row-index w-6">'+icon+'</div><div class="flex-1 min-w-0"><div class="text-xs font-medium text-zinc-300 truncate flex items-center gap-2"><i class="fa-solid fa-music text-zinc-500" style="font-size:10px"></i> '+(it.customName||it.name)+'</div><div class="text-[10px] '+sc+' mt-0.5 flex items-center">'+displayStatus+' '+extra+'</div></div></div>';
+    return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row fade-up"><div class="row-index w-6">'+icon+'</div><div class="flex-1 min-w-0"><div class="text-xs font-medium text-zinc-300 truncate flex items-center gap-2"><i class="fa-solid fa-music text-zinc-500" style="font-size:10px"></i> '+(it.customName||it.name)+'</div><div class="text-[10px] '+sc+' mt-0.5 flex items-center">'+st+' '+extra+'</div></div></div>';
   }).join('');
-
-  $('bulkConvertBtn').classList.toggle('hidden', !hasRaw);
-  $('bulkUploadBtn').classList.toggle('hidden', !hasConverted);
 }
 function formatSize(b){if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB';}
 
@@ -1046,123 +1026,74 @@ function selectAllItems() {
   renderList();
 }
 
-async function processCheckedItems(type) {
-  var targets = items.filter(x => x.checked && x.status === (type === 'convert' ? 'pending' : 'done'));
-  if(targets.length === 0) { toast('Tidak ada file dicentang','info'); return; }
-  
-  if(type === 'convert') {
-    if(!loaded){toast('Editor belum siap','err');return;}
-    for(var i=0; i<targets.length; i++) {
-      await convertItem(targets[i]);
-    }
-    toast('Semua file terconvert','ok');
-  } else {
-    if(!isPremium()){openUpgradeModal();return;}
-    if(!state.rbxKey||!state.rbxUserId){openRbxModal();return;}
-    for(var j=0; j<targets.length; j++) {
-      await uploadItem(targets[j]);
-    }
-  }
-}
-
-async function convertItem(it) {
-  var c = canEdit();
-  if(!c.ok) { toast('Kuota habis','err'); return; }
-  
-  it.checked = false;
-  it.status = 'processing';
-  renderList();
-  
-  try {
-    var cspeed,cresample,cdb;
-    if(activePreset===4){cspeed=parseFloat($customSpeedInput.value)||2.5;cresample=cspeed>4?96000:48000;cdb=0;}
-    else{var pr=presets[activePreset];cspeed=pr.speed;cresample=pr.resample;cdb=pr.db;}
-    
-    it.speedUsed = cspeed;
-    var fmt=FORMATS[state.chosenFmt];
-    var ext=it.file.name.substring(it.file.name.lastIndexOf('.')),inp='in_'+it.id+ext,out='out_'+it.id+fmt.ext;
-    
-    var filter = 'asetrate=44100*'+cspeed+',aresample='+cresample+',volume='+cdb+'dB';
-    if(it.eq) {
-      filter += ',bass=g='+it.eq.low+':f=320,equalizer=g='+it.eq.mid+':f=1000:width_type=q:w=1,treble=g='+it.eq.high+':f=3200,equalizer=g='+it.eq.dens+':f=8000:width_type=q:w=1';
-    }
-    
-    var ff=['-i',inp,'-filter:a',filter].concat(fmt.args).concat([out]);
-    await ffmpeg.writeFile(inp, await fetchFile(it.file));
-    await withTimeout(ffmpeg.exec(ff),90000,"Encode "+fmt.label);
-    var data=await ffmpeg.readFile(out);
-    var blob=new Blob([data.buffer],{type:fmt.mime});
-    it.url=URL.createObjectURL(blob);it.blobData=blob;it.size=blob.size;
-      
-    var baseName = it.customName || it.file.name.replace(/\.[^/.]+$/, "");
-    baseName = baseName.replace(/\.[^/.]+$/, "");
-    var suffix = '_2.3YL';
-    var maxBaseLength = 50 - suffix.length - fmt.ext.length;
-    if (baseName.length > maxBaseLength) baseName = baseName.substring(0, maxBaseLength);
-    it.dlName = baseName + suffix + fmt.ext;
-      
-    it.status='done';useQuota(c.src);updateQuotaDisplay();
-    logLine('success',it.file.name+' berhasil dikonversi');
-    await ffmpeg.deleteFile(inp).catch(function(){});await ffmpeg.deleteFile(out).catch(function(){});
-  }catch(err){
-    it.status='pending';refundQuota(c.src);updateQuotaDisplay();
-    logLine('error',it.file.name+' gagal: '+describeError(err));
-  }
-  renderList();
-}
-
-async function uploadItem(it) {
-  if(!it||!it.blobData)return;
-  it.checked = false;
-  it.status = 'uploading';
-  renderList();
-  try{
-    var fd=new FormData();fd.append('api_key',state.rbxKey);
-    var speedUsed=it.speedUsed||2.3;
-    var rawName = it.customName || it.file.name.replace(/\.[^/.]+$/,'');
-    var safeName = truncateName(rawName, 50);
-    fd.append('request',JSON.stringify({assetType:'Audio',displayName:safeName,description:'Speed '+speedUsed+'x via ConverterYL',creationContext:{creator:{userId:state.rbxUserId}}}));
-    fd.append('file',it.blobData,it.dlName);
-    var res=await fetch(ROBLOX_PROXY_URL,{method:'POST',body:fd});
-    var data=await res.json();
-    if(!res.ok)throw new Error(data.error||data.message||'HTTP '+res.status);
-    var rawId = data.assetId || data.path || data.operationId;
-    var aid = rawId;
-    if (typeof rawId === 'string' && rawId.indexOf('assets/') !== -1) {
-        aid = rawId.split('/')[1];
-    }
-    it.assetId = aid;
-    it.status = 'uploaded';
-    toast('Upload berhasil! ID: '+aid,'ok');
-    logLine('upload','Roblox upload berhasil, ID: '+aid);
-    rbxAssets.push({name:safeName, assetId:aid});
-    renderRbxAssets();
-  }catch(err){
-    it.status='done';
-    toast('Gagal: '+(err.message||'').substring(0,100),'err');
-    logLine('error','Roblox upload gagal: '+(err.message||''));
-  }
-  renderList();
-}
-
 function copyText(t) {
   navigator.clipboard.writeText('rbxassetid://'+t).then(()=>toast('Disalin!','ok'));
 }
 
-// Override btn click to trigger checked convert
  $btn.addEventListener('click',function(){
   var checked = items.filter(x => x.checked && x.status === 'pending');
   if(checked.length === 0) { toast('Centang file dulu','info'); return; }
   openFmtModal();
 });
-// Override startProcess to process checked items
+
 async function startProcess(){
   closeFmtModal();
   var targets = items.filter(x => x.checked && x.status === 'pending');
+  if(targets.length === 0) { toast('Centang file dulu','info'); return; }
+  
+  var fmt=FORMATS[state.chosenFmt];
+  $btn.disabled=true;$progWrap.classList.remove('hidden');
+  var total=targets.length;
+  
   for(var i=0; i<targets.length; i++) {
-    await convertItem(targets[i]);
+    var it = targets[i];
+    var c = canEdit();
+    if(!c.ok) { toast('Kuota habis','err'); break; }
+    
+    it.checked = false;
+    it.status = 'processing';
+    renderList();
+    
+    try {
+      var cspeed,cresample,cdb;
+      if(activePreset===4){cspeed=parseFloat($customSpeedInput.value)||2.5;cresample=cspeed>4?96000:48000;cdb=0;}
+      else{var pr=presets[activePreset];cspeed=pr.speed;cresample=pr.resample;cdb=pr.db;}
+      
+      it.speedUsed = cspeed;
+      var ext=it.file.name.substring(it.file.name.lastIndexOf('.')),inp='in_'+it.id+ext,out='out_'+it.id+fmt.ext;
+      
+      var filter = 'asetrate=44100*'+cspeed+',aresample='+cresample+',volume='+cdb+'dB';
+      if(it.eq) {
+        filter += ',bass=g='+it.eq.low+':f=320,equalizer=g='+it.eq.mid+':f=1000:width_type=q:w=1,treble=g='+it.eq.high+':f=3200,equalizer=g='+it.eq.dens+':f=8000:width_type=q:w=1';
+      }
+      
+      var ff=['-i',inp,'-filter:a',filter].concat(fmt.args).concat([out]);
+      await ffmpeg.writeFile(inp, await fetchFile(it.file));
+      await withTimeout(ffmpeg.exec(ff),90000,"Encode "+fmt.label);
+      var data=await ffmpeg.readFile(out);
+      var blob=new Blob([data.buffer],{type:fmt.mime});
+      it.url=URL.createObjectURL(blob);it.blobData=blob;it.size=blob.size;
+      
+      var baseName = it.customName || it.file.name.replace(/\.[^/.]+$/, "");
+      baseName = baseName.replace(/\.[^/.]+$/, "");
+      var suffix = '_2.3YL';
+      var maxBaseLength = 50 - suffix.length - fmt.ext.length;
+      if (baseName.length > maxBaseLength) baseName = baseName.substring(0, maxBaseLength);
+      it.dlName = baseName + suffix + fmt.ext;
+      
+      it.status='done';useQuota(c.src);updateQuotaDisplay();
+      logLine('success',it.file.name+' berhasil dikonversi');
+      await ffmpeg.deleteFile(inp).catch(function(){});await ffmpeg.deleteFile(out).catch(function(){});
+    }catch(err){
+      it.status='pending';refundQuota(c.src);updateQuotaDisplay();
+      logLine('error',it.file.name+' gagal: '+describeError(err));
+    }
+    renderList();
   }
-  toast('Convert selesai','ok');
+  
+  $progFill.style.width="100%";$progTxt.innerText="100%";
+  logLine('done','Semua tugas selesai');
+  $btn.disabled=false;
 }
 updateQuotaDisplay();
 </script>
