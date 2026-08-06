@@ -48,6 +48,9 @@ body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
 .modal-bg.show{opacity:1;pointer-events:auto}
 .modal-box{background:#121214;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:24px;max-width:480px;width:92%;max-height:88vh;overflow-y:auto;transform:scale(.94) translateY(10px);transition:transform .3s cubic-bezier(.16,1,.3,1);box-shadow:0 20px 50px rgba(0,0,0,.5)}
 .modal-bg.show .modal-box{transform:scale(1) translateY(0)}
+.fmt-card{border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px;background:rgba(255,255,255,.03);transition:all .2s ease;cursor:pointer}
+.fmt-card:hover{border-color:rgba(129,140,248,.3);background:rgba(255,255,255,.05)}
+.fmt-card.chosen{border-color:rgba(129,140,248,.5);background:rgba(129,140,248,.08);box-shadow:0 0 20px rgba(129,140,248,.1)}
 .pay-card{border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:18px;background:rgba(255,255,255,.03);transition:all .25s ease;cursor:pointer}
 .pay-card:hover{border-color:rgba(129,140,248,.3);background:rgba(255,255,255,.05)}
 .pay-card.chosen{border-color:rgba(129,140,248,.6);background:rgba(129,140,248,.08);box-shadow:0 0 24px rgba(129,140,248,.12)}
@@ -162,16 +165,6 @@ input[type="range"]::-moz-range-thumb{width:14px;height:14px;background:#818cf8;
 .pm-row-playing{background:rgba(129,140,248,.06)!important;border-color:rgba(129,140,248,.2)!important}
 input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointer}
 
-/* ===== LOADING MODAL ===== */
-.loading-modal-box{background:#121214;border:1px solid rgba(129,140,248,.2);border-radius:16px;padding:32px;max-width:380px;width:92%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.6)}
-.loading-spinner{width:40px;height:40px;border:3px solid rgba(129,140,248,.15);border-top-color:#818cf8;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
-.loading-text{font-size:13px;color:#a1a1aa;line-height:1.6}
-.loading-text b{color:#c4b5fd}
-
-/* ===== UPLOAD LIST PANEL ===== */
-.upload-list-item{cursor:pointer;transition:all .2s ease;border:1px solid transparent}
-.upload-list-item:hover{border-color:rgba(129,140,248,.25);background:rgba(129,140,248,.04)}
-
 @media(max-width:900px){
   .hamburger-btn{display:flex}
   .app-layout{position:relative}
@@ -181,8 +174,6 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
   .sidebar-overlay.show{opacity:1;pointer-events:auto}
   .main-dashboard{grid-template-columns:1fr;padding:14px}
 }
-
-#googleBtnContainer{min-height:40px;min-width:180px;display:flex;align-items:center;justify-content:center}
 </style>
 <base target="_blank">
 </head>
@@ -203,14 +194,7 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
     </div>
   </div>
   <div id="navRight" class="flex items-center gap-2" style="margin-left:auto">
-    <div id="loginArea" class="flex items-center gap-2">
-      <div id="googleBtnContainer"></div>
-      <div id="manualLoginWrap" class="hidden flex items-center gap-2">
-        <input type="email" id="manualEmailInput" class="input-f" style="width:160px;padding:6px 10px;font-size:11px" placeholder="Email Anda" onkeydown="if(event.key==='Enter')doManualLogin()">
-        <button onclick="doManualLogin()" class="btn-primary" style="padding:6px 12px;font-size:11px"><i class="fa-solid fa-arrow-right"></i></button>
-      </div>
-      <button id="toggleManualBtn" onclick="toggleManualLogin()" class="btn-ghost" style="padding:4px 8px;font-size:10px" title="Login Manual"><i class="fa-solid fa-user" style="font-size:10px"></i></button>
-    </div>
+    <div id="loginArea" class="flex items-center gap-2"><div id="googleBtnContainer"></div></div>
     <div id="userChip" class="hidden items-center gap-2">
       <img id="userAvatar" src="" alt="" style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.1)">
       <span id="userName" class="text-xs text-zinc-400 hidden sm:inline max-w-[90px] truncate"></span>
@@ -247,7 +231,7 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
     </div>
 
     <div class="side-footer">
-      ConverterYL v2.1.0<br>&copy; 2026 ConverterYL. All rights reserved.
+      ConverterYL v2.0.0<br>&copy; 2026 ConverterYL. All rights reserved.
     </div>
   </aside>
 
@@ -260,10 +244,10 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
 
       <div class="panel">
         <div class="panel-head">
-          <span class="panel-title"><i class="fa-solid fa-list text-indigo-400" style="font-size:12px"></i> Daftar Convert</span>
+          <span class="panel-title"><i class="fa-solid fa-list text-indigo-400" style="font-size:12px"></i> Evolution List</span>
           <button onclick="selectAllItems()" class="btn-ghost" style="padding:4px 10px;font-size:10px"><i class="fa-solid fa-check-double"></i> Pilih Semua</button>
         </div>
-        <div class="text-[10px] text-zinc-500 mb-2">Centang file, lalu klik Convert.</div>
+        <div class="text-[10px] text-zinc-500 mb-2">Centang file, lalu gunakan tombol Convert/Upload di panel kanan.</div>
         <div id="fileList" class="flex flex-col gap-1.5"></div>
       </div>
 
@@ -331,7 +315,7 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
             <div class="action-icon" style="background:linear-gradient(135deg,#60a5fa,#818cf8)"><i class="fa-solid fa-rotate"></i></div>
             <div class="min-w-0 flex-1 text-left">
               <div class="text-xs font-semibold text-zinc-200 truncate">Convert</div>
-              <div class="text-[10px] text-zinc-600 truncate hidden lg:block">Proses ke OGG</div>
+              <div class="text-[10px] text-zinc-600 truncate hidden lg:block">Proses format</div>
             </div>
           </button>
           <button class="action-row" onclick="downloadAllFiles()">
@@ -356,8 +340,9 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
           <div class="text-center text-[10px] text-zinc-600 mt-1" id="progTxt">0%</div>
         </div>
       </div>
+    </div>
 
-      <!-- PANEL DAFTAR UPLOAD (BARU) -->
+      <!-- PANEL DAFTAR UPLOAD -->
       <div class="panel">
         <div class="panel-head">
           <span class="panel-title"><i class="fa-solid fa-inbox text-amber-400" style="font-size:12px"></i> Daftar Upload</span>
@@ -366,10 +351,9 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
         <div class="text-[10px] text-zinc-500 mb-2">Klik lagu untuk edit EQ atau langsung convert.</div>
         <div id="uploadList" class="flex flex-col gap-1.5"></div>
       </div>
-    </div>
   </main>
 
-  <!-- ===== VIEW PLAYMODE ===== -->
+  <!-- ===== VIEW PLAYMODE (BARU) ===== -->
   <main class="main-dashboard hidden" id="view-playmode">
     <div class="dash-col">
       <div class="panel">
@@ -377,7 +361,7 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
           <span class="panel-title"><i class="fa-solid fa-circle-play text-indigo-400" style="font-size:12px"></i> Player & Equalizer</span>
           <span class="badge" style="background:rgba(255,255,255,.05);color:#71717a;border:1px solid rgba(255,255,255,.08)">Web Audio API</span>
         </div>
-
+        
         <div class="pm-player mb-4">
           <audio id="pmAudio" style="display:none"></audio>
           <div class="flex items-center gap-3">
@@ -442,7 +426,7 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
           <button class="pm-preset-btn" onclick="applyPmPreset('vocal')"><i class="fa-solid fa-microphone"></i> Vocal Clarity</button>
           <button class="pm-preset-btn" onclick="applyPmPreset('balanced')"><i class="fa-solid fa-scale-balanced"></i> Balanced</button>
         </div>
-
+        
         <div class="mt-4 p-3 rounded-lg" style="background:rgba(129,140,248,.05);border:1px solid rgba(129,140,248,.1)">
           <div class="flex items-center gap-2 text-xs text-zinc-300 mb-2">
             <i class="fa-solid fa-circle-info text-indigo-400"></i> Setelah selesai, EQ akan diterapkan saat convert.
@@ -455,7 +439,7 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
     <div class="dash-col">
       <div class="panel">
         <div class="panel-head">
-          <span class="panel-title"><i class="fa-solid fa-list text-emerald-400" style="font-size:12px"></i> Daftar Lagu</span>
+          <span class="panel-title"><i class="fa-solid fa-list text-emerald-400" style="font-size:12px"></i> Uploaded Files (Preview)</span>
         </div>
         <div id="pmPlaylist" class="flex flex-col gap-1.5"></div>
       </div>
@@ -470,15 +454,13 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
   <p class="text-sm text-zinc-500 max-w-md mx-auto leading-relaxed fade-up">Edit kecepatan audio, upload langsung ke Roblox. Masuk dengan Google untuk mulai.</p>
 </div>
 
-<!-- MODAL ASK EDIT EQ -->
+<!-- MODAL ASK EDIT (SIMPLIFIED) -->
 <div class="modal-bg" id="askEditModal">
-  <div class="modal-box scale-in text-center" style="max-width:340px">
-    <div class="w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:rgba(129,140,248,.1)"><i class="fa-solid fa-sliders text-indigo-400 text-lg"></i></div>
-    <h3 class="text-sm font-bold mb-1">Edit / Tambahkan Preset EQ?</h3>
-    <p class="text-[11px] text-zinc-500 mb-4">Atur equalizer untuk lagu ini sebelum convert.</p>
+  <div class="modal-box scale-in text-center" style="max-width:300px">
+    <h3 class="text-base font-bold mb-4">Ingin edit dulu?</h3>
     <div class="flex gap-2">
-      <button onclick="closeAskEdit(false)" class="btn-ghost flex-1 py-2.5 text-xs">Tidak</button>
-      <button onclick="closeAskEdit(true)" class="btn-primary flex-1 py-2.5 text-xs">Ya</button>
+      <button onclick="closeAskEdit(false)" class="btn-ghost flex-1 py-2.5 text-sm">Tidak</button>
+      <button onclick="closeAskEdit(true)" class="btn-primary flex-1 py-2.5 text-sm">Ya</button>
     </div>
   </div>
 </div>
@@ -492,117 +474,32 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
     <button onclick="closeAskApplyEq('all')" class="btn-primary px-8 py-2.5 text-xs w-full mb-2"><i class="fa-solid fa-check-double"></i> Terapkan ke Semua</button>
     <button onclick="closeAskApplyEq('manual')" class="btn-ghost px-8 py-2.5 text-xs w-full">Tandai Manual 1 per 1</button>
   </div>
-</div>
+</div
 
 <!-- MODAL LOADING EQ -->
 <div class="modal-bg" id="eqLoadingModal">
-  <div class="loading-modal-box scale-in">
-    <div class="loading-spinner"></div>
-    <div class="loading-text">
-      <b>Memproses...</b><br>
+  <div class="modal-box scale-in text-center" style="max-width:380px;padding:32px">
+    <div class="w-10 h-10 mx-auto mb-4 rounded-full border-2 border-indigo-400 border-t-transparent animate-spin"></div>
+    <div class="text-sm font-bold text-zinc-200 mb-2">Memproses...</div>
+    <div class="text-xs text-zinc-500 leading-relaxed">
       Memindahkan lagu ke daftar list,<br>
       membersihkan file mentah<br>
       lalu memindahkan ke daftar convert.
     </div>
   </div>
-</div>
-
-<!-- MODAL ROBLOX SETTINGS -->
-<div class="modal-bg" id="rbxModal">
-  <div class="modal-box scale-in" style="max-width:420px">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="text-base font-bold flex items-center gap-2"><i class="fa-solid fa-cube text-rose-400 text-sm"></i> Pengaturan Roblox</h3>
-      <button onclick="closeRbxModal()" class="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-200 transition-colors" style="background:rgba(255,255,255,.05)"><i class="fa-solid fa-xmark text-xs"></i></button>
-    </div>
-    <div class="p-3 rounded-lg mb-4 text-[11px] text-zinc-500 leading-relaxed" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)">
-      <b class="text-zinc-400">Cara mendapatkan API Key:</b><br>
-      1. <span class="text-indigo-400">create.roblox.com/manage/api-keys</span> → Create Key → pilih <b>assets</b> → tambah <b>write</b> → Generate Key → salin
-    </div>
-    <div class="p-3 rounded-lg mb-3 text-[10px] text-zinc-600 leading-relaxed" style="background:rgba(129,140,248,.05);border:1px solid rgba(129,140,248,.1)">
-      <i class="fa-solid fa-circle-info text-indigo-400"></i> Cukup isi API Key & User ID kamu — server relay sudah diatur otomatis.
-    </div>
-    <div class="mb-3">
-      <label class="block text-[11px] font-medium text-zinc-400 mb-1.5">API Key</label>
-      <input type="password" id="rbxKeyInput" class="input-f text-xs" placeholder="Tempel API Key Roblox">
-    </div>
-    <div class="mb-4">
-      <label class="block text-[11px] font-medium text-zinc-400 mb-1.5">User ID</label>
-      <input type="text" id="rbxUserIdInput" class="input-f text-xs" placeholder="123456789">
-      <p class="text-[10px] text-zinc-700 mt-1.5">Ada di profil Roblox → angka di URL</p>
-    </div>
-    <div class="flex gap-2">
-      <button onclick="saveRbxSettings()" class="btn-primary flex-1 justify-center py-2.5 text-xs"><i class="fa-solid fa-save"></i> Simpan</button>
-      <button onclick="clearRbxSettings()" class="btn-ghost flex-1 justify-center py-2.5 text-xs"><i class="fa-solid fa-trash"></i> Hapus</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL UPGRADE -->
-<div class="modal-bg" id="upgradeModal">
-  <div class="modal-box scale-in text-center" style="max-width:340px">
-    <div class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:rgba(168,85,247,.1)"><i class="fa-solid fa-cube text-purple-400 text-xl"></i></div>
-    <h3 class="text-base font-bold mb-1">Fitur Premium</h3>
-    <p class="text-xs text-zinc-500 mb-5 leading-relaxed">Auto upload ke Roblox hanya tersedia untuk paket Unlimited</p>
-    <button onclick="closeUpgradeModal();openPayModal()" class="btn-primary px-8 py-2.5 text-xs"><i class="fa-solid fa-gem"></i> Lihat Paket Unlimited</button>
-    <button onclick="closeUpgradeModal()" class="btn-ghost mt-2 text-xs">Kembali</button>
-  </div>
-</div>
-
-<!-- MODAL PEMBAYARAN -->
-<div class="modal-bg" id="payModal">
-  <div class="modal-box scale-in" style="max-width:420px">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="text-base font-bold flex items-center gap-2"><i class="fa-solid fa-gem text-purple-400 text-sm"></i> Pilih Paket</h3>
-      <button onclick="closePayModal()" class="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-200 transition-colors" style="background:rgba(255,255,255,.05)"><i class="fa-solid fa-xmark text-xs"></i></button>
-    </div>
-    <div class="space-y-2">
-      <div class="pay-card" data-plan="per_song" onclick="pickPlan(this)">
-        <div class="flex items-center justify-between"><span class="text-sm font-semibold">1 Lagu</span><span class="text-base font-extrabold">Rp1.200</span></div>
-      </div>
-      <div class="pay-card" data-plan="bundle_65" onclick="pickPlan(this)">
-        <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="text-sm font-semibold">65 Lagu</span><span class="badge" style="background:rgba(52,211,153,.1);color:#4ade80;border:1px solid rgba(52,211,153,.15);font-size:9px">HEMAT</span></div><span class="text-base font-extrabold">Rp50.000</span></div>
-      </div>
-      <div class="pay-card relative overflow-hidden" data-plan="subscription" onclick="pickPlan(this)">
-        <div class="absolute top-0 right-0 text-[9px] font-bold text-white px-2.5 py-0.5 rounded-bl-lg" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">BEST</div>
-        <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="text-sm font-semibold">Unlimited</span><span class="badge badge-pro"><i class="fa-solid fa-cube" style="font-size:8px"></i> ROBLOX</span></div><span class="text-base font-extrabold">Rp210.000</span></div>
-        <p class="text-[10px] text-zinc-600 mt-1.5">Tanpa batas + auto upload Roblox, 30 hari</p>
-      </div>
-    </div>
-    <button id="payBtn" disabled onclick="doPayment()" class="btn-primary w-full justify-center mt-4 py-2.5 text-sm">Pilih paket</button>
-  </div>
-</div>
-
-<!-- MODAL SUKSES -->
-<div class="modal-bg" id="successModal">
-  <div class="modal-box scale-in text-center" style="max-width:340px">
-    <div class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:rgba(52,211,153,.1)"><i class="fa-solid fa-check text-emerald-400 text-xl"></i></div>
-    <h3 class="text-base font-bold mb-1">Berhasil</h3>
-    <p id="successMsg" class="text-xs text-zinc-500 mb-5">Kuota ditambahkan.</p>
-    <button onclick="closeSuccessModal()" class="btn-primary px-8 py-2.5 text-xs"><i class="fa-solid fa-arrow-right"></i> Lanjut</button>
-  </div>
-</div>
+</div>>
 
 <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
 <script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
 <script>
 var CONFIG_MODE='demo',API_BASE='https://backend-kamu.contoh.workers.dev',MAX_FILES=10;
 var ROBLOX_PROXY_URL='https://convertyaall-proxy.binomo2b.workers.dev';
-// Format tetap OGG saja
-var FORMATS={ogg:{ext:'.ogg',mime:'audio/ogg',args:['-c:a','libvorbis'],label:'OGG'}};
+var FORMATS={ogg:{ext:'.ogg',mime:'audio/ogg',args:['-c:a','libvorbis'],label:'OGG'},mp3:{ext:'.mp3',mime:'audio/mpeg',args:['-c:a','libmp3lame'],label:'MP3'},wav:{ext:'.wav',mime:'audio/wav',args:['-c:a','pcm_s16le'],label:'WAV'},flac:{ext:'.flac',mime:'audio/flac',args:['-c:a','flac'],label:'FLAC'}};
 var $=function(id){return document.getElementById(id)};
-var $fileInput=$('audioFile'),$fileList=$('fileList'),$uploadList=$('uploadList'),$uploadCountBadge=$('uploadCountBadge');
-var $btn=$('btn'),$status=$('status'),$progWrap=$('progWrap'),$progFill=$('progFill'),$progTxt=$('progTxt');
-var $warnBanner=$('warnBanner'),$loginArea=$('loginArea'),$mainCard=$('mainCard');
-var $userChip=$('userChip'),$userAvatar=$('userAvatar'),$userName=$('userName'),$logoutBtn=$('logoutBtn');
-var $creditChip=$('creditChip'),$creditText=$('creditText'),$quotaText=$('quotaText'),$quotaDot=$('quotaDot'),$planBadge=$('planBadge');
-var $payModal=$('payModal'),$payBtn=$('payBtn'),$successModal=$('successModal'),$successMsg=$('successMsg');
-var $customSpeedWrap=$('customSpeedWrap'),$customSpeedInput=$('customSpeedInput');
-var $rbxModal=$('rbxModal'),$rbxKeyInput=$('rbxKeyInput'),$rbxUserIdInput=$('rbxUserIdInput');
-var $upgradeModal=$('upgradeModal'),$sidebar=$('sidebar'),$sidebarOverlay=$('sidebarOverlay');
-var $logConsole=$('logConsole'),$historyConsole=$('historyConsole'),$loggedOutHero=$('loggedOutHero');
+var $fileInput=$('audioFile'),$fileList=$('fileList'),$uploadList=$('uploadList'),$uploadCountBadge=$('uploadCountBadge'),$btn=$('btn'),$status=$('status'),$progWrap=$('progWrap'),$progFill=$('progFill'),$progTxt=$('progTxt'),$warnBanner=$('warnBanner'),$loginArea=$('loginArea'),$mainCard=$('mainCard'),$userChip=$('userChip'),$userAvatar=$('userAvatar'),$userName=$('userName'),$logoutBtn=$('logoutBtn'),$creditChip=$('creditChip'),$creditText=$('creditText'),$quotaText=$('quotaText'),$quotaDot=$('quotaDot'),$planBadge=$('planBadge'),$payModal=$('payModal'),$payBtn=$('payBtn'),$successModal=$('successModal'),$successMsg=$('successMsg'),$customSpeedWrap=$('customSpeedWrap'),$customSpeedInput=$('customSpeedInput'),$rbxModal=$('rbxModal'),$rbxKeyInput=$('rbxKeyInput'),$rbxUserIdInput=$('rbxUserIdInput'),$upgradeModal=$('upgradeModal'),$sidebar=$('sidebar'),$sidebarOverlay=$('sidebarOverlay'),$logConsole=$('logConsole'),$historyConsole=$('historyConsole'),$loggedOutHero=$('loggedOutHero');
 
 var rbxAssets=[];
-var rbxHistory=[]; // [{name, assetId, time}]
+var rbxHistory=[];
 
 function toggleSidebar(){$sidebar.classList.toggle('open');$sidebarOverlay.classList.toggle('show');}
 function logLine(tag,msg){
@@ -631,8 +528,6 @@ function historyLine(tag,msg,assetId){
   $historyConsole.appendChild(row);
   $historyConsole.scrollTop=$historyConsole.scrollHeight;
 }
-function clearHistoryConsole(){if($historyConsole)$historyConsole.innerHTML='';rbxHistory=[];}
-
 function copySingleRbxId(assetId){
   navigator.clipboard.writeText('rbxassetid://'+assetId).then(function(){toast('Disalin: rbxassetid://'+assetId,'ok');});
 }
@@ -641,7 +536,7 @@ function copyAllRbxIds(){
   var lines=rbxHistory.map(function(h){return h.name+' = rbxassetid://'+h.assetId;}).join('\n');
   navigator.clipboard.writeText(lines).then(function(){toast('Semua Asset ID disalin ('+rbxHistory.length+')','ok');});
 }
-
+function clearHistoryConsole(){if($historyConsole)$historyConsole.innerHTML='';}
 function downloadAllFiles(){
   var doneItems=items.filter(function(x){return x.status==='done';});
   if(!doneItems.length){toast('Belum ada file siap diunduh.','info');return;}
@@ -717,7 +612,7 @@ async function uploadToRoblox(idx){
   if(!state.rbxKey||!state.rbxUserId){openRbxModal();toast('Lengkapi API Key & User ID dulu','info');return;}
   var b=document.getElementById('rbx_'+idx);if(!b||b.disabled)return;
   b.disabled=true;b.className='rbx-btn loading';b.innerHTML='<span class="spinner"></span> Upload...';
-  var rawName = it.file.name.replace(/\.[^/.]+$/,'');
+  var rawName = it.customName || it.file.name.replace(/\.[^/.]+$/,'');
   var safeName = truncateName(rawName, 50);
   var assetEntry={name:safeName,assetId:null,status:'pending'};
   rbxAssets.push(assetEntry);
@@ -737,17 +632,17 @@ async function uploadToRoblox(idx){
     if(!res.ok)throw new Error(data.error||data.message||'HTTP '+res.status);
 
     var aid=extractRbxAssetId(data);
-    if(aid){ finishRbxUpload(assetEntry,b,aid,rawName); return; }
+    if(aid){ finishRbxUpload(assetEntry,b,aid); return; }
 
     var opPath=data.path;
     if(!opPath) throw new Error('Response tidak dikenali dari Roblox (tidak ada assetId/path)');
     b.className='rbx-btn loading';b.innerHTML='<span class="spinner"></span> Moderasi...';
     logLine('upload','Upload terkirim, menunggu moderasi Roblox...');
-    pollRobloxOperation(assetEntry,b,opPath,0,rawName);
+    pollRobloxOperation(assetEntry,b,opPath,0);
   }catch(err){
     assetEntry.status='error';
     renderRbxAssets();
-    b.disabled=false;b.className='rbx-btn idle';b.innerHTML='<i class="fa-solid fa-rotate-right" style="font-size:10px"></i> Coba Lagi';
+    b.disabled=false;b.className='rbx-btn idle';b.innerHTML='<i class="fas fa-rotate-right"></i> Coba Lagi';
     toast('Gagal: '+(err.message||'').substring(0,100),'err');
     logLine('error','Roblox upload gagal: '+(err.message||''));
   }
@@ -758,11 +653,11 @@ function extractRbxAssetId(data){
   if(data.done===true && data.response && data.response.assetId)return data.response.assetId;
   return null;
 }
-var RBX_POLL_INTERVAL_MS=4000, RBX_POLL_MAX_ATTEMPTS=45;
-function pollRobloxOperation(assetEntry,b,opPath,attempt,rawName){
+var RBX_POLL_INTERVAL_MS=4000, RBX_POLL_MAX_ATTEMPTS=45; /* ~3 menit */
+function pollRobloxOperation(assetEntry,b,opPath,attempt){
   if(attempt>=RBX_POLL_MAX_ATTEMPTS){
     assetEntry.status='error';renderRbxAssets();
-    if(b){b.disabled=false;b.className='rbx-btn idle';b.innerHTML='<i class="fa-solid fa-rotate-right" style="font-size:10px"></i> Coba Lagi';}
+    if(b){b.disabled=false;b.className='rbx-btn idle';b.innerHTML='<i class="fas fa-rotate-right"></i> Coba Lagi';}
     toast('Moderasi Roblox lama, coba cek manual nanti','err');
     logLine('error','Polling moderasi timeout untuk "'+assetEntry.name+'"');
     return;
@@ -776,24 +671,21 @@ function pollRobloxOperation(assetEntry,b,opPath,attempt,rawName){
       var data=await res.json();
       if(!res.ok)throw new Error(data.error||data.message||'HTTP '+res.status);
       var aid=extractRbxAssetId(data);
-      if(aid){ finishRbxUpload(assetEntry,b,aid,rawName); }
-      else { pollRobloxOperation(assetEntry,b,opPath,attempt+1,rawName); }
+      if(aid){ finishRbxUpload(assetEntry,b,aid); }
+      else { pollRobloxOperation(assetEntry,b,opPath,attempt+1); }
     }catch(err){
-      pollRobloxOperation(assetEntry,b,opPath,attempt+1,rawName);
+      pollRobloxOperation(assetEntry,b,opPath,attempt+1);
     }
   },RBX_POLL_INTERVAL_MS);
 }
-function finishRbxUpload(assetEntry,b,aid,rawName){
+function finishRbxUpload(assetEntry,b,aid){
   assetEntry.assetId=aid;
   assetEntry.status='done';
   renderRbxAssets();
   if(b){
-    b.disabled=false;b.className='rbx-btn done';b.innerHTML='<i class="fa-solid fa-check" style="font-size:10px"></i> Done';b.title='Upload selesai';b.style.cursor='default';
-    b.onclick=null;
+    b.disabled=false;b.className='rbx-btn done';b.innerHTML='<i class="fas fa-check"></i> '+aid;b.title='Klik salin';b.style.cursor='pointer';
+    b.onclick=function(){navigator.clipboard.writeText(String(aid)).then(function(){toast('Asset ID '+aid+' disalin','ok');});};
   }
-  // Tambahkan ke riwayat
-  rbxHistory.push({name:rawName||assetEntry.name, assetId:aid, time:Date.now()});
-  historyLine('upload','Roblox: '+assetEntry.name+' → '+aid, aid);
   toast('Lolos moderasi! ID: '+aid,'ok');
   logLine('upload','Roblox upload berhasil & lolos moderasi, ID: '+aid);
 }
@@ -829,8 +721,17 @@ function renderRbxAssets(){
         '<div class="text-xs font-medium text-zinc-300 truncate flex items-center gap-2"><i class="fa-solid fa-music text-emerald-500" style="font-size:10px"></i> '+a.name+'</div>'+
         '<div class="text-[10px] text-emerald-500/70 mt-0.5 flex items-center gap-1.5 truncate"><i class="fa-solid fa-circle-check" style="font-size:9px"></i> '+u+'</div>'+
       '</div>'+
+      '<div class="flex items-center gap-1.5 flex-shrink-0">'+
+        '<button class="rbx-btn done" onclick="copyRbxAsset('+i+')" title="Copy Asset ID"><i class="fa-solid fa-copy" style="font-size:10px"></i> Copy</button>'+
+      '</div>'+
     '</div>';
   }).join('');
+}
+function copyRbxAsset(i){
+  if(rbxAssets[i] && rbxAssets[i].status==='done'){
+    var u='rbxassetid://'+rbxAssets[i].assetId;
+    navigator.clipboard.writeText(u).then(function(){toast('Disalin: '+u,'ok');});
+  }
 }
 function clearRbxAssets(){rbxAssets=[];renderRbxAssets();toast('List dibersihkan','info');}
 
@@ -843,6 +744,9 @@ function canEdit(){
 function useQuota(s){if(s==='free'){state.freeUsed=true;return;}if(s==='credit'){state.credits--;saveLocal();}}
 function refundQuota(s){if(s==='free'){state.freeUsed=false;return;}if(s==='credit'){state.credits++;saveLocal();}}
 
+
+
+
 function openPayModal(){state.chosenPlan=null;document.querySelectorAll('.pay-card').forEach(function(c){c.classList.remove('chosen');});$payBtn.disabled=true;$payBtn.textContent='Pilih paket';$payModal.classList.add('show');document.body.style.overflow='hidden';}
 function closePayModal(){$payModal.classList.remove('show');document.body.style.overflow='';}
 function pickPlan(el){document.querySelectorAll('.pay-card').forEach(function(c){c.classList.remove('chosen');});el.classList.add('chosen');state.chosenPlan=el.getAttribute('data-plan');$payBtn.disabled=false;$payBtn.textContent='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');}
@@ -850,7 +754,7 @@ function showSuccessModal(p){if(p==='subscription')$successMsg.textContent='Unli
 function closeSuccessModal(){$successModal.classList.remove('show');document.body.style.overflow='';updateQuotaDisplay();}
  $payModal.addEventListener('click',function(e){if(e.target===$payModal)closePayModal();});
  $successModal.addEventListener('click',function(e){if(e.target===$successModal)closeSuccessModal();});
-document.addEventListener('keydown',function(e){if(e.key==='Escape'){closePayModal();closeSuccessModal();closeRbxModal();closeUpgradeModal();closeAskEditModal();closeAskApplyEqModal();closeEqLoadingModal();}});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeFmtModal();closePayModal();closeSuccessModal();closeRbxModal();closeUpgradeModal();closeAskEditModal();closeAskApplyEqModal();}});
 
 function doPayment(){
   if(!state.chosenPlan||!state.email)return;
@@ -910,49 +814,14 @@ function handleLogout(){
   try{localStorage.removeItem('convyl_user');}catch(e){}
   state.email=null;state.name=null;state.credits=0;state.isSubscribed=false;state.subExpiry=null;state.freeUsed=false;
   state.rbxKey=null;state.rbxUserId=null;
-  $loginArea.classList.remove('hidden');$userChip.classList.add('hidden');$mainCard.classList.add('hidden');if($loggedOutHero)$loggedOutHero.classList.add('hidden');
-  // Reset manual login UI
-  $('manualLoginWrap').classList.add('hidden');
-  $('toggleManualBtn').innerHTML='<i class="fa-solid fa-user" style="font-size:10px"></i>';
-  $('manualEmailInput').value='';
+  $loginArea.classList.remove('hidden');$userChip.classList.add('hidden');$mainCard.classList.add('hidden');if($loggedOutHero)$loggedOutHero.classList.remove('hidden');
 }
  $logoutBtn.addEventListener('click',handleLogout);
-var googleInitAttempts=0;
 function initGoogleLogin(){
   if(isInApp)return;
-  googleInitAttempts++;
-  if(googleInitAttempts>30){console.warn('Google GSI max retries reached');return;}
-
-  if(typeof google==='undefined'||!google.accounts||!google.accounts.id){
-    setTimeout(initGoogleLogin,600);
-    return;
-  }
-  try{
-    google.accounts.id.initialize({
-      client_id:GOOGLE_CLIENT_ID,
-      callback:handleCredentialResponse,
-      auto_select:false,
-      cancel_on_tap_outside:true
-    });
-    var container=$('googleBtnContainer');
-    if(container){
-      container.innerHTML='';
-      google.accounts.id.renderButton(container,{
-        type:"standard",
-        theme:"filled_black",
-        size:"large",
-        shape:"pill",
-        text:"signin_with",
-        logo_alignment:"left",
-        width:180
-      });
-      console.log('Google Sign-In button rendered');
-    }
-  }catch(err){
-    console.error('Google init error:',err);
-    setTimeout(initGoogleLogin,1000);
-    return;
-  }
+  if(typeof google==='undefined'||!google.accounts){setTimeout(initGoogleLogin,300);return;}
+  google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:handleCredentialResponse});
+  google.accounts.id.renderButton($('googleBtnContainer'),{type:"standard",theme:"filled_black",size:"medium",shape:"pill",text:"signin_with",width:160});
   try{
     var s=localStorage.getItem('convyl_user');
     if(s){
@@ -964,45 +833,7 @@ function initGoogleLogin(){
     }
   }catch(e){}
 }
-
-// ===== MANUAL LOGIN FALLBACK =====
-function toggleManualLogin(){
-  var wrap=$('manualLoginWrap');
-  var btn=$('toggleManualBtn');
-  if(wrap.classList.contains('hidden')){
-    wrap.classList.remove('hidden');
-    btn.innerHTML='<i class="fa-solid fa-xmark" style="font-size:10px"></i>';
-    setTimeout(function(){$('manualEmailInput').focus();},100);
-  }else{
-    wrap.classList.add('hidden');
-    btn.innerHTML='<i class="fa-solid fa-user" style="font-size:10px"></i>';
-  }
-}
-function doManualLogin(){
-  var email=$('manualEmailInput').value.trim();
-  if(!email||!email.includes('@')){toast('Masukkan email valid','err');return;}
-  var fakeProfile={email:email,name:email.split('@')[0],picture:''};
-  state.email=fakeProfile.email;state.name=fakeProfile.name;state.freeUsed=false;
-  $userAvatar.src='';$userName.textContent=state.name;
-  $loginArea.classList.add('hidden');$userChip.classList.remove('hidden');$mainCard.classList.remove('hidden');if($loggedOutHero)$loggedOutHero.classList.add('hidden');
-  loadLocal(state.email);loadRbxLocal();updateQuotaDisplay();
-  try{localStorage.setItem('convyl_user',JSON.stringify(fakeProfile));}catch(e){}
-  toast('Login manual berhasil','ok');
-}
-
-// Panggil setelah DOM ready dan library siap
-document.addEventListener('DOMContentLoaded',function(){
-  if(!isInApp){
-    setTimeout(function(){initGoogleLogin();},500);
-    // Cek ulang setelah 3 detik jika tombol belum muncul
-    setTimeout(function(){
-      var container=$('googleBtnContainer');
-      if(container&&container.children.length===0){
-        console.warn('Google button not rendered after 3s. Possible causes: 1) Client ID not whitelisted for this domain, 2) CSP blocking, 3) GSI library failed to load.');
-      }
-    },3500);
-  }
-});
+initGoogleLogin();
 
 var presets=[{speed:2.3,db:0,resample:48000},{speed:2.5,db:0,resample:48000},{speed:2.7,db:0,resample:48000},{speed:4.7,db:0,resample:96000}];
 var activePreset=0;
@@ -1049,7 +880,7 @@ async function boot(){
       wasmURL:await toBlobURL(b+'/ffmpeg-core.wasm',"application/wasm"),
       classWorkerURL:await toBlobURL("https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js","text/javascript")
     }),25000,"Load FFmpeg");
-    loaded=true;$status.innerText="Editor siap. Upload file untuk mulai.";
+    loaded=true;$status.innerText=items.length?"Siap diedit.":"Editor siap.";
     logLine('info','FFmpeg berhasil dimuat');
   }catch(e){
     $status.innerText="Gagal — "+describeError(e);$warnBanner.classList.remove('hidden');
@@ -1058,34 +889,39 @@ async function boot(){
 }
 boot();
 
-// ===== FILE INPUT HANDLER (MODIFIED) =====
- $fileInput.addEventListener('change',function(e){
+if($box){
+  $box.addEventListener('dragover',function(e){e.preventDefault();$box.style.borderColor='rgba(129,140,248,.6)';$box.style.background='rgba(129,140,248,.05)';});
+  $box.addEventListener('dragleave',function(e){$box.style.borderColor='';$box.style.background='';});
+  $box.addEventListener('drop',function(e){
+    e.preventDefault();$box.style.borderColor='';$box.style.background='';
+    var dt=e.dataTransfer;if(!dt||!dt.files||!dt.files.length)return;
+    var ev=new Event('change');
+    var dtRef=new DataTransfer();
+    Array.from(dt.files).forEach(function(f){dtRef.items.add(f);});
+    $fileInput.files=dtRef.files;
+    $fileInput.dispatchEvent(ev);
+  });
+}
+
+  $fileInput.addEventListener('change',function(e){
   var p=Array.from(e.target.files||[]);if(!p.length)return;
   if(p.length>MAX_FILES){toast('Maks '+MAX_FILES+' file.','info');p=p.slice(0,MAX_FILES);}
-  items=p.map(function(f){return{
-    id:Date.now()+Math.random(),
-    file:f,
-    name:f.name,
-    size:f.size,
-    status:'pending',
-    url:null,
-    blobData:null,
-    dlName:null,
-    checked:false,
-    eq:null,
-    speedUsed:null,
-    assetId:null,
-    inConvertList:false  // BARU: false = di daftar upload (kanan), true = di daftar convert (kiri)
-  };});
+  items=p.map(function(f){return{id:Date.now()+Math.random(),file:f,name:f.name,size:f.size,status:'pending',url:null,blobData:null,dlName:null,checked:false,eq:null,speedUsed:null,assetId:null,inConvertList:false};});
   p.forEach(function(f){historyLine('raw','File asli: '+f.name+' ('+formatSize(f.size)+')');});
   $btn.disabled=false;
-  $status.innerText=loaded?items.length+" file siap. Klik file di daftar upload untuk edit EQ.":"Tunggu editor...";
+  $status.innerText=loaded?items.length+" file di Daftar Upload. Klik file untuk edit EQ.":"Tunggu editor...";
   renderUploadList();
   renderList();
   logLine('info',p.length+' file terdeteksi, masuk ke Daftar Upload');
 });
+  p.forEach(function(f){historyLine('raw','File asli: '+f.name+' ('+formatSize(f.size)+')');});
+  $btn.disabled=false;$status.innerText=loaded?"Siap diedit.":"Tunggu editor...";renderList();
+  logLine('info',p.length+' file terdeteksi');
+  $('askEditModal').classList.add('show');
+});
 
-// ===== ASK EDIT EQ MODAL =====
+function closeAskEditModal(){$('askEditModal').classList.remove('show');}
+ $('askEditModal').addEventListener('click',function(e){if(e.target===$('askEditModal'))closeAskEditModal();});
 var askEditIndex=-1;
 function openAskEdit(idx){
   askEditIndex=idx;
@@ -1093,17 +929,15 @@ function openAskEdit(idx){
   document.body.style.overflow='hidden';
 }
 function closeAskEditModal(){$('askEditModal').classList.remove('show');document.body.style.overflow='';askEditIndex=-1;}
-function closeAskEdit(yes){
+function closeAskEdit(editFirst){
   closeAskEditModal();
   if(askEditIndex<0)return;
-  if(yes){
-    // Masuk ke PlayMode, TIDAK auto play
+  if(editFirst){
     switchView('playmode');
     pmCurrentIdx=askEditIndex;
-    pmLoadSong(askEditIndex); // load tapi tidak play
+    pmLoadSong(askEditIndex);
     renderPmList();
   }else{
-    // Langsung masuk ke daftar convert
     items[askEditIndex].inConvertList=true;
     renderUploadList();
     renderList();
@@ -1111,78 +945,8 @@ function closeAskEdit(yes){
   }
   askEditIndex=-1;
 }
- $('askEditModal').addEventListener('click',function(e){if(e.target===$('askEditModal'))closeAskEditModal();});
 
-// ===== UPLOAD LIST RENDERER (PANEL KANAN) =====
-function renderUploadList(){
-  var uploadItems=items.filter(function(x){return x.status==='pending'&&!x.inConvertList;});
-  if($uploadCountBadge)$uploadCountBadge.textContent=uploadItems.length+' Files';
-  if(!uploadItems.length){
-    $uploadList.innerHTML='<div class="text-xs text-zinc-600 text-center py-6"><i class="fa-solid fa-inbox" style="font-size:20px;opacity:.4"></i><div class="mt-2">Belum ada file. Upload dulu.</div></div>';
-    return;
-  }
-  $uploadList.innerHTML=uploadItems.map(function(it,i){
-    var realIdx=items.indexOf(it);
-    return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row upload-list-item fade-up" onclick="openAskEdit('+realIdx+')">'+
-      '<div class="row-index">'+(i+1)+'</div>'+
-      '<div class="flex-1 min-w-0">'+
-        '<div class="text-xs font-medium text-zinc-300 truncate flex items-center gap-2"><i class="fa-solid fa-music text-zinc-500" style="font-size:10px"></i> '+it.name+'</div>'+
-        '<div class="text-[10px] text-zinc-600 mt-0.5">'+formatSize(it.size)+' · Klik untuk edit EQ</div>'+
-      '</div>'+
-      '<i class="fa-solid fa-chevron-right text-zinc-700" style="font-size:10px"></i>'+
-    '</div>';
-  }).join('');
-}
-
-// ===== EVOLUTION LIST RENDERER (PANEL KIRI — CONVERT LIST) =====
-function renderList(){
-  var convertItems=items.filter(function(x){return x.inConvertList;});
-  if(!convertItems.length){
-    $fileList.innerHTML='<div class="text-xs text-zinc-600 text-center py-8"><i class="fa-solid fa-inbox" style="font-size:24px;opacity:.4"></i><div class="mt-2">Belum ada file di daftar convert. Klik file di Daftar Upload untuk mulai.</div></div>';
-    return;
-  }
-  $fileList.innerHTML=convertItems.map(function(it){
-    var i=items.indexOf(it);
-    var st='Menunggu',sc='text-zinc-600',extra='<div class="flex items-center gap-1.5 flex-shrink-0">',icon='<i class="fa-solid fa-circle text-zinc-700" style="font-size:6px"></i>';
-
-    if(it.status==='pending'){
-        st = it.eq ? 'Siap Convert (EQ Applied)' : 'Siap Convert';
-        sc = it.eq ? 'text-purple-400' : 'text-zinc-400';
-        icon = '<input type="checkbox" '+(it.checked?'checked':'')+' onchange="toggleCheck('+i+')">';
-    }
-    if(it.status==='processing'){icon='<i class="fa-solid fa-circle-notch fa-spin text-indigo-400" style="font-size:9px"></i>';st='Mengedit...';sc='text-indigo-400';}
-    if(it.status==='done'){
-        icon='<input type="checkbox" '+(it.checked?'checked':'')+' onchange="toggleCheck('+i+')">';
-        st='OGG — '+formatSize(it.size);sc='text-emerald-500/70';
-        extra+='<a class="rbx-btn done" href="'+it.url+'" download="'+it.dlName+'" title="Download"><i class="fa-solid fa-download" style="font-size:10px"></i></a>';
-        extra+='<button id="rbx_'+i+'" class="rbx-btn '+(isPremium()?'idle':'locked')+'" onclick="uploadToRoblox('+i+')" title="Upload Roblox">'+(isPremium()?'<i class="fa-solid fa-cloud-arrow-up" style="font-size:10px"></i>':'<i class="fa-solid fa-lock" style="font-size:10px"></i>')+'</button>';
-    }
-    if(it.status==='uploading'){icon='<i class="fa-solid fa-circle-notch fa-spin text-indigo-400" style="font-size:9px"></i>';st='Uploading...';sc='text-indigo-400';}
-    if(it.status==='uploaded'){
-        icon='<i class="fa-solid fa-check-circle text-emerald-400" style="font-size:10px"></i>';
-        st='rbxassetid://'+it.assetId; sc='text-purple-400 font-mono';
-        // HAPUS tombol copy di sini (perintah #9)
-    }
-
-    extra+='</div>';
-
-    return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row fade-up"><div class="row-index w-6">'+icon+'</div><div class="flex-1 min-w-0"><div class="text-xs font-medium text-zinc-300 truncate flex items-center gap-2"><i class="fa-solid fa-music text-zinc-500" style="font-size:10px"></i> '+it.name+'</div><div class="text-[10px] '+sc+' mt-0.5 flex items-center gap-1.5">'+st+'</div></div>'+extra+'</div>';
-  }).join('');
-}
-function formatSize(b){if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB';}
-
-function toggleCheck(i) {
-  items[i].checked = !items[i].checked;
-  renderList();
-}
-function selectAllItems() {
-  var target = items.find(x => x.status === 'done' && x.inConvertList) ? 'done' : 'pending';
-  var allChecked = items.filter(x => x.status === target && x.inConvertList).every(x => x.checked);
-  items.forEach(it => { if(it.status === target && it.inConvertList) it.checked = !allChecked; });
-  renderList();
-}
-
-// ===== PLAYMODE (EQ) — MODIFIED: tidak auto play =====
+// ===== PLAYMODE (EQ) =====
 var pmAudioCtx, pmSource, pmLow, pmMid, pmHigh, pmDens;
 var pmEq = { low: 0, mid: 0, high: 0, dens: 0 };
 var pmCurrentIdx = -1;
@@ -1194,7 +958,6 @@ function switchView(view) {
     $('nav-converter').classList.add('active');
     $('nav-playmode').classList.remove('active');
     renderList();
-    renderUploadList();
   } else {
     $('view-converter').classList.add('hidden');
     $('view-playmode').classList.remove('hidden');
@@ -1222,22 +985,19 @@ function pmFormatTime(sec) {
   return m + ':' + (s < 10 ? '0' + s : s);
 }
 function pmPlaylistIndexes() {
-  // Tampilkan SEMUA file yang belum inConvertList (stage upload) + yang sedang diedit
   var out = [];
   items.forEach(function(it, i){ if (it.status === 'pending') out.push(i); });
   return out;
 }
-
-// Load lagu ke player TAPI TIDAK AUTO PLAY
 function pmLoadSong(idx) {
   var it = items[idx];
   if (!it || it.status !== 'pending') return;
   initPmAudioGraph();
   if (pmAudioCtx.state === 'suspended') pmAudioCtx.resume();
   var audio = $('pmAudio');
-  // Hentikan yang sedang berjalan
   audio.pause();
   audio.src = URL.createObjectURL(it.file);
+  pmCurrentIdx = idx;
   $('pmNowPlaying').textContent = it.name;
   $('pmSubText').textContent = 'Siap diputar — klik Play';
   setPmPlayIcon(false);
@@ -1245,7 +1005,6 @@ function pmLoadSong(idx) {
   updatePmNavButtons();
 }
 
-// Play lagu (hanya dipanggil saat user klik play)
 function playPmSong(idx) {
   var it = items[idx];
   if (!it || it.status !== 'pending') return;
@@ -1261,7 +1020,6 @@ function playPmSong(idx) {
   renderPmList();
   updatePmNavButtons();
 }
-
 function togglePmPlay() {
   var audio = $('pmAudio');
   if (!audio.src) {
@@ -1357,14 +1115,14 @@ var PM_PRESETS = {bass:{low:8,mid:0,high:2,dens:0},vocal:{low:-3,mid:5,high:3,de
 function applyPmPreset(type){var p=PM_PRESETS[type];$('eqLow').value=p.low;$('eqMid').value=p.mid;$('eqHigh').value=p.high;$('eqDens').value=p.dens;updatePmEQ();}
 function renderPmList() {
   var $pmList = $('pmPlaylist');
-  var rawItems = items.filter(function(x) { return x.status === 'pending'; });
+  var rawItems = items.filter(x => x.status === 'pending');
   if(rawItems.length === 0) {
     $pmList.innerHTML = '<div class="text-xs text-zinc-600 text-center py-8"><i class="fa-solid fa-inbox" style="font-size:24px;opacity:.4"></i><div class="mt-2">Belum ada file. Upload dulu di Converter.</div></div>';
     return;
   }
   $pmList.innerHTML = rawItems.map(function(it) {
     var i = items.indexOf(it);
-    var playing = i === pmCurrentIdx && !$('pmAudio').paused;
+    var playing = i === pmCurrentIdx;
     return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row'+(playing?' pm-row-playing':'')+'" style="cursor:pointer;border:1px solid transparent;border-radius:8px" onclick="playPmSong('+i+')">'+
       '<div class="row-index">'+(playing?'<i class="fa-solid fa-volume-high text-indigo-400"></i>':'#')+'</div>'+
       '<div class="flex-1 min-w-0"><div class="text-xs font-medium '+(playing?'text-indigo-300':'text-zinc-300')+' truncate">'+it.name+'</div></div>'+
@@ -1372,8 +1130,6 @@ function renderPmList() {
   }).join('');
   updatePmNavButtons();
 }
-
-// ===== FINISH EQ EDITING — MODIFIED with loading modal =====
 function finishEqEditing() {
   $('askApplyEqModal').classList.add('show');
 }
@@ -1381,41 +1137,110 @@ function closeAskApplyEqModal(){$('askApplyEqModal').classList.remove('show');}
 function closeAskApplyEq(type) {
   closeAskApplyEqModal();
   if(type === 'all') {
-    // Tampilkan loading modal
     $('eqLoadingModal').classList.add('show');
     document.body.style.overflow='hidden';
-
     setTimeout(function(){
-      // Terapkan EQ ke semua file yang belum inConvertList
-      items.forEach(function(it) {
-        if(it.status==='pending' && !it.inConvertList) {
-          it.eq = {low:pmEq.low, mid:pmEq.mid, high:pmEq.high, dens:pmEq.dens};
-          it.inConvertList = true;
+      items.forEach(function(it){
+        if(it.status==='pending'&&!it.inConvertList){
+          it.eq={low:pmEq.low,mid:pmEq.mid,high:pmEq.high,dens:pmEq.dens};
+          it.inConvertList=true;
         }
       });
-      // Reset EQ sliders
       $('eqLow').value=0;$('eqMid').value=0;$('eqHigh').value=0;$('eqDens').value=0;updatePmEQ();
-
       $('eqLoadingModal').classList.remove('show');
       document.body.style.overflow='';
-
       switchView('converter');
       renderUploadList();
       renderList();
       toast('EQ diterapkan & file dipindahkan ke Daftar Convert','ok');
       logLine('convert','Semua file dipindahkan ke daftar convert dengan EQ');
-    }, 1800);
+    },1800);
   } else {
     toast('Tandai file manual di list','info');
     switchView('converter');
   }
 }
- $('askApplyEqModal').addEventListener('click',function(e){if(e.target===$('askApplyEqModal'))closeAskApplyEqModal();});
 function closeEqLoadingModal(){$('eqLoadingModal').classList.remove('show');document.body.style.overflow='';}
  $('eqLoadingModal').addEventListener('click',function(e){if(e.target===$('eqLoadingModal'))closeEqLoadingModal();});
 
-// ===== CONVERT BUTTON — langsung OGG tanpa popup format =====
- $btn.addEventListener('click',function(){
+// ===== EVOLUTIONARY LIST RENDERER =====
+function renderUploadList(){
+  var uploadItems=items.filter(function(x){return x.status==='pending'&&!x.inConvertList;});
+  if($uploadCountBadge)$uploadCountBadge.textContent=uploadItems.length+' Files';
+  if(!uploadItems.length){
+    $uploadList.innerHTML='<div class="text-xs text-zinc-600 text-center py-6"><i class="fa-solid fa-inbox" style="font-size:20px;opacity:.4"></i><div class="mt-2">Belum ada file. Upload dulu.</div></div>';
+    return;
+  }
+  $uploadList.innerHTML=uploadItems.map(function(it,i){
+    var realIdx=items.indexOf(it);
+    return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row upload-list-item fade-up" style="cursor:pointer" onclick="openAskEdit('+realIdx+')">'+
+      '<div class="row-index">'+(i+1)+'</div>'+
+      '<div class="flex-1 min-w-0">'+
+        '<div class="text-xs font-medium text-zinc-300 truncate flex items-center gap-2"><i class="fa-solid fa-music text-zinc-500" style="font-size:10px"></i> '+it.name+'</div>'+
+        '<div class="text-[10px] text-zinc-600 mt-0.5">'+formatSize(it.size)+' · Klik untuk edit EQ</div>'+
+      '</div>'+
+      '<i class="fa-solid fa-chevron-right text-zinc-700" style="font-size:10px"></i>'+
+    '</div>';
+  }).join('');
+}
+
+function renderList(){
+  var convertItems=items.filter(function(x){return x.inConvertList;});
+  if(!convertItems.length){
+    $fileList.innerHTML='<div class="text-xs text-zinc-600 text-center py-8"><i class="fa-solid fa-inbox" style="font-size:24px;opacity:.4"></i><div class="mt-2">Belum ada file di daftar convert. Klik file di Daftar Upload untuk mulai.</div></div>';
+    return;
+  }
+  $fileList.innerHTML=items.map(function(it,i){
+    var st='Menunggu',sc='text-zinc-600',extra='<div class="flex items-center gap-1.5 flex-shrink-0">',icon='<i class="fa-solid fa-circle text-zinc-700" style="font-size:6px"></i>';
+    
+    var baseName = it.customName || it.file.name.replace(/\.[^/.]+$/, "");
+    var suffix = '_2.3YL';
+    var ext = FORMATS[state.chosenFmt].ext;
+    var isTooLong = (baseName.length + suffix.length + ext.length) > 50;
+    var displayName = it.customName || it.file.name;
+    
+    if(it.status==='pending'){
+        st = it.eq ? 'Siap Convert (EQ Applied)' : 'Siap Convert';
+        sc = it.eq ? 'text-purple-400' : 'text-zinc-400';
+        icon = '<input type="checkbox" '+(it.checked?'checked':'')+' onchange="toggleCheck('+i+')">';
+    }
+    if(it.status==='processing'){icon='<i class="fa-solid fa-circle-notch fa-spin text-indigo-400" style="font-size:9px"></i>';st='Mengedit...';sc='text-indigo-400';}
+    if(it.status==='done'){
+        icon='<input type="checkbox" '+(it.checked?'checked':'')+' onchange="toggleCheck('+i+')">';
+        st=FORMATS[state.chosenFmt].label+' — '+formatSize(it.size);sc='text-emerald-500/70';
+        extra+='<a class="rbx-btn done" href="'+it.url+'" download="'+it.dlName+'" title="Download"><i class="fa-solid fa-download" style="font-size:10px"></i></a>';
+        extra+='<button id="rbx_'+i+'" class="rbx-btn '+(isPremium()?'idle':'locked')+'" onclick="uploadToRoblox('+i+')" title="Upload Roblox">'+(isPremium()?'<i class="fa-solid fa-cloud-arrow-up" style="font-size:10px"></i>':'<i class="fa-solid fa-lock" style="font-size:10px"></i>')+'</button>';
+    }
+    if(it.status==='uploading'){icon='<i class="fa-solid fa-circle-notch fa-spin text-indigo-400" style="font-size:9px"></i>';st='Uploading...';sc='text-indigo-400';}
+    if(it.status==='uploaded'){
+        icon='<i class="fa-solid fa-check-circle text-emerald-400" style="font-size:10px"></i>';
+        st='rbxassetid://'+it.assetId; sc='text-purple-400 font-mono';
+        extra+='<button class="rbx-btn done" onclick="copyText(\''+it.assetId+'\')"><i class="fa-solid fa-copy"></i> Copy</button>';
+    }
+    
+    extra+='</div>';
+    
+    return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row fade-up"><div class="row-index w-6">'+icon+'</div><div class="flex-1 min-w-0"><div class="text-xs font-medium text-zinc-300 truncate flex items-center gap-2"><i class="fa-solid fa-music text-zinc-500" style="font-size:10px"></i> '+displayName+'</div><div class="text-[10px] '+sc+' mt-0.5 flex items-center gap-1.5">'+st+'</div></div>'+extra+'</div>';
+  }).join('');
+}
+function formatSize(b){if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB';}
+
+function toggleCheck(i) {
+  items[i].checked = !items[i].checked;
+  renderList();
+}
+function selectAllItems() {
+  var target = items.find(x => x.status === 'done') ? 'done' : 'pending';
+  var allChecked = items.filter(x => x.status === target).every(x => x.checked);
+  items.forEach(it => { if(it.status === target) it.checked = !allChecked; });
+  renderList();
+}
+
+function copyText(t) {
+  navigator.clipboard.writeText('rbxassetid://'+t).then(()=>toast('Disalin!','ok'));
+}
+
+  $btn.addEventListener('click',function(){
   if(!items.length)return;
   if(!loaded){$status.innerText="Editor belum siap.";return;}
   var c=canEdit();if(!c.ok){toast('Kuota habis.','info');openPayModal();return;}
@@ -1425,50 +1250,51 @@ function closeEqLoadingModal(){$('eqLoadingModal').classList.remove('show');docu
 });
 
 async function startProcess(){
-  var targets = items.filter(function(x){return x.checked && x.status === 'pending' && x.inConvertList;});
+  var targets = items.filter(function(x){return x.checked && x.status === 'pending' && x.inConvertList;});(x => x.checked && x.status === 'pending');
   if(targets.length === 0) { toast('Centang file dulu','info'); return; }
-
-  var fmt=FORMATS.ogg; // TETAP OGG
+  
+  var fmt=FORMATS[state.chosenFmt];
   $btn.disabled=true;$progWrap.classList.remove('hidden');
   var total=targets.length;
-
+  
   for(var i=0; i<targets.length; i++) {
     var it = targets[i];
     var c = canEdit();
     if(!c.ok) { toast('Kuota habis','err'); break; }
-
+    
     it.checked = false;
     it.status = 'processing';
     renderList();
-
+    
     try {
       var cspeed,cresample,cdb;
       if(activePreset===4){cspeed=parseFloat($customSpeedInput.value)||2.5;cresample=cspeed>4?96000:48000;cdb=0;}
       else{var pr=presets[activePreset];cspeed=pr.speed;cresample=pr.resample;cdb=pr.db;}
-
+      
       it.speedUsed = cspeed;
       var ext=it.file.name.substring(it.file.name.lastIndexOf('.')),inp='in_'+it.id+ext,out='out_'+it.id+fmt.ext;
-
+      
       var filter = 'asetrate=44100*'+cspeed+',aresample='+cresample+',volume='+cdb+'dB';
       if(it.eq) {
         filter += ',bass=g='+it.eq.low+':f=320,equalizer=g='+it.eq.mid+':f=1000:width_type=q:w=1,treble=g='+it.eq.high+':f=3200,equalizer=g='+it.eq.dens+':f=8000:width_type=q:w=1';
       }
-
+      
       var ff=['-i',inp,'-filter:a',filter].concat(fmt.args).concat([out]);
       await ffmpeg.writeFile(inp, await fetchFile(it.file));
-      await withTimeout(ffmpeg.exec(ff),90000,"Encode OGG");
+      await withTimeout(ffmpeg.exec(ff),90000,"Encode "+fmt.label);
       var data=await ffmpeg.readFile(out);
       var blob=new Blob([data.buffer],{type:fmt.mime});
       it.url=URL.createObjectURL(blob);it.blobData=blob;it.size=blob.size;
-
-      var baseName = it.file.name.replace(/\.[^/.]+$/,'');
+      
+      var baseName = it.customName || it.file.name.replace(/\.[^/.]+$/, "");
+      baseName = baseName.replace(/\.[^/.]+$/, "");
       var suffix = '_2.3YL';
       var maxBaseLength = 50 - suffix.length - fmt.ext.length;
       if (baseName.length > maxBaseLength) baseName = baseName.substring(0, maxBaseLength);
       it.dlName = baseName + suffix + fmt.ext;
-
+      
       it.status='done';useQuota(c.src);updateQuotaDisplay();
-      logLine('success',it.file.name+' berhasil dikonversi ke OGG');
+      logLine('success',it.file.name+' berhasil dikonversi');
       await ffmpeg.deleteFile(inp).catch(function(){});await ffmpeg.deleteFile(out).catch(function(){});
     }catch(err){
       it.status='pending';refundQuota(c.src);updateQuotaDisplay();
@@ -1476,9 +1302,9 @@ async function startProcess(){
     }
     renderList();
   }
-
+  
   $progFill.style.width="100%";$progTxt.innerText="100%";
-  logLine('done','Semua tugas convert selesai');
+  logLine('done','Semua tugas selesai');
   $btn.disabled=false;
 }
 updateQuotaDisplay();
