@@ -203,7 +203,14 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
     </div>
   </div>
   <div id="navRight" class="flex items-center gap-2" style="margin-left:auto">
-    <div id="loginArea" class="flex items-center gap-2"><div id="googleBtnContainer"></div></div>
+    <div id="loginArea" class="flex items-center gap-2">
+      <div id="googleBtnContainer"></div>
+      <div id="manualLoginWrap" class="hidden flex items-center gap-2">
+        <input type="email" id="manualEmailInput" class="input-f" style="width:160px;padding:6px 10px;font-size:11px" placeholder="Email Anda" onkeydown="if(event.key==='Enter')doManualLogin()">
+        <button onclick="doManualLogin()" class="btn-primary" style="padding:6px 12px;font-size:11px"><i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+      <button id="toggleManualBtn" onclick="toggleManualLogin()" class="btn-ghost" style="padding:4px 8px;font-size:10px" title="Login Manual"><i class="fa-solid fa-user" style="font-size:10px"></i></button>
+    </div>
     <div id="userChip" class="hidden items-center gap-2">
       <img id="userAvatar" src="" alt="" style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.1)">
       <span id="userName" class="text-xs text-zinc-400 hidden sm:inline max-w-[90px] truncate"></span>
@@ -903,17 +910,30 @@ function handleLogout(){
   try{localStorage.removeItem('convyl_user');}catch(e){}
   state.email=null;state.name=null;state.credits=0;state.isSubscribed=false;state.subExpiry=null;state.freeUsed=false;
   state.rbxKey=null;state.rbxUserId=null;
-  $loginArea.classList.remove('hidden');$userChip.classList.add('hidden');$mainCard.classList.add('hidden');if($loggedOutHero)$loggedOutHero.classList.remove('hidden');
+  $loginArea.classList.remove('hidden');$userChip.classList.add('hidden');$mainCard.classList.add('hidden');if($loggedOutHero)$loggedOutHero.classList.add('hidden');
+  // Reset manual login UI
+  $('manualLoginWrap').classList.add('hidden');
+  $('toggleManualBtn').innerHTML='<i class="fa-solid fa-user" style="font-size:10px"></i>';
+  $('manualEmailInput').value='';
 }
  $logoutBtn.addEventListener('click',handleLogout);
+var googleInitAttempts=0;
 function initGoogleLogin(){
   if(isInApp)return;
+  googleInitAttempts++;
+  if(googleInitAttempts>30){console.warn('Google GSI max retries reached');return;}
+
   if(typeof google==='undefined'||!google.accounts||!google.accounts.id){
-    setTimeout(initGoogleLogin,500);
+    setTimeout(initGoogleLogin,600);
     return;
   }
   try{
-    google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:handleCredentialResponse});
+    google.accounts.id.initialize({
+      client_id:GOOGLE_CLIENT_ID,
+      callback:handleCredentialResponse,
+      auto_select:false,
+      cancel_on_tap_outside:true
+    });
     var container=$('googleBtnContainer');
     if(container){
       container.innerHTML='';
@@ -926,10 +946,11 @@ function initGoogleLogin(){
         logo_alignment:"left",
         width:180
       });
+      console.log('Google Sign-In button rendered');
     }
   }catch(err){
     console.error('Google init error:',err);
-    setTimeout(initGoogleLogin,800);
+    setTimeout(initGoogleLogin,1000);
     return;
   }
   try{
@@ -944,10 +965,42 @@ function initGoogleLogin(){
   }catch(e){}
 }
 
+// ===== MANUAL LOGIN FALLBACK =====
+function toggleManualLogin(){
+  var wrap=$('manualLoginWrap');
+  var btn=$('toggleManualBtn');
+  if(wrap.classList.contains('hidden')){
+    wrap.classList.remove('hidden');
+    btn.innerHTML='<i class="fa-solid fa-xmark" style="font-size:10px"></i>';
+    setTimeout(function(){$('manualEmailInput').focus();},100);
+  }else{
+    wrap.classList.add('hidden');
+    btn.innerHTML='<i class="fa-solid fa-user" style="font-size:10px"></i>';
+  }
+}
+function doManualLogin(){
+  var email=$('manualEmailInput').value.trim();
+  if(!email||!email.includes('@')){toast('Masukkan email valid','err');return;}
+  var fakeProfile={email:email,name:email.split('@')[0],picture:''};
+  state.email=fakeProfile.email;state.name=fakeProfile.name;state.freeUsed=false;
+  $userAvatar.src='';$userName.textContent=state.name;
+  $loginArea.classList.add('hidden');$userChip.classList.remove('hidden');$mainCard.classList.remove('hidden');if($loggedOutHero)$loggedOutHero.classList.add('hidden');
+  loadLocal(state.email);loadRbxLocal();updateQuotaDisplay();
+  try{localStorage.setItem('convyl_user',JSON.stringify(fakeProfile));}catch(e){}
+  toast('Login manual berhasil','ok');
+}
+
 // Panggil setelah DOM ready dan library siap
 document.addEventListener('DOMContentLoaded',function(){
   if(!isInApp){
-    setTimeout(initGoogleLogin,300);
+    setTimeout(function(){initGoogleLogin();},500);
+    // Cek ulang setelah 3 detik jika tombol belum muncul
+    setTimeout(function(){
+      var container=$('googleBtnContainer');
+      if(container&&container.children.length===0){
+        console.warn('Google button not rendered after 3s. Possible causes: 1) Client ID not whitelisted for this domain, 2) CSP blocking, 3) GSI library failed to load.');
+      }
+    },3500);
   }
 });
 
