@@ -706,11 +706,14 @@ async function uploadToRoblox(idx){
   if(!state.rbxKey||!state.rbxUserId){openRbxModal();toast('Lengkapi API Key & User ID dulu','info');return;}
   var b=document.getElementById('rbx_'+idx);if(!b||b.disabled)return;
   b.disabled=true;b.className='rbx-btn loading';b.innerHTML='<span class="spinner"></span> Upload...';
+  var rawName = it.customName || it.file.name.replace(/\.[^/.]+$/,'');
+  var safeName = truncateName(rawName, 50);
+  var assetEntry={name:safeName,assetId:null,status:'pending'};
+  rbxAssets.push(assetEntry);
+  renderRbxAssets();
   try{
     var fd=new FormData();
     fd.append('api_key',state.rbxKey);
-    var rawName = it.customName || it.file.name.replace(/\.[^/.]+$/,'');
-    var safeName = truncateName(rawName, 50);
     fd.append('request',JSON.stringify({
       assetType:'Audio',
       displayName:safeName,
@@ -721,18 +724,64 @@ async function uploadToRoblox(idx){
     var res=await fetch(ROBLOX_PROXY_URL,{method:'POST',body:fd});
     var data=await res.json();
     if(!res.ok)throw new Error(data.error||data.message||'HTTP '+res.status);
-    var aid=data.assetId||data.path;
-    b.disabled=false;b.className='rbx-btn done';b.innerHTML='<i class="fas fa-check"></i> '+aid;b.title='Klik salin';b.style.cursor='pointer';
-    b.onclick=function(){navigator.clipboard.writeText(String(aid)).then(function(){toast('Asset ID '+aid+' disalin','ok');});};
-    rbxAssets.push({name:safeName,assetId:aid});
-    renderRbxAssets();
-    toast('Upload berhasil! ID: '+aid,'ok');
-    logLine('upload','Roblox upload berhasil, ID: '+aid);
+
+    var aid=extractRbxAssetId(data);
+    if(aid){ finishRbxUpload(assetEntry,b,aid); return; }
+
+    var opPath=data.path;
+    if(!opPath) throw new Error('Response tidak dikenali dari Roblox (tidak ada assetId/path)');
+    b.className='rbx-btn loading';b.innerHTML='<span class="spinner"></span> Moderasi...';
+    logLine('upload','Upload terkirim, menunggu moderasi Roblox...');
+    pollRobloxOperation(assetEntry,b,opPath,0);
   }catch(err){
+    assetEntry.status='error';
+    renderRbxAssets();
     b.disabled=false;b.className='rbx-btn idle';b.innerHTML='<i class="fas fa-rotate-right"></i> Coba Lagi';
     toast('Gagal: '+(err.message||'').substring(0,100),'err');
     logLine('error','Roblox upload gagal: '+(err.message||''));
   }
+}
+function extractRbxAssetId(data){
+  if(!data)return null;
+  if(data.assetId)return data.assetId;
+  if(data.done===true && data.response && data.response.assetId)return data.response.assetId;
+  return null;
+}
+var RBX_POLL_INTERVAL_MS=4000, RBX_POLL_MAX_ATTEMPTS=45; /* ~3 menit */
+function pollRobloxOperation(assetEntry,b,opPath,attempt){
+  if(attempt>=RBX_POLL_MAX_ATTEMPTS){
+    assetEntry.status='error';renderRbxAssets();
+    if(b){b.disabled=false;b.className='rbx-btn idle';b.innerHTML='<i class="fas fa-rotate-right"></i> Coba Lagi';}
+    toast('Moderasi Roblox lama, coba cek manual nanti','err');
+    logLine('error','Polling moderasi timeout untuk "'+assetEntry.name+'"');
+    return;
+  }
+  setTimeout(async function(){
+    try{
+      var fd=new FormData();
+      fd.append('api_key',state.rbxKey);
+      fd.append('operation_path',opPath);
+      var res=await fetch(ROBLOX_PROXY_URL,{method:'POST',body:fd});
+      var data=await res.json();
+      if(!res.ok)throw new Error(data.error||data.message||'HTTP '+res.status);
+      var aid=extractRbxAssetId(data);
+      if(aid){ finishRbxUpload(assetEntry,b,aid); }
+      else { pollRobloxOperation(assetEntry,b,opPath,attempt+1); }
+    }catch(err){
+      pollRobloxOperation(assetEntry,b,opPath,attempt+1);
+    }
+  },RBX_POLL_INTERVAL_MS);
+}
+function finishRbxUpload(assetEntry,b,aid){
+  assetEntry.assetId=aid;
+  assetEntry.status='done';
+  renderRbxAssets();
+  if(b){
+    b.disabled=false;b.className='rbx-btn done';b.innerHTML='<i class="fas fa-check"></i> '+aid;b.title='Klik salin';b.style.cursor='pointer';
+    b.onclick=function(){navigator.clipboard.writeText(String(aid)).then(function(){toast('Asset ID '+aid+' disalin','ok');});};
+  }
+  toast('Lolos moderasi! ID: '+aid,'ok');
+  logLine('upload','Roblox upload berhasil & lolos moderasi, ID: '+aid);
 }
 
 function renderRbxAssets(){
@@ -741,9 +790,27 @@ function renderRbxAssets(){
   if(rbxAssets.length===0){$p.classList.add('hidden');$l.innerHTML='';return;}
   $p.classList.remove('hidden');
   $l.innerHTML=rbxAssets.map(function(a,i){
+    if(a.status==='pending'){
+      return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row fade-up">'+
+        '<div class="row-index" style="background:rgba(129,140,248,.15);color:#a5b4fc"><span class="spinner"></span></div>'+
+        '<div class="flex-1 min-w-0">'+
+          '<div class="text-xs font-medium text-zinc-300 truncate flex items-center gap-2"><i class="fa-solid fa-music text-indigo-400" style="font-size:10px"></i> '+a.name+'</div>'+
+          '<div class="text-[10px] text-indigo-400/80 mt-0.5 flex items-center gap-1.5"><span class="spinner" style="width:8px;height:8px"></span> Menunggu moderasi Roblox...</div>'+
+        '</div>'+
+      '</div>';
+    }
+    if(a.status==='error'){
+      return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row fade-up">'+
+        '<div class="row-index" style="background:rgba(248,113,113,.15);color:#f87171"><i class="fa-solid fa-xmark" style="font-size:11px"></i></div>'+
+        '<div class="flex-1 min-w-0">'+
+          '<div class="text-xs font-medium text-zinc-300 truncate">'+a.name+'</div>'+
+          '<div class="text-[10px] text-red-400/80 mt-0.5">Gagal / timeout menunggu moderasi</div>'+
+        '</div>'+
+      '</div>';
+    }
     var u='rbxassetid://'+a.assetId;
     return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row fade-up">'+
-      '<div class="row-index" style="background:rgba(52,211,153,.15);color:#4ade80">'+(i+1)+'</div>'+
+      '<div class="row-index" style="background:rgba(52,211,153,.15);color:#4ade80"><i class="fa-solid fa-check" style="font-size:10px"></i></div>'+
       '<div class="flex-1 min-w-0">'+
         '<div class="text-xs font-medium text-zinc-300 truncate flex items-center gap-2"><i class="fa-solid fa-music text-emerald-500" style="font-size:10px"></i> '+a.name+'</div>'+
         '<div class="text-[10px] text-emerald-500/70 mt-0.5 flex items-center gap-1.5 truncate"><i class="fa-solid fa-circle-check" style="font-size:9px"></i> '+u+'</div>'+
@@ -755,7 +822,7 @@ function renderRbxAssets(){
   }).join('');
 }
 function copyRbxAsset(i){
-  if(rbxAssets[i]){
+  if(rbxAssets[i] && rbxAssets[i].status==='done'){
     var u='rbxassetid://'+rbxAssets[i].assetId;
     navigator.clipboard.writeText(u).then(function(){toast('Disalin: '+u,'ok');});
   }
