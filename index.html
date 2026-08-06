@@ -48,9 +48,6 @@ body{background:#0a0a0d;color:#e4e4e7;overflow-x:hidden}
 .modal-bg.show{opacity:1;pointer-events:auto}
 .modal-box{background:#121214;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:24px;max-width:480px;width:92%;max-height:88vh;overflow-y:auto;transform:scale(.94) translateY(10px);transition:transform .3s cubic-bezier(.16,1,.3,1);box-shadow:0 20px 50px rgba(0,0,0,.5)}
 .modal-bg.show .modal-box{transform:scale(1) translateY(0)}
-.fmt-card{border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px;background:rgba(255,255,255,.03);transition:all .2s ease;cursor:pointer}
-.fmt-card:hover{border-color:rgba(129,140,248,.3);background:rgba(255,255,255,.05)}
-.fmt-card.chosen{border-color:rgba(129,140,248,.5);background:rgba(129,140,248,.08);box-shadow:0 0 20px rgba(129,140,248,.1)}
 .pay-card{border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:18px;background:rgba(255,255,255,.03);transition:all .25s ease;cursor:pointer}
 .pay-card:hover{border-color:rgba(129,140,248,.3);background:rgba(255,255,255,.05)}
 .pay-card.chosen{border-color:rgba(129,140,248,.6);background:rgba(129,140,248,.08);box-shadow:0 0 24px rgba(129,140,248,.12)}
@@ -165,6 +162,16 @@ input[type="range"]::-moz-range-thumb{width:14px;height:14px;background:#818cf8;
 .pm-row-playing{background:rgba(129,140,248,.06)!important;border-color:rgba(129,140,248,.2)!important}
 input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointer}
 
+/* ===== LOADING MODAL ===== */
+.loading-modal-box{background:#121214;border:1px solid rgba(129,140,248,.2);border-radius:16px;padding:32px;max-width:380px;width:92%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.6)}
+.loading-spinner{width:40px;height:40px;border:3px solid rgba(129,140,248,.15);border-top-color:#818cf8;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
+.loading-text{font-size:13px;color:#a1a1aa;line-height:1.6}
+.loading-text b{color:#c4b5fd}
+
+/* ===== UPLOAD LIST PANEL ===== */
+.upload-list-item{cursor:pointer;transition:all .2s ease;border:1px solid transparent}
+.upload-list-item:hover{border-color:rgba(129,140,248,.25);background:rgba(129,140,248,.04)}
+
 @media(max-width:900px){
   .hamburger-btn{display:flex}
   .app-layout{position:relative}
@@ -175,6 +182,7 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
   .main-dashboard{grid-template-columns:1fr;padding:14px}
 }
 </style>
+<base target="_blank">
 </head>
 <body class="min-h-screen">
 
@@ -230,7 +238,7 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
     </div>
 
     <div class="side-footer">
-      ConverterYL v2.0.0<br>&copy; 2026 ConverterYL. All rights reserved.
+      ConverterYL v2.1.0<br>&copy; 2026 ConverterYL. All rights reserved.
     </div>
   </aside>
 
@@ -243,10 +251,10 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
 
       <div class="panel">
         <div class="panel-head">
-          <span class="panel-title"><i class="fa-solid fa-list text-indigo-400" style="font-size:12px"></i> Evolution List</span>
+          <span class="panel-title"><i class="fa-solid fa-list text-indigo-400" style="font-size:12px"></i> Daftar Convert</span>
           <button onclick="selectAllItems()" class="btn-ghost" style="padding:4px 10px;font-size:10px"><i class="fa-solid fa-check-double"></i> Pilih Semua</button>
         </div>
-        <div class="text-[10px] text-zinc-500 mb-2">Centang file, lalu gunakan tombol Convert/Upload di panel kanan.</div>
+        <div class="text-[10px] text-zinc-500 mb-2">Centang file, lalu klik Convert.</div>
         <div id="fileList" class="flex flex-col gap-1.5"></div>
       </div>
 
@@ -262,7 +270,10 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
       <div class="panel">
         <div class="panel-head">
           <span class="panel-title"><i class="fa-solid fa-clock-rotate-left text-indigo-400" style="font-size:12px"></i> Riwayat File</span>
-          <button onclick="clearHistoryConsole()" class="btn-ghost" style="padding:4px 10px;font-size:10px"><i class="fa-solid fa-trash" style="font-size:9px"></i> Clear</button>
+          <div class="flex items-center gap-2">
+            <button onclick="copyAllRbxIds()" class="btn-ghost" style="padding:4px 10px;font-size:10px" title="Copy semua Asset ID"><i class="fa-solid fa-copy" style="font-size:9px"></i> Copy All</button>
+            <button onclick="clearHistoryConsole()" class="btn-ghost" style="padding:4px 10px;font-size:10px"><i class="fa-solid fa-trash" style="font-size:9px"></i> Clear</button>
+          </div>
         </div>
         <div id="historyConsole" class="log-console" style="max-height:160px"></div>
       </div>
@@ -311,7 +322,7 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
             <div class="action-icon" style="background:linear-gradient(135deg,#60a5fa,#818cf8)"><i class="fa-solid fa-rotate"></i></div>
             <div class="min-w-0 flex-1 text-left">
               <div class="text-xs font-semibold text-zinc-200 truncate">Convert</div>
-              <div class="text-[10px] text-zinc-600 truncate hidden lg:block">Proses format</div>
+              <div class="text-[10px] text-zinc-600 truncate hidden lg:block">Proses ke OGG</div>
             </div>
           </button>
           <button class="action-row" onclick="downloadAllFiles()">
@@ -336,10 +347,20 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
           <div class="text-center text-[10px] text-zinc-600 mt-1" id="progTxt">0%</div>
         </div>
       </div>
+
+      <!-- PANEL DAFTAR UPLOAD (BARU) -->
+      <div class="panel">
+        <div class="panel-head">
+          <span class="panel-title"><i class="fa-solid fa-inbox text-amber-400" style="font-size:12px"></i> Daftar Upload</span>
+          <span id="uploadCountBadge" class="badge" style="background:rgba(255,255,255,.05);color:#71717a;border:1px solid rgba(255,255,255,.08);font-size:9px">0 Files</span>
+        </div>
+        <div class="text-[10px] text-zinc-500 mb-2">Klik lagu untuk edit EQ atau langsung convert.</div>
+        <div id="uploadList" class="flex flex-col gap-1.5"></div>
+      </div>
     </div>
   </main>
 
-  <!-- ===== VIEW PLAYMODE (BARU) ===== -->
+  <!-- ===== VIEW PLAYMODE ===== -->
   <main class="main-dashboard hidden" id="view-playmode">
     <div class="dash-col">
       <div class="panel">
@@ -347,7 +368,7 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
           <span class="panel-title"><i class="fa-solid fa-circle-play text-indigo-400" style="font-size:12px"></i> Player & Equalizer</span>
           <span class="badge" style="background:rgba(255,255,255,.05);color:#71717a;border:1px solid rgba(255,255,255,.08)">Web Audio API</span>
         </div>
-        
+
         <div class="pm-player mb-4">
           <audio id="pmAudio" style="display:none"></audio>
           <div class="flex items-center gap-3">
@@ -412,7 +433,7 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
           <button class="pm-preset-btn" onclick="applyPmPreset('vocal')"><i class="fa-solid fa-microphone"></i> Vocal Clarity</button>
           <button class="pm-preset-btn" onclick="applyPmPreset('balanced')"><i class="fa-solid fa-scale-balanced"></i> Balanced</button>
         </div>
-        
+
         <div class="mt-4 p-3 rounded-lg" style="background:rgba(129,140,248,.05);border:1px solid rgba(129,140,248,.1)">
           <div class="flex items-center gap-2 text-xs text-zinc-300 mb-2">
             <i class="fa-solid fa-circle-info text-indigo-400"></i> Setelah selesai, EQ akan diterapkan saat convert.
@@ -425,7 +446,7 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
     <div class="dash-col">
       <div class="panel">
         <div class="panel-head">
-          <span class="panel-title"><i class="fa-solid fa-list text-emerald-400" style="font-size:12px"></i> Uploaded Files (Preview)</span>
+          <span class="panel-title"><i class="fa-solid fa-list text-emerald-400" style="font-size:12px"></i> Daftar Lagu</span>
         </div>
         <div id="pmPlaylist" class="flex flex-col gap-1.5"></div>
       </div>
@@ -440,13 +461,15 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
   <p class="text-sm text-zinc-500 max-w-md mx-auto leading-relaxed fade-up">Edit kecepatan audio, upload langsung ke Roblox. Masuk dengan Google untuk mulai.</p>
 </div>
 
-<!-- MODAL ASK EDIT (SIMPLIFIED) -->
+<!-- MODAL ASK EDIT EQ -->
 <div class="modal-bg" id="askEditModal">
-  <div class="modal-box scale-in text-center" style="max-width:300px">
-    <h3 class="text-base font-bold mb-4">Ingin edit dulu?</h3>
+  <div class="modal-box scale-in text-center" style="max-width:340px">
+    <div class="w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:rgba(129,140,248,.1)"><i class="fa-solid fa-sliders text-indigo-400 text-lg"></i></div>
+    <h3 class="text-sm font-bold mb-1">Edit / Tambahkan Preset EQ?</h3>
+    <p class="text-[11px] text-zinc-500 mb-4">Atur equalizer untuk lagu ini sebelum convert.</p>
     <div class="flex gap-2">
-      <button onclick="closeAskEdit(false)" class="btn-ghost flex-1 py-2.5 text-sm">Tidak</button>
-      <button onclick="closeAskEdit(true)" class="btn-primary flex-1 py-2.5 text-sm">Ya</button>
+      <button onclick="closeAskEdit(false)" class="btn-ghost flex-1 py-2.5 text-xs">Tidak</button>
+      <button onclick="closeAskEdit(true)" class="btn-primary flex-1 py-2.5 text-xs">Ya</button>
     </div>
   </div>
 </div>
@@ -462,42 +485,16 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
   </div>
 </div>
 
-<!-- MODAL FORMAT -->
-<div class="modal-bg" id="fmtModal">
-  <div class="modal-box scale-in" style="max-width:400px">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="text-base font-bold flex items-center gap-2"><i class="fa-solid fa-file-audio text-indigo-400 text-sm"></i> Format Output</h3>
+<!-- MODAL LOADING EQ -->
+<div class="modal-bg" id="eqLoadingModal">
+  <div class="loading-modal-box scale-in">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">
+      <b>Memproses...</b><br>
+      Memindahkan lagu ke daftar list,<br>
+      membersihkan file mentah<br>
+      lalu memindahkan ke daftar convert.
     </div>
-    <div class="space-y-1.5">
-      <div class="fmt-card chosen" data-fmt="ogg" onclick="pickFmt(this)">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-lg flex items-center justify-center text-[11px] font-bold" style="background:rgba(251,146,60,.1);color:#fb923c">OGG</div>
-            <div><div class="text-sm font-semibold text-zinc-200">OGG Vorbis</div><div class="text-[10px] text-zinc-600">Roblox compatible</div></div>
-          </div>
-          <span class="badge" style="background:rgba(251,146,60,.1);color:#fb923c;border:1px solid rgba(251,146,60,.15);font-size:9px">REC</span>
-        </div>
-      </div>
-      <div class="fmt-card" data-fmt="mp3" onclick="pickFmt(this)">
-        <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-lg flex items-center justify-center text-[11px] font-bold" style="background:rgba(96,165,250,.1);color:#60a5fa">MP3</div>
-          <div><div class="text-sm font-semibold text-zinc-200">MP3</div><div class="text-[10px] text-zinc-600">Kompak, universal</div></div>
-        </div>
-      </div>
-      <div class="fmt-card" data-fmt="wav" onclick="pickFmt(this)">
-        <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-lg flex items-center justify-center text-[11px] font-bold" style="background:rgba(167,139,250,.1);color:#a78bfa">WAV</div>
-          <div><div class="text-sm font-semibold text-zinc-200">WAV</div><div class="text-[10px] text-zinc-600">Lossless, file besar</div></div>
-        </div>
-      </div>
-      <div class="fmt-card" data-fmt="flac" onclick="pickFmt(this)">
-        <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-lg flex items-center justify-center text-[11px] font-bold" style="background:rgba(244,114,182,.1);color:#f472b6">FLAC</div>
-          <div><div class="text-sm font-semibold text-zinc-200">FLAC</div><div class="text-[10px] text-zinc-600">Lossless kompresi</div></div>
-        </div>
-      </div>
-    </div>
-    <button id="fmtBtn" onclick="startProcess()" class="btn-primary w-full justify-center mt-4 py-2.5 text-sm">Mulai Edit — OGG</button>
   </div>
 </div>
 
@@ -576,33 +573,27 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
   </div>
 </div>
 
-<!-- MODAL RENAME -->
-<div class="modal-bg" id="renameModal">
-  <div class="modal-box scale-in" style="max-width:380px">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="text-base font-bold flex items-center gap-2"><i class="fa-solid fa-pen text-indigo-400 text-sm"></i> Rename File</h3>
-      <button onclick="closeRenameModal()" class="w-7 h-7 rounded-lg flex items-center justify-center text-zinc-500 hover:text-zinc-200 transition-colors" style="background:rgba(255,255,255,.05)"><i class="fa-solid fa-xmark text-xs"></i></button>
-    </div>
-    <div id="renameWarn" class="hidden p-3 rounded-lg mb-3 text-[10px] text-orange-400 leading-relaxed" style="background:rgba(251,146,60,.05);border:1px solid rgba(251,146,60,.1)">
-      <i class="fa-solid fa-triangle-exclamation"></i> Nama file terlalu panjang (maks 50 karakter termasuk suffix). Silakan ubah nama.
-    </div>
-    <label class="block text-[11px] font-medium text-zinc-400 mb-1.5">Nama File Baru</label>
-    <input type="text" id="renameInput" class="input-f text-sm" placeholder="Masukkan nama file">
-    <p class="text-[10px] text-zinc-600 mt-1.5">Suffix <b>_2.3YL</b> akan ditambahkan otomatis.</p>
-    <button onclick="saveRename()" class="btn-primary w-full justify-center mt-4 py-2.5 text-sm"><i class="fa-solid fa-check"></i> Simpan Nama</button>
-  </div>
-</div>
-
 <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
 <script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
 <script>
 var CONFIG_MODE='demo',API_BASE='https://backend-kamu.contoh.workers.dev',MAX_FILES=10;
 var ROBLOX_PROXY_URL='https://convertyaall-proxy.binomo2b.workers.dev';
-var FORMATS={ogg:{ext:'.ogg',mime:'audio/ogg',args:['-c:a','libvorbis'],label:'OGG'},mp3:{ext:'.mp3',mime:'audio/mpeg',args:['-c:a','libmp3lame'],label:'MP3'},wav:{ext:'.wav',mime:'audio/wav',args:['-c:a','pcm_s16le'],label:'WAV'},flac:{ext:'.flac',mime:'audio/flac',args:['-c:a','flac'],label:'FLAC'}};
+// Format tetap OGG saja
+var FORMATS={ogg:{ext:'.ogg',mime:'audio/ogg',args:['-c:a','libvorbis'],label:'OGG'}};
 var $=function(id){return document.getElementById(id)};
-var $box=$('box'),$boxTitle=$('boxTitle'),$boxSub=$('boxSub'),$fileInput=$('audioFile'),$fileList=$('fileList'),$btn=$('btn'),$status=$('status'),$progWrap=$('progWrap'),$progFill=$('progFill'),$progTxt=$('progTxt'),$warnBanner=$('warnBanner'),$loginArea=$('loginArea'),$mainCard=$('mainCard'),$userChip=$('userChip'),$userAvatar=$('userAvatar'),$userName=$('userName'),$logoutBtn=$('logoutBtn'),$creditChip=$('creditChip'),$creditText=$('creditText'),$quotaText=$('quotaText'),$quotaDot=$('quotaDot'),$planBadge=$('planBadge'),$payModal=$('payModal'),$payBtn=$('payBtn'),$successModal=$('successModal'),$successMsg=$('successMsg'),$customSpeedWrap=$('customSpeedWrap'),$customSpeedInput=$('customSpeedInput'),$fmtModal=$('fmtModal'),$fmtBtn=$('fmtBtn'),$rbxModal=$('rbxModal'),$rbxKeyInput=$('rbxKeyInput'),$rbxUserIdInput=$('rbxUserIdInput'),$upgradeModal=$('upgradeModal'),$sidebar=$('sidebar'),$sidebarOverlay=$('sidebarOverlay'),$logConsole=$('logConsole'),$historyConsole=$('historyConsole'),$fileCountBadge=$('fileCountBadge'),$loggedOutHero=$('loggedOutHero');
+var $fileInput=$('audioFile'),$fileList=$('fileList'),$uploadList=$('uploadList'),$uploadCountBadge=$('uploadCountBadge');
+var $btn=$('btn'),$status=$('status'),$progWrap=$('progWrap'),$progFill=$('progFill'),$progTxt=$('progTxt');
+var $warnBanner=$('warnBanner'),$loginArea=$('loginArea'),$mainCard=$('mainCard');
+var $userChip=$('userChip'),$userAvatar=$('userAvatar'),$userName=$('userName'),$logoutBtn=$('logoutBtn');
+var $creditChip=$('creditChip'),$creditText=$('creditText'),$quotaText=$('quotaText'),$quotaDot=$('quotaDot'),$planBadge=$('planBadge');
+var $payModal=$('payModal'),$payBtn=$('payBtn'),$successModal=$('successModal'),$successMsg=$('successMsg');
+var $customSpeedWrap=$('customSpeedWrap'),$customSpeedInput=$('customSpeedInput');
+var $rbxModal=$('rbxModal'),$rbxKeyInput=$('rbxKeyInput'),$rbxUserIdInput=$('rbxUserIdInput');
+var $upgradeModal=$('upgradeModal'),$sidebar=$('sidebar'),$sidebarOverlay=$('sidebarOverlay');
+var $logConsole=$('logConsole'),$historyConsole=$('historyConsole'),$loggedOutHero=$('loggedOutHero');
 
 var rbxAssets=[];
+var rbxHistory=[]; // [{name, assetId, time}]
 
 function toggleSidebar(){$sidebar.classList.toggle('open');$sidebarOverlay.classList.toggle('show');}
 function logLine(tag,msg){
@@ -619,18 +610,29 @@ function logLine(tag,msg){
 function clearLogConsole(){if($logConsole)$logConsole.innerHTML='';}
 
 /* ===== HISTORY (file mentah & editan sebelum convert) ===== */
-function historyLine(tag,msg){
+function historyLine(tag,msg,assetId){
   if(!$historyConsole)return;
   var cls=String(tag).toLowerCase();
   var time=new Date().toLocaleTimeString('id-ID',{hour12:false});
   var row=document.createElement('div');
   row.className='log-line fade-in';
-  row.innerHTML='<span class="log-tag '+cls+'">['+String(tag).toUpperCase()+']</span><span class="log-time">'+time+'</span><span class="log-msg"></span>';
+  var assetBtn = assetId ? ' <button class="btn-ghost" style="padding:2px 6px;font-size:9px;margin-left:4px" onclick="copySingleRbxId(''+assetId+'')" title="Copy"><i class="fa-solid fa-copy" style="font-size:8px"></i></button>' : '';
+  row.innerHTML='<span class="log-tag '+cls+'">['+String(tag).toUpperCase()+']</span><span class="log-time">'+time+'</span><span class="log-msg"></span>'+assetBtn;
   row.querySelector('.log-msg').textContent=msg;
   $historyConsole.appendChild(row);
   $historyConsole.scrollTop=$historyConsole.scrollHeight;
 }
-function clearHistoryConsole(){if($historyConsole)$historyConsole.innerHTML='';}
+function clearHistoryConsole(){if($historyConsole)$historyConsole.innerHTML='';rbxHistory=[];}
+
+function copySingleRbxId(assetId){
+  navigator.clipboard.writeText('rbxassetid://'+assetId).then(function(){toast('Disalin: rbxassetid://'+assetId,'ok');});
+}
+function copyAllRbxIds(){
+  if(!rbxHistory.length){toast('Belum ada Asset ID di riwayat','info');return;}
+  var lines=rbxHistory.map(function(h){return h.name+' = rbxassetid://'+h.assetId;}).join('\n');
+  navigator.clipboard.writeText(lines).then(function(){toast('Semua Asset ID disalin ('+rbxHistory.length+')','ok');});
+}
+
 function downloadAllFiles(){
   var doneItems=items.filter(function(x){return x.status==='done';});
   if(!doneItems.length){toast('Belum ada file siap diunduh.','info');return;}
@@ -706,7 +708,7 @@ async function uploadToRoblox(idx){
   if(!state.rbxKey||!state.rbxUserId){openRbxModal();toast('Lengkapi API Key & User ID dulu','info');return;}
   var b=document.getElementById('rbx_'+idx);if(!b||b.disabled)return;
   b.disabled=true;b.className='rbx-btn loading';b.innerHTML='<span class="spinner"></span> Upload...';
-  var rawName = it.customName || it.file.name.replace(/\.[^/.]+$/,'');
+  var rawName = it.file.name.replace(/\.[^/.]+$/,'');
   var safeName = truncateName(rawName, 50);
   var assetEntry={name:safeName,assetId:null,status:'pending'};
   rbxAssets.push(assetEntry);
@@ -726,17 +728,17 @@ async function uploadToRoblox(idx){
     if(!res.ok)throw new Error(data.error||data.message||'HTTP '+res.status);
 
     var aid=extractRbxAssetId(data);
-    if(aid){ finishRbxUpload(assetEntry,b,aid); return; }
+    if(aid){ finishRbxUpload(assetEntry,b,aid,rawName); return; }
 
     var opPath=data.path;
     if(!opPath) throw new Error('Response tidak dikenali dari Roblox (tidak ada assetId/path)');
     b.className='rbx-btn loading';b.innerHTML='<span class="spinner"></span> Moderasi...';
     logLine('upload','Upload terkirim, menunggu moderasi Roblox...');
-    pollRobloxOperation(assetEntry,b,opPath,0);
+    pollRobloxOperation(assetEntry,b,opPath,0,rawName);
   }catch(err){
     assetEntry.status='error';
     renderRbxAssets();
-    b.disabled=false;b.className='rbx-btn idle';b.innerHTML='<i class="fas fa-rotate-right"></i> Coba Lagi';
+    b.disabled=false;b.className='rbx-btn idle';b.innerHTML='<i class="fa-solid fa-rotate-right" style="font-size:10px"></i> Coba Lagi';
     toast('Gagal: '+(err.message||'').substring(0,100),'err');
     logLine('error','Roblox upload gagal: '+(err.message||''));
   }
@@ -747,11 +749,11 @@ function extractRbxAssetId(data){
   if(data.done===true && data.response && data.response.assetId)return data.response.assetId;
   return null;
 }
-var RBX_POLL_INTERVAL_MS=4000, RBX_POLL_MAX_ATTEMPTS=45; /* ~3 menit */
-function pollRobloxOperation(assetEntry,b,opPath,attempt){
+var RBX_POLL_INTERVAL_MS=4000, RBX_POLL_MAX_ATTEMPTS=45;
+function pollRobloxOperation(assetEntry,b,opPath,attempt,rawName){
   if(attempt>=RBX_POLL_MAX_ATTEMPTS){
     assetEntry.status='error';renderRbxAssets();
-    if(b){b.disabled=false;b.className='rbx-btn idle';b.innerHTML='<i class="fas fa-rotate-right"></i> Coba Lagi';}
+    if(b){b.disabled=false;b.className='rbx-btn idle';b.innerHTML='<i class="fa-solid fa-rotate-right" style="font-size:10px"></i> Coba Lagi';}
     toast('Moderasi Roblox lama, coba cek manual nanti','err');
     logLine('error','Polling moderasi timeout untuk "'+assetEntry.name+'"');
     return;
@@ -765,21 +767,24 @@ function pollRobloxOperation(assetEntry,b,opPath,attempt){
       var data=await res.json();
       if(!res.ok)throw new Error(data.error||data.message||'HTTP '+res.status);
       var aid=extractRbxAssetId(data);
-      if(aid){ finishRbxUpload(assetEntry,b,aid); }
-      else { pollRobloxOperation(assetEntry,b,opPath,attempt+1); }
+      if(aid){ finishRbxUpload(assetEntry,b,aid,rawName); }
+      else { pollRobloxOperation(assetEntry,b,opPath,attempt+1,rawName); }
     }catch(err){
-      pollRobloxOperation(assetEntry,b,opPath,attempt+1);
+      pollRobloxOperation(assetEntry,b,opPath,attempt+1,rawName);
     }
   },RBX_POLL_INTERVAL_MS);
 }
-function finishRbxUpload(assetEntry,b,aid){
+function finishRbxUpload(assetEntry,b,aid,rawName){
   assetEntry.assetId=aid;
   assetEntry.status='done';
   renderRbxAssets();
   if(b){
-    b.disabled=false;b.className='rbx-btn done';b.innerHTML='<i class="fas fa-check"></i> '+aid;b.title='Klik salin';b.style.cursor='pointer';
-    b.onclick=function(){navigator.clipboard.writeText(String(aid)).then(function(){toast('Asset ID '+aid+' disalin','ok');});};
+    b.disabled=false;b.className='rbx-btn done';b.innerHTML='<i class="fa-solid fa-check" style="font-size:10px"></i> Done';b.title='Upload selesai';b.style.cursor='default';
+    b.onclick=null;
   }
+  // Tambahkan ke riwayat
+  rbxHistory.push({name:rawName||assetEntry.name, assetId:aid, time:Date.now()});
+  historyLine('upload','Roblox: '+assetEntry.name+' → '+aid, aid);
   toast('Lolos moderasi! ID: '+aid,'ok');
   logLine('upload','Roblox upload berhasil & lolos moderasi, ID: '+aid);
 }
@@ -815,17 +820,8 @@ function renderRbxAssets(){
         '<div class="text-xs font-medium text-zinc-300 truncate flex items-center gap-2"><i class="fa-solid fa-music text-emerald-500" style="font-size:10px"></i> '+a.name+'</div>'+
         '<div class="text-[10px] text-emerald-500/70 mt-0.5 flex items-center gap-1.5 truncate"><i class="fa-solid fa-circle-check" style="font-size:9px"></i> '+u+'</div>'+
       '</div>'+
-      '<div class="flex items-center gap-1.5 flex-shrink-0">'+
-        '<button class="rbx-btn done" onclick="copyRbxAsset('+i+')" title="Copy Asset ID"><i class="fa-solid fa-copy" style="font-size:10px"></i> Copy</button>'+
-      '</div>'+
     '</div>';
   }).join('');
-}
-function copyRbxAsset(i){
-  if(rbxAssets[i] && rbxAssets[i].status==='done'){
-    var u='rbxassetid://'+rbxAssets[i].assetId;
-    navigator.clipboard.writeText(u).then(function(){toast('Disalin: '+u,'ok');});
-  }
 }
 function clearRbxAssets(){rbxAssets=[];renderRbxAssets();toast('List dibersihkan','info');}
 
@@ -838,11 +834,6 @@ function canEdit(){
 function useQuota(s){if(s==='free'){state.freeUsed=true;return;}if(s==='credit'){state.credits--;saveLocal();}}
 function refundQuota(s){if(s==='free'){state.freeUsed=false;return;}if(s==='credit'){state.credits++;saveLocal();}}
 
-function openFmtModal(){$fmtModal.classList.add('show');document.body.style.overflow='hidden';}
-function closeFmtModal(){$fmtModal.classList.remove('show');document.body.style.overflow='';}
-function pickFmt(el){document.querySelectorAll('.fmt-card').forEach(function(c){c.classList.remove('chosen');});el.classList.add('chosen');state.chosenFmt=el.getAttribute('data-fmt');$fmtBtn.textContent='Mulai Edit — '+FORMATS[state.chosenFmt].label;}
- $fmtModal.addEventListener('click',function(e){if(e.target===$fmtModal)closeFmtModal();});
-
 function openPayModal(){state.chosenPlan=null;document.querySelectorAll('.pay-card').forEach(function(c){c.classList.remove('chosen');});$payBtn.disabled=true;$payBtn.textContent='Pilih paket';$payModal.classList.add('show');document.body.style.overflow='hidden';}
 function closePayModal(){$payModal.classList.remove('show');document.body.style.overflow='';}
 function pickPlan(el){document.querySelectorAll('.pay-card').forEach(function(c){c.classList.remove('chosen');});el.classList.add('chosen');state.chosenPlan=el.getAttribute('data-plan');$payBtn.disabled=false;$payBtn.textContent='Bayar Rp'+PLAN_PRICES[state.chosenPlan].toLocaleString('id-ID');}
@@ -850,7 +841,7 @@ function showSuccessModal(p){if(p==='subscription')$successMsg.textContent='Unli
 function closeSuccessModal(){$successModal.classList.remove('show');document.body.style.overflow='';updateQuotaDisplay();}
  $payModal.addEventListener('click',function(e){if(e.target===$payModal)closePayModal();});
  $successModal.addEventListener('click',function(e){if(e.target===$successModal)closeSuccessModal();});
-document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeFmtModal();closePayModal();closeSuccessModal();closeRbxModal();closeUpgradeModal();closeRenameModal();closeAskEditModal();closeAskApplyEqModal();}});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closePayModal();closeSuccessModal();closeRbxModal();closeUpgradeModal();closeAskEditModal();closeAskApplyEqModal();closeEqLoadingModal();}});
 
 function doPayment(){
   if(!state.chosenPlan||!state.email)return;
@@ -976,7 +967,7 @@ async function boot(){
       wasmURL:await toBlobURL(b+'/ffmpeg-core.wasm',"application/wasm"),
       classWorkerURL:await toBlobURL("https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js","text/javascript")
     }),25000,"Load FFmpeg");
-    loaded=true;$status.innerText=items.length?"Siap diedit.":"Editor siap.";
+    loaded=true;$status.innerText="Editor siap. Upload file untuk mulai.";
     logLine('info','FFmpeg berhasil dimuat');
   }catch(e){
     $status.innerText="Gagal — "+describeError(e);$warnBanner.classList.remove('hidden');
@@ -985,84 +976,131 @@ async function boot(){
 }
 boot();
 
-if($box){
-  $box.addEventListener('dragover',function(e){e.preventDefault();$box.style.borderColor='rgba(129,140,248,.6)';$box.style.background='rgba(129,140,248,.05)';});
-  $box.addEventListener('dragleave',function(e){$box.style.borderColor='';$box.style.background='';});
-  $box.addEventListener('drop',function(e){
-    e.preventDefault();$box.style.borderColor='';$box.style.background='';
-    var dt=e.dataTransfer;if(!dt||!dt.files||!dt.files.length)return;
-    var ev=new Event('change');
-    var dtRef=new DataTransfer();
-    Array.from(dt.files).forEach(function(f){dtRef.items.add(f);});
-    $fileInput.files=dtRef.files;
-    $fileInput.dispatchEvent(ev);
-  });
-}
-
+// ===== FILE INPUT HANDLER (MODIFIED) =====
  $fileInput.addEventListener('change',function(e){
   var p=Array.from(e.target.files||[]);if(!p.length)return;
   if(p.length>MAX_FILES){toast('Maks '+MAX_FILES+' file.','info');p=p.slice(0,MAX_FILES);}
-  items=p.map(function(f){return{id:Date.now()+Math.random(),file:f,name:f.name,size:f.size,status:'pending',url:null,blobData:null,dlName:null,customName:null,checked:false,eq:null,speedUsed:null,assetId:null};});
+  items=p.map(function(f){return{
+    id:Date.now()+Math.random(),
+    file:f,
+    name:f.name,
+    size:f.size,
+    status:'pending',
+    url:null,
+    blobData:null,
+    dlName:null,
+    checked:false,
+    eq:null,
+    speedUsed:null,
+    assetId:null,
+    inConvertList:false  // BARU: false = di daftar upload (kanan), true = di daftar convert (kiri)
+  };});
   p.forEach(function(f){historyLine('raw','File asli: '+f.name+' ('+formatSize(f.size)+')');});
-  if($boxTitle)$boxTitle.innerText=p.length+' file dipilih';
-  if($boxSub)$boxSub.innerText='Klik untuk ganti';
-  $btn.disabled=false;$status.innerText=loaded?"Siap diedit.":"Tunggu editor...";renderList();
-  logLine('info',p.length+' file terdeteksi');
+  $btn.disabled=false;
+  $status.innerText=loaded?items.length+" file siap. Klik file di daftar upload untuk edit EQ.":"Tunggu editor...";
+  renderUploadList();
+  renderList();
+  logLine('info',p.length+' file terdeteksi, masuk ke Daftar Upload');
+});
+
+// ===== ASK EDIT EQ MODAL =====
+var askEditIndex=-1;
+function openAskEdit(idx){
+  askEditIndex=idx;
   $('askEditModal').classList.add('show');
-});
-
-function closeAskEditModal(){$('askEditModal').classList.remove('show');}
-function closeAskEdit(editFirst) {
+  document.body.style.overflow='hidden';
+}
+function closeAskEditModal(){$('askEditModal').classList.remove('show');document.body.style.overflow='';askEditIndex=-1;}
+function closeAskEdit(yes){
   closeAskEditModal();
-  if(editFirst) {
+  if(askEditIndex<0)return;
+  if(yes){
+    // Masuk ke PlayMode, TIDAK auto play
     switchView('playmode');
-    if(items.length>0) playPmSong(0);
+    pmCurrentIdx=askEditIndex;
+    pmLoadSong(askEditIndex); // load tapi tidak play
+    renderPmList();
+  }else{
+    // Langsung masuk ke daftar convert
+    items[askEditIndex].inConvertList=true;
+    renderUploadList();
+    renderList();
+    toast('"'+items[askEditIndex].name+'" masuk ke Daftar Convert','ok');
   }
+  askEditIndex=-1;
+}
+ $('askEditModal').addEventListener('click',function(e){if(e.target===$('askEditModal'))closeAskEditModal();});
+
+// ===== UPLOAD LIST RENDERER (PANEL KANAN) =====
+function renderUploadList(){
+  var uploadItems=items.filter(function(x){return x.status==='pending'&&!x.inConvertList;});
+  if($uploadCountBadge)$uploadCountBadge.textContent=uploadItems.length+' Files';
+  if(!uploadItems.length){
+    $uploadList.innerHTML='<div class="text-xs text-zinc-600 text-center py-6"><i class="fa-solid fa-inbox" style="font-size:20px;opacity:.4"></i><div class="mt-2">Belum ada file. Upload dulu.</div></div>';
+    return;
+  }
+  $uploadList.innerHTML=uploadItems.map(function(it,i){
+    var realIdx=items.indexOf(it);
+    return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row upload-list-item fade-up" onclick="openAskEdit('+realIdx+')">'+
+      '<div class="row-index">'+(i+1)+'</div>'+
+      '<div class="flex-1 min-w-0">'+
+        '<div class="text-xs font-medium text-zinc-300 truncate flex items-center gap-2"><i class="fa-solid fa-music text-zinc-500" style="font-size:10px"></i> '+it.name+'</div>'+
+        '<div class="text-[10px] text-zinc-600 mt-0.5">'+formatSize(it.size)+' · Klik untuk edit EQ</div>'+
+      '</div>'+
+      '<i class="fa-solid fa-chevron-right text-zinc-700" style="font-size:10px"></i>'+
+    '</div>';
+  }).join('');
 }
 
-// ===== RENAME LOGIC (RESTORED) =====
-var renamingIndex = -1;
-function renameFile(idx) {
-    renamingIndex = idx;
-    var it = items[idx];
-    var baseName = it.customName || it.file.name.replace(/\.[^/.]+$/, "");
-    $('renameInput').value = baseName;
-    var suffix = '_2.3YL';
-    var ext = FORMATS[state.chosenFmt].ext;
-    var isTooLong = (baseName.length + suffix.length + ext.length) > 50;
-    if(isTooLong && !it.customName) {
-        $('renameWarn').classList.remove('hidden');
-    } else {
-        $('renameWarn').classList.add('hidden');
-    }
-    $('renameModal').classList.add('show');
-    document.body.style.overflow = 'hidden';
-    setTimeout(function(){ $('renameInput').focus(); }, 100);
-}
-function closeRenameModal() {
-    $('renameModal').classList.remove('show');
-    document.body.style.overflow = '';
-}
-function saveRename() {
-    if (renamingIndex > -1) {
-        var newName = $('renameInput').value.trim();
-        if (newName) {
-            var oldDisplay = items[renamingIndex].customName || items[renamingIndex].file.name;
-            newName = newName.replace(/\.[^/.]+$/, "");
-            items[renamingIndex].customName = truncateName(newName, 50);
-            renderList();
-            toast('Nama file diubah', 'ok');
-            historyLine('edit','Rename: "'+oldDisplay+'" -> "'+items[renamingIndex].customName+'"');
-        }
-    }
-    closeRenameModal();
-}
- $('renameModal').addEventListener('click',function(e){if(e.target===$('renameModal'))closeRenameModal();});
- $('renameInput').addEventListener('keydown', function(e) {
-    if(e.key === 'Enter') saveRename();
-});
+// ===== EVOLUTION LIST RENDERER (PANEL KIRI — CONVERT LIST) =====
+function renderList(){
+  var convertItems=items.filter(function(x){return x.inConvertList;});
+  if(!convertItems.length){
+    $fileList.innerHTML='<div class="text-xs text-zinc-600 text-center py-8"><i class="fa-solid fa-inbox" style="font-size:24px;opacity:.4"></i><div class="mt-2">Belum ada file di daftar convert. Klik file di Daftar Upload untuk mulai.</div></div>';
+    return;
+  }
+  $fileList.innerHTML=convertItems.map(function(it){
+    var i=items.indexOf(it);
+    var st='Menunggu',sc='text-zinc-600',extra='<div class="flex items-center gap-1.5 flex-shrink-0">',icon='<i class="fa-solid fa-circle text-zinc-700" style="font-size:6px"></i>';
 
-// ===== PLAYMODE (EQ) =====
+    if(it.status==='pending'){
+        st = it.eq ? 'Siap Convert (EQ Applied)' : 'Siap Convert';
+        sc = it.eq ? 'text-purple-400' : 'text-zinc-400';
+        icon = '<input type="checkbox" '+(it.checked?'checked':'')+' onchange="toggleCheck('+i+')">';
+    }
+    if(it.status==='processing'){icon='<i class="fa-solid fa-circle-notch fa-spin text-indigo-400" style="font-size:9px"></i>';st='Mengedit...';sc='text-indigo-400';}
+    if(it.status==='done'){
+        icon='<input type="checkbox" '+(it.checked?'checked':'')+' onchange="toggleCheck('+i+')">';
+        st='OGG — '+formatSize(it.size);sc='text-emerald-500/70';
+        extra+='<a class="rbx-btn done" href="'+it.url+'" download="'+it.dlName+'" title="Download"><i class="fa-solid fa-download" style="font-size:10px"></i></a>';
+        extra+='<button id="rbx_'+i+'" class="rbx-btn '+(isPremium()?'idle':'locked')+'" onclick="uploadToRoblox('+i+')" title="Upload Roblox">'+(isPremium()?'<i class="fa-solid fa-cloud-arrow-up" style="font-size:10px"></i>':'<i class="fa-solid fa-lock" style="font-size:10px"></i>')+'</button>';
+    }
+    if(it.status==='uploading'){icon='<i class="fa-solid fa-circle-notch fa-spin text-indigo-400" style="font-size:9px"></i>';st='Uploading...';sc='text-indigo-400';}
+    if(it.status==='uploaded'){
+        icon='<i class="fa-solid fa-check-circle text-emerald-400" style="font-size:10px"></i>';
+        st='rbxassetid://'+it.assetId; sc='text-purple-400 font-mono';
+        // HAPUS tombol copy di sini (perintah #9)
+    }
+
+    extra+='</div>';
+
+    return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row fade-up"><div class="row-index w-6">'+icon+'</div><div class="flex-1 min-w-0"><div class="text-xs font-medium text-zinc-300 truncate flex items-center gap-2"><i class="fa-solid fa-music text-zinc-500" style="font-size:10px"></i> '+it.name+'</div><div class="text-[10px] '+sc+' mt-0.5 flex items-center gap-1.5">'+st+'</div></div>'+extra+'</div>';
+  }).join('');
+}
+function formatSize(b){if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB';}
+
+function toggleCheck(i) {
+  items[i].checked = !items[i].checked;
+  renderList();
+}
+function selectAllItems() {
+  var target = items.find(x => x.status === 'done' && x.inConvertList) ? 'done' : 'pending';
+  var allChecked = items.filter(x => x.status === target && x.inConvertList).every(x => x.checked);
+  items.forEach(it => { if(it.status === target && it.inConvertList) it.checked = !allChecked; });
+  renderList();
+}
+
+// ===== PLAYMODE (EQ) — MODIFIED: tidak auto play =====
 var pmAudioCtx, pmSource, pmLow, pmMid, pmHigh, pmDens;
 var pmEq = { low: 0, mid: 0, high: 0, dens: 0 };
 var pmCurrentIdx = -1;
@@ -1074,6 +1112,7 @@ function switchView(view) {
     $('nav-converter').classList.add('active');
     $('nav-playmode').classList.remove('active');
     renderList();
+    renderUploadList();
   } else {
     $('view-converter').classList.add('hidden');
     $('view-playmode').classList.remove('hidden');
@@ -1101,10 +1140,30 @@ function pmFormatTime(sec) {
   return m + ':' + (s < 10 ? '0' + s : s);
 }
 function pmPlaylistIndexes() {
+  // Tampilkan SEMUA file yang belum inConvertList (stage upload) + yang sedang diedit
   var out = [];
   items.forEach(function(it, i){ if (it.status === 'pending') out.push(i); });
   return out;
 }
+
+// Load lagu ke player TAPI TIDAK AUTO PLAY
+function pmLoadSong(idx) {
+  var it = items[idx];
+  if (!it || it.status !== 'pending') return;
+  initPmAudioGraph();
+  if (pmAudioCtx.state === 'suspended') pmAudioCtx.resume();
+  var audio = $('pmAudio');
+  // Hentikan yang sedang berjalan
+  audio.pause();
+  audio.src = URL.createObjectURL(it.file);
+  $('pmNowPlaying').textContent = it.name;
+  $('pmSubText').textContent = 'Siap diputar — klik Play';
+  setPmPlayIcon(false);
+  renderPmList();
+  updatePmNavButtons();
+}
+
+// Play lagu (hanya dipanggil saat user klik play)
 function playPmSong(idx) {
   var it = items[idx];
   if (!it || it.status !== 'pending') return;
@@ -1120,6 +1179,7 @@ function playPmSong(idx) {
   renderPmList();
   updatePmNavButtons();
 }
+
 function togglePmPlay() {
   var audio = $('pmAudio');
   if (!audio.src) {
@@ -1215,14 +1275,14 @@ var PM_PRESETS = {bass:{low:8,mid:0,high:2,dens:0},vocal:{low:-3,mid:5,high:3,de
 function applyPmPreset(type){var p=PM_PRESETS[type];$('eqLow').value=p.low;$('eqMid').value=p.mid;$('eqHigh').value=p.high;$('eqDens').value=p.dens;updatePmEQ();}
 function renderPmList() {
   var $pmList = $('pmPlaylist');
-  var rawItems = items.filter(x => x.status === 'pending');
+  var rawItems = items.filter(function(x) { return x.status === 'pending'; });
   if(rawItems.length === 0) {
     $pmList.innerHTML = '<div class="text-xs text-zinc-600 text-center py-8"><i class="fa-solid fa-inbox" style="font-size:24px;opacity:.4"></i><div class="mt-2">Belum ada file. Upload dulu di Converter.</div></div>';
     return;
   }
   $pmList.innerHTML = rawItems.map(function(it) {
     var i = items.indexOf(it);
-    var playing = i === pmCurrentIdx;
+    var playing = i === pmCurrentIdx && !$('pmAudio').paused;
     return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row'+(playing?' pm-row-playing':'')+'" style="cursor:pointer;border:1px solid transparent;border-radius:8px" onclick="playPmSong('+i+')">'+
       '<div class="row-index">'+(playing?'<i class="fa-solid fa-volume-high text-indigo-400"></i>':'#')+'</div>'+
       '<div class="flex-1 min-w-0"><div class="text-xs font-medium '+(playing?'text-indigo-300':'text-zinc-300')+' truncate">'+it.name+'</div></div>'+
@@ -1230,6 +1290,8 @@ function renderPmList() {
   }).join('');
   updatePmNavButtons();
 }
+
+// ===== FINISH EQ EDITING — MODIFIED with loading modal =====
 function finishEqEditing() {
   $('askApplyEqModal').classList.add('show');
 }
@@ -1237,138 +1299,94 @@ function closeAskApplyEqModal(){$('askApplyEqModal').classList.remove('show');}
 function closeAskApplyEq(type) {
   closeAskApplyEqModal();
   if(type === 'all') {
-    items.forEach(it => { if(it.status==='pending') it.eq = {...pmEq} });
-    toast('EQ diterapkan ke semua file','ok');
-    switchView('converter');
+    // Tampilkan loading modal
+    $('eqLoadingModal').classList.add('show');
+    document.body.style.overflow='hidden';
+
+    setTimeout(function(){
+      // Terapkan EQ ke semua file yang belum inConvertList
+      items.forEach(function(it) {
+        if(it.status==='pending' && !it.inConvertList) {
+          it.eq = {low:pmEq.low, mid:pmEq.mid, high:pmEq.high, dens:pmEq.dens};
+          it.inConvertList = true;
+        }
+      });
+      // Reset EQ sliders
+      $('eqLow').value=0;$('eqMid').value=0;$('eqHigh').value=0;$('eqDens').value=0;updatePmEQ();
+
+      $('eqLoadingModal').classList.remove('show');
+      document.body.style.overflow='';
+
+      switchView('converter');
+      renderUploadList();
+      renderList();
+      toast('EQ diterapkan & file dipindahkan ke Daftar Convert','ok');
+      logLine('convert','Semua file dipindahkan ke daftar convert dengan EQ');
+    }, 1800);
   } else {
     toast('Tandai file manual di list','info');
     switchView('converter');
   }
 }
+ $('askApplyEqModal').addEventListener('click',function(e){if(e.target===$('askApplyEqModal'))closeAskApplyEqModal();});
+function closeEqLoadingModal(){$('eqLoadingModal').classList.remove('show');document.body.style.overflow='';}
+ $('eqLoadingModal').addEventListener('click',function(e){if(e.target===$('eqLoadingModal'))closeEqLoadingModal();});
 
-// ===== EVOLUTIONARY LIST RENDERER =====
-function renderList(){
-  if($fileCountBadge)$fileCountBadge.textContent=items.length+' Files';
-  if(!items.length){
-    $fileList.innerHTML='<div class="text-xs text-zinc-600 text-center py-8"><i class="fa-solid fa-inbox" style="font-size:24px;opacity:.4"></i><div class="mt-2">Belum ada file. Klik "Upload Audio" untuk mulai.</div></div>';
-    return;
-  }
-  $fileList.innerHTML=items.map(function(it,i){
-    var st='Menunggu',sc='text-zinc-600',extra='<div class="flex items-center gap-1.5 flex-shrink-0">',icon='<i class="fa-solid fa-circle text-zinc-700" style="font-size:6px"></i>';
-    
-    var baseName = it.customName || it.file.name.replace(/\.[^/.]+$/, "");
-    var suffix = '_2.3YL';
-    var ext = FORMATS[state.chosenFmt].ext;
-    var isTooLong = (baseName.length + suffix.length + ext.length) > 50;
-    var displayName = it.customName || it.file.name;
-    
-    if(it.status==='pending'){
-        st = it.eq ? 'Siap Convert (EQ Applied)' : 'Siap Convert';
-        sc = it.eq ? 'text-purple-400' : 'text-zinc-400';
-        icon = '<input type="checkbox" '+(it.checked?'checked':'')+' onchange="toggleCheck('+i+')">';
-    }
-    if(it.status==='processing'){icon='<i class="fa-solid fa-circle-notch fa-spin text-indigo-400" style="font-size:9px"></i>';st='Mengedit...';sc='text-indigo-400';}
-    if(it.status==='done'){
-        icon='<input type="checkbox" '+(it.checked?'checked':'')+' onchange="toggleCheck('+i+')">';
-        st=FORMATS[state.chosenFmt].label+' — '+formatSize(it.size);sc='text-emerald-500/70';
-        extra+='<a class="rbx-btn done" href="'+it.url+'" download="'+it.dlName+'" title="Download"><i class="fa-solid fa-download" style="font-size:10px"></i></a>';
-        extra+='<button id="rbx_'+i+'" class="rbx-btn '+(isPremium()?'idle':'locked')+'" onclick="uploadToRoblox('+i+')" title="Upload Roblox">'+(isPremium()?'<i class="fa-solid fa-cloud-arrow-up" style="font-size:10px"></i>':'<i class="fa-solid fa-lock" style="font-size:10px"></i>')+'</button>';
-    }
-    if(it.status==='uploading'){icon='<i class="fa-solid fa-circle-notch fa-spin text-indigo-400" style="font-size:9px"></i>';st='Uploading...';sc='text-indigo-400';}
-    if(it.status==='uploaded'){
-        icon='<i class="fa-solid fa-check-circle text-emerald-400" style="font-size:10px"></i>';
-        st='rbxassetid://'+it.assetId; sc='text-purple-400 font-mono';
-        extra+='<button class="rbx-btn done" onclick="copyText(\''+it.assetId+'\')"><i class="fa-solid fa-copy"></i> Copy</button>';
-    }
-    
-    if(it.status!=='processing') {
-        if (isTooLong && !it.customName) {
-            extra += '<button class="rbx-btn idle" style="border-color:rgba(251,146,60,.4);color:#fb923c;background:rgba(251,146,60,.1)" onclick="renameFile('+i+')" title="Nama terlalu panjang, rename disarankan"><i class="fa-solid fa-triangle-exclamation" style="font-size:10px"></i></button>';
-        } else if (it.customName) {
-            extra += '<button class="rbx-btn done" onclick="renameFile('+i+')" title="Edit nama"><i class="fa-solid fa-pen" style="font-size:10px"></i></button>';
-        } else {
-            extra += '<button class="rbx-btn idle" onclick="renameFile('+i+')" title="Rename file"><i class="fa-solid fa-pen" style="font-size:10px"></i></button>';
-        }
-    }
-    
-    extra+='</div>';
-    
-    return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row fade-up"><div class="row-index w-6">'+icon+'</div><div class="flex-1 min-w-0"><div class="text-xs font-medium text-zinc-300 truncate flex items-center gap-2"><i class="fa-solid fa-music text-zinc-500" style="font-size:10px"></i> '+displayName+'</div><div class="text-[10px] '+sc+' mt-0.5 flex items-center gap-1.5">'+st+'</div></div>'+extra+'</div>';
-  }).join('');
-}
-function formatSize(b){if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB';}
-
-function toggleCheck(i) {
-  items[i].checked = !items[i].checked;
-  renderList();
-}
-function selectAllItems() {
-  var target = items.find(x => x.status === 'done') ? 'done' : 'pending';
-  var allChecked = items.filter(x => x.status === target).every(x => x.checked);
-  items.forEach(it => { if(it.status === target) it.checked = !allChecked; });
-  renderList();
-}
-
-function copyText(t) {
-  navigator.clipboard.writeText('rbxassetid://'+t).then(()=>toast('Disalin!','ok'));
-}
-
+// ===== CONVERT BUTTON — langsung OGG tanpa popup format =====
  $btn.addEventListener('click',function(){
   if(!items.length)return;
   if(!loaded){$status.innerText="Editor belum siap.";return;}
   var c=canEdit();if(!c.ok){toast('Kuota habis.','info');openPayModal();return;}
-  var checked = items.filter(x => x.checked && x.status === 'pending');
-  if(checked.length === 0) { toast('Centang file dulu','info'); return; }
-  openFmtModal();
+  var checked = items.filter(function(x){return x.checked && x.status === 'pending' && x.inConvertList;});
+  if(checked.length === 0) { toast('Centang file di Daftar Convert dulu','info'); return; }
+  startProcess();
 });
 
 async function startProcess(){
-  closeFmtModal();
-  var targets = items.filter(x => x.checked && x.status === 'pending');
+  var targets = items.filter(function(x){return x.checked && x.status === 'pending' && x.inConvertList;});
   if(targets.length === 0) { toast('Centang file dulu','info'); return; }
-  
-  var fmt=FORMATS[state.chosenFmt];
+
+  var fmt=FORMATS.ogg; // TETAP OGG
   $btn.disabled=true;$progWrap.classList.remove('hidden');
   var total=targets.length;
-  
+
   for(var i=0; i<targets.length; i++) {
     var it = targets[i];
     var c = canEdit();
     if(!c.ok) { toast('Kuota habis','err'); break; }
-    
+
     it.checked = false;
     it.status = 'processing';
     renderList();
-    
+
     try {
       var cspeed,cresample,cdb;
       if(activePreset===4){cspeed=parseFloat($customSpeedInput.value)||2.5;cresample=cspeed>4?96000:48000;cdb=0;}
       else{var pr=presets[activePreset];cspeed=pr.speed;cresample=pr.resample;cdb=pr.db;}
-      
+
       it.speedUsed = cspeed;
       var ext=it.file.name.substring(it.file.name.lastIndexOf('.')),inp='in_'+it.id+ext,out='out_'+it.id+fmt.ext;
-      
+
       var filter = 'asetrate=44100*'+cspeed+',aresample='+cresample+',volume='+cdb+'dB';
       if(it.eq) {
         filter += ',bass=g='+it.eq.low+':f=320,equalizer=g='+it.eq.mid+':f=1000:width_type=q:w=1,treble=g='+it.eq.high+':f=3200,equalizer=g='+it.eq.dens+':f=8000:width_type=q:w=1';
       }
-      
+
       var ff=['-i',inp,'-filter:a',filter].concat(fmt.args).concat([out]);
       await ffmpeg.writeFile(inp, await fetchFile(it.file));
-      await withTimeout(ffmpeg.exec(ff),90000,"Encode "+fmt.label);
+      await withTimeout(ffmpeg.exec(ff),90000,"Encode OGG");
       var data=await ffmpeg.readFile(out);
       var blob=new Blob([data.buffer],{type:fmt.mime});
       it.url=URL.createObjectURL(blob);it.blobData=blob;it.size=blob.size;
-      
-      var baseName = it.customName || it.file.name.replace(/\.[^/.]+$/, "");
-      baseName = baseName.replace(/\.[^/.]+$/, "");
+
+      var baseName = it.file.name.replace(/\.[^/.]+$/,'');
       var suffix = '_2.3YL';
       var maxBaseLength = 50 - suffix.length - fmt.ext.length;
       if (baseName.length > maxBaseLength) baseName = baseName.substring(0, maxBaseLength);
       it.dlName = baseName + suffix + fmt.ext;
-      
+
       it.status='done';useQuota(c.src);updateQuotaDisplay();
-      logLine('success',it.file.name+' berhasil dikonversi');
+      logLine('success',it.file.name+' berhasil dikonversi ke OGG');
       await ffmpeg.deleteFile(inp).catch(function(){});await ffmpeg.deleteFile(out).catch(function(){});
     }catch(err){
       it.status='pending';refundQuota(c.src);updateQuotaDisplay();
@@ -1376,9 +1394,9 @@ async function startProcess(){
     }
     renderList();
   }
-  
+
   $progFill.style.width="100%";$progTxt.innerText="100%";
-  logLine('done','Semua tugas selesai');
+  logLine('done','Semua tugas convert selesai');
   $btn.disabled=false;
 }
 updateQuotaDisplay();
