@@ -181,6 +181,8 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
   .sidebar-overlay.show{opacity:1;pointer-events:auto}
   .main-dashboard{grid-template-columns:1fr;padding:14px}
 }
+
+#googleBtnContainer{min-height:40px;min-width:180px;display:flex;align-items:center;justify-content:center}
 </style>
 <base target="_blank">
 </head>
@@ -906,9 +908,30 @@ function handleLogout(){
  $logoutBtn.addEventListener('click',handleLogout);
 function initGoogleLogin(){
   if(isInApp)return;
-  if(typeof google==='undefined'||!google.accounts){setTimeout(initGoogleLogin,300);return;}
-  google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:handleCredentialResponse});
-  google.accounts.id.renderButton($('googleBtnContainer'),{type:"standard",theme:"filled_black",size:"medium",shape:"pill",text:"signin_with",width:160});
+  if(typeof google==='undefined'||!google.accounts||!google.accounts.id){
+    setTimeout(initGoogleLogin,500);
+    return;
+  }
+  try{
+    google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:handleCredentialResponse});
+    var container=$('googleBtnContainer');
+    if(container){
+      container.innerHTML='';
+      google.accounts.id.renderButton(container,{
+        type:"standard",
+        theme:"filled_black",
+        size:"large",
+        shape:"pill",
+        text:"signin_with",
+        logo_alignment:"left",
+        width:180
+      });
+    }
+  }catch(err){
+    console.error('Google init error:',err);
+    setTimeout(initGoogleLogin,800);
+    return;
+  }
   try{
     var s=localStorage.getItem('convyl_user');
     if(s){
@@ -920,7 +943,13 @@ function initGoogleLogin(){
     }
   }catch(e){}
 }
-initGoogleLogin();
+
+// Panggil setelah DOM ready dan library siap
+document.addEventListener('DOMContentLoaded',function(){
+  if(!isInApp){
+    setTimeout(initGoogleLogin,300);
+  }
+});
 
 var presets=[{speed:2.3,db:0,resample:48000},{speed:2.5,db:0,resample:48000},{speed:2.7,db:0,resample:48000},{speed:4.7,db:0,resample:96000}];
 var activePreset=0;
