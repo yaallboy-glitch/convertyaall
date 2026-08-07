@@ -144,7 +144,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .action-row{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);cursor:pointer;transition:all .2s ease;text-align:left;overflow:hidden}
 .action-row:hover:not(:disabled){border-color:rgba(129,140,248,.3);background:rgba(255,255,255,.05);transform:translateY(-1px)}
 .action-row:disabled{opacity:.4;cursor:not-allowed;transform:none}
-.action-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:12px;box-shadow:0 4px 12px -2px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.06) inset}
+.action-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:14px;box-shadow:0 4px 12px -2px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.06) inset}
 .action-row .action-chev{display:none}
 
 input[type="range"]{-webkit-appearance:none;width:100%;height:4px;background:rgba(255,255,255,.1);border-radius:2px;outline:none}
@@ -192,7 +192,7 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
 <header class="topbar">
   <button class="hamburger-btn" onclick="toggleSidebar()" title="Menu"><i class="fa-solid fa-bars"></i></button>
   <div class="flex items-center gap-2">
-    <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)"><i class="fa-solid fa-bolt text-[11px] text-white"></i></div>
+    <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);box-shadow:0 4px 14px -2px rgba(99,102,241,.5),0 0 0 1px rgba(255,255,255,.08) inset"><i class="fa-solid fa-bolt text-[13px] text-white"></i></div>
     <div class="leading-tight">
       <div class="font-bold text-sm tracking-tight">Converter<span class="grad-text">YL</span></div>
       <div class="text-[9px] text-zinc-600 hidden sm:block">Pro Audio Converter</div>
@@ -299,33 +299,33 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
         </div>
         <input type="file" id="audioFile" accept=".mp3,audio/mpeg,.wav,audio/wav,.ogg,audio/ogg,.flac,audio/flac,.m4a,audio/mp4,.aac,audio/aac,.wma,.opus,audio/opus" multiple style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0">
 
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
+        <div class="grid grid-cols-2 gap-2">
           <button class="action-row" onclick="$fileInput.click()">
             <div class="action-icon" style="background:linear-gradient(135deg,#818cf8,#a78bfa)"><i class="fa-solid fa-cloud-arrow-up"></i></div>
             <div class="min-w-0 flex-1 text-left">
               <div class="text-xs font-semibold text-zinc-200 truncate">Upload</div>
-              <div class="text-[10px] text-zinc-600 truncate hidden lg:block">Pilih file audio</div>
+              <div class="text-[10px] text-zinc-600 truncate">Pilih file audio</div>
             </div>
           </button>
           <button id="btn" disabled class="action-row">
             <div class="action-icon" style="background:linear-gradient(135deg,#60a5fa,#818cf8)"><i class="fa-solid fa-rotate"></i></div>
             <div class="min-w-0 flex-1 text-left">
               <div class="text-xs font-semibold text-zinc-200 truncate">Convert</div>
-              <div class="text-[10px] text-zinc-600 truncate hidden lg:block">Proses format</div>
+              <div class="text-[10px] text-zinc-600 truncate">Proses format</div>
             </div>
           </button>
           <button class="action-row" onclick="downloadAllFiles()">
             <div class="action-icon" style="background:linear-gradient(135deg,#34d399,#4ade80)"><i class="fa-solid fa-download"></i></div>
             <div class="min-w-0 flex-1 text-left">
               <div class="text-xs font-semibold text-zinc-200 truncate">Download</div>
-              <div class="text-[10px] text-zinc-600 truncate hidden lg:block">Unduh semua</div>
+              <div class="text-[10px] text-zinc-600 truncate">Unduh semua</div>
             </div>
           </button>
           <button class="action-row" onclick="uploadAllToRoblox()">
             <div class="action-icon" style="background:linear-gradient(135deg,#fb7185,#e11d48)"><i class="fa-solid fa-cube"></i></div>
             <div class="min-w-0 flex-1 text-left">
               <div class="text-xs font-semibold text-zinc-200 truncate">Roblox</div>
-              <div class="text-[10px] text-zinc-600 truncate hidden lg:block">Upload langsung</div>
+              <div class="text-[10px] text-zinc-600 truncate">Upload langsung</div>
             </div>
           </button>
         </div>
@@ -875,7 +875,7 @@ function initGoogleLogin(){
 }
 initGoogleLogin();
 
-var presets=[{speed:2.3,db:0,resample:48000},{speed:2.5,db:0,resample:48000},{speed:2.7,db:0,resample:48000},{speed:4.7,db:0,resample:96000}];
+var presets=[{speed:2.3,db:0,resample:96000},{speed:2.5,db:0,resample:96000},{speed:2.7,db:0,resample:96000},{speed:4.7,db:0,resample:96000}];
 var activePreset=0;
 document.querySelectorAll('.preset-btn').forEach(function(b){
   b.addEventListener('click',function(){
@@ -1353,7 +1353,7 @@ async function startProcess(){
     
     try {
       var cspeed,cresample,cdb;
-      if(activePreset===4){cspeed=parseFloat($customSpeedInput.value)||2.5;cresample=cspeed>4?96000:48000;cdb=0;}
+      if(activePreset===4){cspeed=parseFloat($customSpeedInput.value)||2.5;cresample=96000;cdb=0;}
       else{var pr=presets[activePreset];cspeed=pr.speed;cresample=pr.resample;cdb=pr.db;}
       
       it.speedUsed = cspeed;
