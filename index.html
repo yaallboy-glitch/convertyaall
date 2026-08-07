@@ -150,6 +150,11 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 input[type="range"]{-webkit-appearance:none;width:100%;height:4px;background:rgba(255,255,255,.1);border-radius:2px;outline:none}
 input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:#818cf8;border-radius:50%;cursor:pointer}
 input[type="range"]::-moz-range-thumb{width:14px;height:14px;background:#818cf8;border-radius:50%;cursor:pointer;border:none}
+.vslider-col{display:flex;flex-direction:column;align-items:center;gap:8px}
+.vslider-track{height:110px;width:40px;display:flex;align-items:center;justify-content:center;position:relative}
+.vslider-track input[type="range"]{-webkit-appearance:none;appearance:none;width:96px;height:4px;background:rgba(255,255,255,.1);border-radius:2px;outline:none;transform:rotate(-90deg)}
+.vslider-track input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:#818cf8;border-radius:50%;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+.vslider-track input[type="range"]::-moz-range-thumb{width:16px;height:16px;background:#818cf8;border-radius:50%;cursor:pointer;border:none}
 .pm-preset-btn{padding:6px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:#a1a1aa;transition:all .2s}
 .pm-preset-btn:hover{border-color:rgba(129,140,248,.3);background:rgba(129,140,248,.1);color:#c4b5fd}
 .pm-player{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:16px}
@@ -192,7 +197,9 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
 <header class="topbar">
   <button class="hamburger-btn" onclick="toggleSidebar()" title="Menu"><i class="fa-solid fa-bars"></i></button>
   <div class="flex items-center gap-2">
-    <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);box-shadow:0 4px 14px -2px rgba(99,102,241,.5),0 0 0 1px rgba(255,255,255,.08) inset"><i class="fa-solid fa-bolt text-[13px] text-white"></i></div>
+    <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);box-shadow:0 4px 14px -2px rgba(99,102,241,.5),0 0 0 1px rgba(255,255,255,.08) inset">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+    </div>
     <div class="leading-tight">
       <div class="font-bold text-sm tracking-tight">Converter<span class="grad-text">YL</span></div>
       <div class="text-[9px] text-zinc-600 hidden sm:block">Pro Audio Converter</div>
@@ -301,28 +308,28 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
 
         <div class="grid grid-cols-2 gap-2">
           <button class="action-row" onclick="$fileInput.click()">
-            <div class="action-icon" style="background:linear-gradient(135deg,#818cf8,#a78bfa)"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+            <div class="action-icon" style="background:linear-gradient(135deg,#818cf8,#a78bfa)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.9A5 5 0 0 1 6 5.3 6.5 6.5 0 0 1 18.9 6 4.5 4.5 0 0 1 18 15"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/></svg></div>
             <div class="min-w-0 flex-1 text-left">
               <div class="text-xs font-semibold text-zinc-200 truncate">Upload</div>
               <div class="text-[10px] text-zinc-600 truncate">Pilih file audio</div>
             </div>
           </button>
           <button id="btn" disabled class="action-row">
-            <div class="action-icon" style="background:linear-gradient(135deg,#60a5fa,#818cf8)"><i class="fa-solid fa-rotate"></i></div>
+            <div class="action-icon" style="background:linear-gradient(135deg,#60a5fa,#818cf8)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg></div>
             <div class="min-w-0 flex-1 text-left">
               <div class="text-xs font-semibold text-zinc-200 truncate">Convert</div>
               <div class="text-[10px] text-zinc-600 truncate">Proses format</div>
             </div>
           </button>
           <button class="action-row" onclick="downloadAllFiles()">
-            <div class="action-icon" style="background:linear-gradient(135deg,#34d399,#4ade80)"><i class="fa-solid fa-download"></i></div>
+            <div class="action-icon" style="background:linear-gradient(135deg,#34d399,#4ade80)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg></div>
             <div class="min-w-0 flex-1 text-left">
               <div class="text-xs font-semibold text-zinc-200 truncate">Download</div>
               <div class="text-[10px] text-zinc-600 truncate">Unduh semua</div>
             </div>
           </button>
           <button class="action-row" onclick="uploadAllToRoblox()">
-            <div class="action-icon" style="background:linear-gradient(135deg,#fb7185,#e11d48)"><i class="fa-solid fa-cube"></i></div>
+            <div class="action-icon" style="background:linear-gradient(135deg,#fb7185,#e11d48)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></div>
             <div class="min-w-0 flex-1 text-left">
               <div class="text-xs font-semibold text-zinc-200 truncate">Roblox</div>
               <div class="text-[10px] text-zinc-600 truncate">Upload langsung</div>
@@ -392,26 +399,36 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
         </div>
 
         <div class="section-label">Equalizer Settings (Real-time)</div>
-        <div class="grid grid-cols-4 gap-3 mb-4">
-          <div class="text-center">
-            <div class="text-[10px] text-zinc-500 mb-1">Low (Bass)</div>
-            <input type="range" id="eqLow" min="-12" max="12" step="1" value="0" oninput="updatePmEQ()">
-            <div class="text-[10px] text-indigo-400 font-bold mt-1" id="valLow">0 dB</div>
+        <div class="grid grid-cols-3 gap-3 mb-4">
+          <div class="vslider-col">
+            <div class="text-[10px] text-zinc-500">Low (Bass)</div>
+            <div class="vslider-track"><input type="range" id="eqLow" min="-12" max="12" step="1" value="0" oninput="updatePmEQ()"></div>
+            <div class="text-[10px] text-indigo-400 font-bold" id="valLow">0 dB</div>
           </div>
-          <div class="text-center">
-            <div class="text-[10px] text-zinc-500 mb-1">Mid</div>
-            <input type="range" id="eqMid" min="-12" max="12" step="1" value="0" oninput="updatePmEQ()">
-            <div class="text-[10px] text-indigo-400 font-bold mt-1" id="valMid">0 dB</div>
+          <div class="vslider-col">
+            <div class="text-[10px] text-zinc-500">Mid</div>
+            <div class="vslider-track"><input type="range" id="eqMid" min="-12" max="12" step="1" value="0" oninput="updatePmEQ()"></div>
+            <div class="text-[10px] text-indigo-400 font-bold" id="valMid">0 dB</div>
           </div>
-          <div class="text-center">
-            <div class="text-[10px] text-zinc-500 mb-1">High (Treble)</div>
-            <input type="range" id="eqHigh" min="-12" max="12" step="1" value="0" oninput="updatePmEQ()">
-            <div class="text-[10px] text-indigo-400 font-bold mt-1" id="valHigh">0 dB</div>
+          <div class="vslider-col">
+            <div class="text-[10px] text-zinc-500">High (Treble)</div>
+            <div class="vslider-track"><input type="range" id="eqHigh" min="-12" max="12" step="1" value="0" oninput="updatePmEQ()"></div>
+            <div class="text-[10px] text-indigo-400 font-bold" id="valHigh">0 dB</div>
           </div>
-          <div class="text-center">
-            <div class="text-[10px] text-zinc-500 mb-1">Density</div>
-            <input type="range" id="eqDens" min="-12" max="12" step="1" value="0" oninput="updatePmEQ()">
-            <div class="text-[10px] text-indigo-400 font-bold mt-1" id="valDens">0 dB</div>
+          <div class="vslider-col">
+            <div class="text-[10px] text-zinc-500">Density</div>
+            <div class="vslider-track"><input type="range" id="eqDens" min="-12" max="12" step="1" value="0" oninput="updatePmEQ()"></div>
+            <div class="text-[10px] text-indigo-400 font-bold" id="valDens">0 dB</div>
+          </div>
+          <div class="vslider-col">
+            <div class="text-[10px] text-zinc-500">Wet</div>
+            <div class="vslider-track"><input type="range" id="eqWet" min="0" max="100" step="1" value="0" oninput="updatePmEQ()"></div>
+            <div class="text-[10px] text-purple-400 font-bold" id="valWet">0%</div>
+          </div>
+          <div class="vslider-col">
+            <div class="text-[10px] text-zinc-500">Decay</div>
+            <div class="vslider-track"><input type="range" id="eqDecay" min="0" max="100" step="1" value="0" oninput="updatePmEQ()"></div>
+            <div class="text-[10px] text-purple-400 font-bold" id="valDecay">0%</div>
           </div>
         </div>
 
@@ -1019,8 +1036,8 @@ function closeAskEdit(editFirst) {
 }
 
 // ===== PLAYMODE (EQ) =====
-var pmAudioCtx, pmSource, pmLow, pmMid, pmHigh, pmDens;
-var pmEq = { low: 0, mid: 0, high: 0, dens: 0 };
+var pmAudioCtx, pmSource, pmLow, pmMid, pmHigh, pmDens, pmDelay, pmFeedback, pmWetGain, pmDryGain;
+var pmEq = { low: 0, mid: 0, high: 0, dens: 0, wet: 0, decay: 0 };
 var pmCurrentIdx = -1;
 
 function switchView(view) {
@@ -1048,7 +1065,13 @@ function initPmAudioGraph() {
   pmMid = pmAudioCtx.createBiquadFilter(); pmMid.type = 'peaking'; pmMid.frequency.value = 1000; pmMid.Q.value = 1;
   pmHigh = pmAudioCtx.createBiquadFilter(); pmHigh.type = 'highshelf'; pmHigh.frequency.value = 3200;
   pmDens = pmAudioCtx.createBiquadFilter(); pmDens.type = 'peaking'; pmDens.frequency.value = 8000; pmDens.Q.value = 1;
-  pmSource.connect(pmLow); pmLow.connect(pmMid); pmMid.connect(pmHigh); pmHigh.connect(pmDens); pmDens.connect(pmAudioCtx.destination);
+  pmDelay = pmAudioCtx.createDelay(1.0); pmDelay.delayTime.value = 0.08;
+  pmFeedback = pmAudioCtx.createGain(); pmFeedback.gain.value = 0;
+  pmWetGain = pmAudioCtx.createGain(); pmWetGain.gain.value = 0;
+  pmDryGain = pmAudioCtx.createGain(); pmDryGain.gain.value = 1;
+  pmSource.connect(pmLow); pmLow.connect(pmMid); pmMid.connect(pmHigh); pmHigh.connect(pmDens);
+  pmDens.connect(pmDryGain); pmDryGain.connect(pmAudioCtx.destination);
+  pmDens.connect(pmDelay); pmDelay.connect(pmFeedback); pmFeedback.connect(pmDelay); pmDelay.connect(pmWetGain); pmWetGain.connect(pmAudioCtx.destination);
   updatePmEQ();
 }
 function pmFormatTime(sec) {
@@ -1164,19 +1187,26 @@ function updatePmEQ() {
   pmEq.mid = parseFloat($('eqMid').value);
   pmEq.high = parseFloat($('eqHigh').value);
   pmEq.dens = parseFloat($('eqDens').value);
+  pmEq.wet = parseFloat($('eqWet').value);
+  pmEq.decay = parseFloat($('eqDecay').value);
   if(pmLow) {
     pmLow.gain.value = pmEq.low;
     pmMid.gain.value = pmEq.mid;
     pmHigh.gain.value = pmEq.high;
     pmDens.gain.value = pmEq.dens;
+    pmWetGain.gain.value = pmEq.wet/100;
+    pmFeedback.gain.value = Math.min(0.6,(pmEq.decay/100)*0.6);
+    pmDelay.delayTime.value = 0.05+(pmEq.decay/100)*0.25;
   }
   $('valLow').textContent = pmEq.low + ' dB';
   $('valMid').textContent = pmEq.mid + ' dB';
   $('valHigh').textContent = pmEq.high + ' dB';
   $('valDens').textContent = pmEq.dens + ' dB';
+  $('valWet').textContent = pmEq.wet + '%';
+  $('valDecay').textContent = pmEq.decay + '%';
 }
-var PM_PRESETS = {bass:{low:8,mid:0,high:2,dens:0},vocal:{low:-3,mid:5,high:3,dens:2},balanced:{low:3,mid:2,high:3,dens:1}};
-function applyPmPreset(type){var p=PM_PRESETS[type];$('eqLow').value=p.low;$('eqMid').value=p.mid;$('eqHigh').value=p.high;$('eqDens').value=p.dens;updatePmEQ();}
+var PM_PRESETS = {bass:{low:8,mid:0,high:2,dens:0,wet:0,decay:0},vocal:{low:-3,mid:5,high:3,dens:2,wet:0,decay:0},balanced:{low:3,mid:2,high:3,dens:1,wet:0,decay:0}};
+function applyPmPreset(type){var p=PM_PRESETS[type];$('eqLow').value=p.low;$('eqMid').value=p.mid;$('eqHigh').value=p.high;$('eqDens').value=p.dens;$('eqWet').value=p.wet;$('eqDecay').value=p.decay;updatePmEQ();}
 function renderPmList() {
   var $pmList = $('pmPlaylist');
   if(!$pmList)return;
@@ -1215,7 +1245,7 @@ function moveOneQueueSongToConvert(i,ev){
   var qIdx=queueItems.indexOf(q);
   if(qIdx<0)return;
   queueItems.splice(qIdx,1);
-  moveQueueItemToItems(q,{low:pmEq.low,mid:pmEq.mid,high:pmEq.high,dens:pmEq.dens});
+  moveQueueItemToItems(q,{low:pmEq.low,mid:pmEq.mid,high:pmEq.high,dens:pmEq.dens,wet:pmEq.wet,decay:pmEq.decay});
   if(pmCurrentIdx===i){ pmCurrentIdx=-1; var a=$('pmAudio'); if(a)a.pause(); }
   renderQueueList();
   renderList();
@@ -1238,7 +1268,7 @@ function hideMoveLoadingPopup(){
 }
 function closeAskApplyEq(type) {
   closeAskApplyEqModal();
-  var eqSnapshot={low:pmEq.low,mid:pmEq.mid,high:pmEq.high,dens:pmEq.dens};
+  var eqSnapshot={low:pmEq.low,mid:pmEq.mid,high:pmEq.high,dens:pmEq.dens,wet:pmEq.wet,decay:pmEq.decay};
   var targets = type==='all' ? pmCombinedSnapshot.slice() : pmCombinedSnapshot.filter(function(e){return !!e.ref.pmMarked;});
   if(targets.length===0){
     toast(type==='all' ? 'Tidak ada lagu untuk diterapkan' : 'Belum ada lagu yang ditandai','info');
@@ -1362,6 +1392,11 @@ async function startProcess(){
       var filter = 'asetrate=44100*'+cspeed+',aresample='+cresample+',volume='+cdb+'dB';
       if(it.eq) {
         filter += ',bass=g='+it.eq.low+':f=320,equalizer=g='+it.eq.mid+':f=1000:width_type=q:w=1,treble=g='+it.eq.high+':f=3200,equalizer=g='+it.eq.dens+':f=8000:width_type=q:w=1';
+        if(it.eq.wet>0) {
+          var wDelayMs=Math.round(50+(it.eq.decay||0)/100*250);
+          var wDecayVal=Math.min(0.6,((it.eq.decay||0)/100)*0.6).toFixed(2);
+          filter += ',aecho=1.0:'+(it.eq.wet/100).toFixed(2)+':'+wDelayMs+':'+wDecayVal;
+        }
       }
       
       var ff=['-i',inp,'-filter:a',filter].concat(fmt.args).concat([out]);
@@ -1393,6 +1428,19 @@ async function startProcess(){
   $btn.disabled=false;
 }
 updateQuotaDisplay();
+
+// ===== PROTEKSI REFRESH/TUTUP TAB TIDAK SENGAJA =====
+// Kuota & langganan sudah otomatis aman (tersimpan & dipulihkan lewat login),
+// tapi file yang masih di Antrian/Evolution List (belum didownload) cuma ada
+// di memory browser, jadi kita cegah orang tidak sengaja keluar dari halaman.
+window.addEventListener('beforeunload', function(e){
+  var hasUnsavedWork = (typeof items!=='undefined' && items.length>0) || (typeof queueItems!=='undefined' && queueItems.length>0);
+  if(hasUnsavedWork){
+    e.preventDefault();
+    e.returnValue = 'Masih ada file yang belum didownload. Yakin mau meninggalkan halaman ini?';
+    return e.returnValue;
+  }
+});
 </script>
 </body>
 </html>
