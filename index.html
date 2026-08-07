@@ -150,11 +150,11 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 input[type="range"]{-webkit-appearance:none;width:100%;height:4px;background:rgba(255,255,255,.1);border-radius:2px;outline:none}
 input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:#818cf8;border-radius:50%;cursor:pointer}
 input[type="range"]::-moz-range-thumb{width:14px;height:14px;background:#818cf8;border-radius:50%;cursor:pointer;border:none}
-.vslider-col{display:flex;flex-direction:column;align-items:center;gap:8px}
-.vslider-track{height:110px;width:40px;display:flex;align-items:center;justify-content:center;position:relative}
-.vslider-track input[type="range"]{-webkit-appearance:none;appearance:none;width:96px;height:4px;background:rgba(255,255,255,.1);border-radius:2px;outline:none;transform:rotate(-90deg)}
-.vslider-track input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:#818cf8;border-radius:50%;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.4)}
-.vslider-track input[type="range"]::-moz-range-thumb{width:16px;height:16px;background:#818cf8;border-radius:50%;cursor:pointer;border:none}
+.vslider-col{display:flex;flex-direction:column;align-items:center;gap:4px}
+.vslider-track{height:64px;width:32px;display:flex;align-items:center;justify-content:center;position:relative}
+.vslider-track input[type="range"]{-webkit-appearance:none;appearance:none;width:56px;height:3px;background:rgba(255,255,255,.1);border-radius:2px;outline:none;transform:rotate(-90deg)}
+.vslider-track input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;background:#818cf8;border-radius:50%;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+.vslider-track input[type="range"]::-moz-range-thumb{width:13px;height:13px;background:#818cf8;border-radius:50%;cursor:pointer;border:none}
 .pm-preset-btn{padding:6px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:#a1a1aa;transition:all .2s}
 .pm-preset-btn:hover{border-color:rgba(129,140,248,.3);background:rgba(129,140,248,.1);color:#c4b5fd}
 .pm-player{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:16px}
@@ -207,12 +207,14 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
   </div>
   <div id="navRight" class="flex items-center gap-2" style="margin-left:auto">
     <div id="loginArea" class="flex items-center gap-2"><div id="googleBtnContainer"></div></div>
-    <div id="userChip" class="hidden items-center gap-2">
-      <img id="userAvatar" src="" alt="" style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.1)">
+    <div id="userChip" class="hidden items-center gap-1.5" style="flex-wrap:nowrap">
+      <div id="userAvatar" style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,.1);background-color:#27272a;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg id="userAvatarFallback" width="14" height="14" viewBox="0 0 24 24" fill="#71717a"><path d="M12 12c2.7 0 4.9-2.2 4.9-4.9S14.7 2.2 12 2.2 7.1 4.4 7.1 7.1 9.3 12 12 12zm0 2.5c-3.3 0-9.8 1.6-9.8 4.9v2.4h19.6v-2.4c0-3.3-6.5-4.9-9.8-4.9z"/></svg>
+      </div>
       <span id="userName" class="text-xs text-zinc-400 hidden sm:inline max-w-[90px] truncate"></span>
-      <div id="creditChip" class="badge" style="background:rgba(255,255,255,.05);color:#71717a;border:1px solid rgba(255,255,255,.08)"><span id="creditText">0</span></div>
-      <button class="rbx-nav-btn" onclick="openRbxModal()" title="Pengaturan Roblox"><i class="fa-solid fa-cube" style="font-size:13px"></i></button>
-      <button id="logoutBtn" onclick="handleLogout()" class="btn-ghost" style="padding:6px 8px" title="Keluar"><i class="fa-solid fa-right-from-bracket" style="font-size:11px"></i></button>
+      <div id="creditChip" class="badge" style="background:rgba(255,255,255,.05);color:#71717a;border:1px solid rgba(255,255,255,.08);flex-shrink:0"><span id="creditText">0</span></div>
+      <button class="rbx-nav-btn" onclick="openRbxModal()" title="Pengaturan Roblox" style="flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></button>
+      <button id="logoutBtn" onclick="handleLogout()" class="btn-ghost" style="padding:6px 8px;flex-shrink:0" title="Keluar"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></button>
     </div>
   </div>
 </header>
@@ -387,48 +389,48 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
               <input type="range" id="pmVolume" min="0" max="100" step="1" value="100" oninput="pmSetVolume(this.value)">
             </div>
             <div class="flex items-center gap-3">
-              <button class="pm-navbtn" id="pmPrevBtn" onclick="pmPlayOffset(-1)" title="Lagu sebelumnya"><i class="fa-solid fa-backward-step"></i></button>
-              <button class="pm-playbtn" id="pmPlayBtn" onclick="togglePmPlay()" title="Play/Pause"><i class="fa-solid fa-play" id="pmPlayIcon"></i></button>
-              <button class="pm-navbtn" id="pmNextBtn" onclick="pmPlayOffset(1)" title="Lagu berikutnya"><i class="fa-solid fa-forward-step"></i></button>
+              <button class="pm-navbtn" id="pmPrevBtn" onclick="pmPlayOffset(-1)" title="Lagu sebelumnya"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h2v16H6zm3.5 8L20 4v16z"/></svg></button>
+              <button class="pm-playbtn" id="pmPlayBtn" onclick="togglePmPlay()" title="Play/Pause"><svg width="16" height="16" viewBox="0 0 24 24" fill="white" id="pmPlayIcon"><path d="M8 5v14l11-7z"/></svg></button>
+              <button class="pm-navbtn" id="pmNextBtn" onclick="pmPlayOffset(1)" title="Lagu berikutnya"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M16 4h2v16h-2zM4 4l10.5 8L4 20z"/></svg></button>
             </div>
             <div class="flex items-center gap-1.5">
-              <button class="btn-ghost" style="padding:6px 9px" onclick="seekAudio(-10)" title="Mundur 10 detik"><i class="fa-solid fa-rotate-left" style="font-size:10px"></i></button>
-              <button class="btn-ghost" style="padding:6px 9px" onclick="seekAudio(10)" title="Maju 10 detik"><i class="fa-solid fa-rotate-right" style="font-size:10px"></i></button>
+              <button class="btn-ghost" style="padding:6px 9px" onclick="seekAudio(-10)" title="Mundur 10 detik"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+              <button class="btn-ghost" style="padding:6px 9px" onclick="seekAudio(10)" title="Maju 10 detik"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg></button>
             </div>
           </div>
         </div>
 
         <div class="section-label">Equalizer Settings (Real-time)</div>
-        <div class="grid grid-cols-3 gap-3 mb-4">
+        <div class="grid grid-cols-6 gap-1.5 mb-3">
           <div class="vslider-col">
-            <div class="text-[10px] text-zinc-500">Low (Bass)</div>
+            <div class="text-[9px] text-zinc-500 text-center leading-tight">Low</div>
             <div class="vslider-track"><input type="range" id="eqLow" min="-12" max="12" step="1" value="0" oninput="updatePmEQ()"></div>
-            <div class="text-[10px] text-indigo-400 font-bold" id="valLow">0 dB</div>
+            <div class="text-[9px] text-indigo-400 font-bold" id="valLow">0 dB</div>
           </div>
           <div class="vslider-col">
-            <div class="text-[10px] text-zinc-500">Mid</div>
+            <div class="text-[9px] text-zinc-500 text-center leading-tight">Mid</div>
             <div class="vslider-track"><input type="range" id="eqMid" min="-12" max="12" step="1" value="0" oninput="updatePmEQ()"></div>
-            <div class="text-[10px] text-indigo-400 font-bold" id="valMid">0 dB</div>
+            <div class="text-[9px] text-indigo-400 font-bold" id="valMid">0 dB</div>
           </div>
           <div class="vslider-col">
-            <div class="text-[10px] text-zinc-500">High (Treble)</div>
+            <div class="text-[9px] text-zinc-500 text-center leading-tight">High</div>
             <div class="vslider-track"><input type="range" id="eqHigh" min="-12" max="12" step="1" value="0" oninput="updatePmEQ()"></div>
-            <div class="text-[10px] text-indigo-400 font-bold" id="valHigh">0 dB</div>
+            <div class="text-[9px] text-indigo-400 font-bold" id="valHigh">0 dB</div>
           </div>
           <div class="vslider-col">
-            <div class="text-[10px] text-zinc-500">Density</div>
+            <div class="text-[9px] text-zinc-500 text-center leading-tight">Density</div>
             <div class="vslider-track"><input type="range" id="eqDens" min="-12" max="12" step="1" value="0" oninput="updatePmEQ()"></div>
-            <div class="text-[10px] text-indigo-400 font-bold" id="valDens">0 dB</div>
+            <div class="text-[9px] text-indigo-400 font-bold" id="valDens">0 dB</div>
           </div>
           <div class="vslider-col">
-            <div class="text-[10px] text-zinc-500">Wet</div>
+            <div class="text-[9px] text-purple-400/70 text-center leading-tight">Wet</div>
             <div class="vslider-track"><input type="range" id="eqWet" min="0" max="100" step="1" value="0" oninput="updatePmEQ()"></div>
-            <div class="text-[10px] text-purple-400 font-bold" id="valWet">0%</div>
+            <div class="text-[9px] text-purple-400 font-bold" id="valWet">0%</div>
           </div>
           <div class="vslider-col">
-            <div class="text-[10px] text-zinc-500">Decay</div>
+            <div class="text-[9px] text-purple-400/70 text-center leading-tight">Decay</div>
             <div class="vslider-track"><input type="range" id="eqDecay" min="0" max="100" step="1" value="0" oninput="updatePmEQ()"></div>
-            <div class="text-[10px] text-purple-400 font-bold" id="valDecay">0%</div>
+            <div class="text-[9px] text-purple-400 font-bold" id="valDecay">0%</div>
           </div>
         </div>
 
@@ -860,10 +862,8 @@ function decodeJwt(t){try{var p=t.split('.')[1];return JSON.parse(decodeURICompo
 function handleCredentialResponse(r){
   var p=decodeJwt(r.credential);if(!p)return;
   state.email=p.email;state.name=p.name||p.email;state.freeUsed=false;
-  $userAvatar.src=p.picture||'';$userName.textContent=state.name;
-  $loginArea.classList.add('hidden');$userChip.classList.remove('hidden');$mainCard.classList.remove('hidden');if($loggedOutHero)$loggedOutHero.classList.add('hidden');
-  loadLocal(state.email);loadRbxLocal();updateQuotaDisplay();
-  try{localStorage.setItem('convyl_user',JSON.stringify(p));}catch(e){}
+  if(p.picture){$userAvatar.style.backgroundImage="url('"+p.picture+"')";var fb1=$('userAvatarFallback');if(fb1)fb1.style.display='none';}
+  $userName.textContent=state.name;
   toast('Selamat datang, '+(p.name||p.email.split('@')[0])+'!','ok');
 }
 function handleLogout(){
@@ -884,7 +884,8 @@ function initGoogleLogin(){
     if(s){
       var p=JSON.parse(s);
       state.email=p.email;state.name=p.name||p.email;
-      $userAvatar.src=p.picture||'';$userName.textContent=state.name;
+      if(p.picture){$userAvatar.style.backgroundImage="url('"+p.picture+"')";var fb2=$('userAvatarFallback');if(fb2)fb2.style.display='none';}
+      $userName.textContent=state.name;
       $loginArea.classList.add('hidden');$userChip.classList.remove('hidden');$mainCard.classList.remove('hidden');if($loggedOutHero)$loggedOutHero.classList.add('hidden');
       loadLocal(state.email);loadRbxLocal();updateQuotaDisplay();
     }
@@ -1123,7 +1124,9 @@ function togglePmPlay() {
 }
 function setPmPlayIcon(isPlaying) {
   var icon = $('pmPlayIcon');
-  icon.className = isPlaying ? 'fa-solid fa-pause' : 'fa-solid fa-play';
+  icon.innerHTML = isPlaying
+    ? '<rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/>'
+    : '<path d="M8 5v14l11-7z"/>';
 }
 function pmPlayOffset(dir) {
   var idxs = pmPlaylistIndexes();
@@ -1205,7 +1208,7 @@ function updatePmEQ() {
   $('valWet').textContent = pmEq.wet + '%';
   $('valDecay').textContent = pmEq.decay + '%';
 }
-var PM_PRESETS = {bass:{low:8,mid:0,high:2,dens:0,wet:0,decay:0},vocal:{low:-3,mid:5,high:3,dens:2,wet:0,decay:0},balanced:{low:3,mid:2,high:3,dens:1,wet:0,decay:0}};
+var PM_PRESETS = {bass:{low:8,mid:-1,high:1,dens:0,wet:5,decay:10},vocal:{low:-4,mid:6,high:4,dens:2,wet:8,decay:12},balanced:{low:3,mid:2,high:3,dens:1,wet:15,decay:25}};
 function applyPmPreset(type){var p=PM_PRESETS[type];$('eqLow').value=p.low;$('eqMid').value=p.mid;$('eqHigh').value=p.high;$('eqDens').value=p.dens;$('eqWet').value=p.wet;$('eqDecay').value=p.decay;updatePmEQ();}
 function renderPmList() {
   var $pmList = $('pmPlaylist');
