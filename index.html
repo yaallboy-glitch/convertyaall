@@ -307,17 +307,11 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
     <div class="dash-col">
       <div class="panel">
         <div class="section-label">Speed Preset</div>
-        <div class="grid grid-cols-5 gap-1.5" id="presetPicker">
+        <div class="grid grid-cols-4 gap-1.5" id="presetPicker">
           <button class="preset-btn active text-xs font-semibold py-2 rounded-lg" data-i="0">2.3x</button>
           <button class="preset-btn text-xs font-semibold py-2 rounded-lg" data-i="1">2.5x</button>
           <button class="preset-btn text-xs font-semibold py-2 rounded-lg" data-i="2">2.7x</button>
           <button class="preset-btn text-xs font-semibold py-2 rounded-lg" data-i="3">4.7x</button>
-          <button class="preset-btn text-xs font-semibold py-2 rounded-lg" data-i="4">Custom</button>
-        </div>
-        <div id="customSpeedWrap" class="hidden mt-3 flex items-center justify-center gap-3 py-3 px-4 rounded-lg" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)">
-          <span class="text-xs text-zinc-500">Speed:</span>
-          <input type="number" id="customSpeedInput" class="speed-input" value="2.5" min="0.1" max="10" step="0.1">
-          <span class="text-zinc-600 font-bold">x</span>
         </div>
       </div>
 
@@ -599,10 +593,10 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
 <script>
 var CONFIG_MODE='demo',API_BASE='https://backend-kamu.contoh.workers.dev',MAX_FILES=10;
 var ROBLOX_PROXY_URL='https://convertyaall-proxy.binomo2b.workers.dev';
-var FORMATS={ogg:{ext:'.ogg',mime:'audio/ogg',args:['-c:a','libvorbis','-q:a','8'],label:'OGG'},mp3:{ext:'.mp3',mime:'audio/mpeg',args:['-c:a','libmp3lame','-q:a','0'],label:'MP3'},wav:{ext:'.wav',mime:'audio/wav',args:['-c:a','pcm_s16le'],label:'WAV'},flac:{ext:'.flac',mime:'audio/flac',args:['-c:a','flac'],label:'FLAC'}};
+var FORMATS={ogg:{ext:'.ogg',mime:'audio/ogg',args:['-c:a','libvorbis','-q:a','10'],label:'OGG'},mp3:{ext:'.mp3',mime:'audio/mpeg',args:['-c:a','libmp3lame','-q:a','0'],label:'MP3'},wav:{ext:'.wav',mime:'audio/wav',args:['-c:a','pcm_s16le'],label:'WAV'},flac:{ext:'.flac',mime:'audio/flac',args:['-c:a','flac'],label:'FLAC'}};
 var $=function(id){return document.getElementById(id)};
 function escapeHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-var $box=$('box'),$boxTitle=$('boxTitle'),$boxSub=$('boxSub'),$fileInput=$('audioFile'),$fileList=$('fileList'),$btn=$('btn'),$status=$('status'),$progWrap=$('progWrap'),$progFill=$('progFill'),$progTxt=$('progTxt'),$warnBanner=$('warnBanner'),$loginArea=$('loginArea'),$mainCard=$('mainCard'),$userChip=$('userChip'),$userAvatar=$('userAvatar'),$userName=$('userName'),$creditChip=$('creditChip'),$creditText=$('creditText'),$quotaText=$('quotaText'),$quotaDot=$('quotaDot'),$planBadge=$('planBadge'),$payModal=$('payModal'),$payBtn=$('payBtn'),$successModal=$('successModal'),$successMsg=$('successMsg'),$customSpeedWrap=$('customSpeedWrap'),$customSpeedInput=$('customSpeedInput'),$rbxModal=$('rbxModal'),$rbxKeyInput=$('rbxKeyInput'),$rbxUserIdInput=$('rbxUserIdInput'),$upgradeModal=$('upgradeModal'),$sidebar=$('sidebar'),$sidebarOverlay=$('sidebarOverlay'),$logConsole=$('logConsole'),$historyConsole=$('historyConsole'),$fileCountBadge=$('fileCountBadge'),$loggedOutHero=$('loggedOutHero');
+var $box=$('box'),$boxTitle=$('boxTitle'),$boxSub=$('boxSub'),$fileInput=$('audioFile'),$fileList=$('fileList'),$btn=$('btn'),$status=$('status'),$progWrap=$('progWrap'),$progFill=$('progFill'),$progTxt=$('progTxt'),$warnBanner=$('warnBanner'),$loginArea=$('loginArea'),$mainCard=$('mainCard'),$userChip=$('userChip'),$userAvatar=$('userAvatar'),$userName=$('userName'),$creditChip=$('creditChip'),$creditText=$('creditText'),$quotaText=$('quotaText'),$quotaDot=$('quotaDot'),$planBadge=$('planBadge'),$payModal=$('payModal'),$payBtn=$('payBtn'),$successModal=$('successModal'),$successMsg=$('successMsg'),$rbxModal=$('rbxModal'),$rbxKeyInput=$('rbxKeyInput'),$rbxUserIdInput=$('rbxUserIdInput'),$upgradeModal=$('upgradeModal'),$sidebar=$('sidebar'),$sidebarOverlay=$('sidebarOverlay'),$logConsole=$('logConsole'),$historyConsole=$('historyConsole'),$fileCountBadge=$('fileCountBadge'),$loggedOutHero=$('loggedOutHero');
 
 var rbxAssets=[];
 
@@ -719,21 +713,69 @@ function getAudioDuration(blob){
    suara jadi kedengaran aneh/kurang jernih. Sekarang basisnya dibaca dari
    file aslinya lewat Web Audio API, dengan fallback 44100 kalau gagal decode. */
 function getAudioSampleRate(file){
+  return getAudioInfo(file).then(function(info){ return info.sampleRate; });
+}
+/* Decode sekali untuk dapat sampleRate DAN duration bareng (lebih efisien
+   daripada decode terpisah). Dipakai untuk menghitung estimasi durasi hasil
+   convert (duration asli / speed) supaya bisa pilih format terbaik. */
+function getAudioInfo(file){
   return new Promise(function(resolve){
     var ctx;
-    try{ ctx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ resolve(44100); return; }
+    try{ ctx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ resolve({sampleRate:44100,duration:0}); return; }
     file.arrayBuffer().then(function(buf){
       ctx.decodeAudioData(buf, function(audioBuffer){
-        resolve(audioBuffer.sampleRate||44100);
+        resolve({sampleRate:audioBuffer.sampleRate||44100,duration:audioBuffer.duration||0});
         try{ctx.close();}catch(e){}
       }, function(){
-        resolve(44100);
+        resolve({sampleRate:44100,duration:0});
         try{ctx.close();}catch(e){}
       });
-    }).catch(function(){ resolve(44100); try{ctx.close();}catch(e){} });
+    }).catch(function(){ resolve({sampleRate:44100,duration:0}); try{ctx.close();}catch(e){} });
   });
 }
 var RBX_MAX_SIZE_BYTES=20*1024*1024, RBX_MAX_DURATION_SEC=7*60;
+/* ===== PEMILIH FORMAT OTOMATIS SESUAI BATASAN ROBLOX (<20MB, <=48kHz) =====
+   Roblox membatasi asset audio maksimal 20MB. Preset speed (2.3x/2.5x/2.7x/4.7x)
+   MEMPERPENDEK durasi hasil (makin besar speed-nya, makin pendek durasinya),
+   jadi bukan angka presetnya yang menentukan format, tapi ESTIMASI DURASI HASIL
+   (durasi asli / speed) untuk file yang sedang diproses. Semakin pendek durasi
+   hasil, semakin "muat" pakai format lossless (kualitas maksimal tanpa kompresi).
+   SAFE_CAP dikasih margin ~1MB di bawah limit 20MB Roblox utk jaga2 overhead
+   container/metadata. Asumsi PCM stereo 48kHz (worst-case) supaya estimasi
+   tidak pernah under-estimate ukuran WAV. */
+var RBX_SAFE_CAP_BYTES = 19 * 1024 * 1024;
+var WAV_BYTES_PER_SEC = 48000 * 2 * 2;      // 16-bit stereo 48kHz PCM
+var FLAC_BYTES_PER_SEC = WAV_BYTES_PER_SEC * 0.9; // worst-case (audio kompleks/noise, kompresi FLAC minim)
+function pickBestFormatForDuration(outDurSec){
+  // durasi tidak terdeteksi (decode gagal) -> asumsikan panjang, main aman pakai OGG
+  if(!outDurSec || outDurSec<=0) outDurSec = RBX_MAX_DURATION_SEC;
+  if(outDurSec*WAV_BYTES_PER_SEC <= RBX_SAFE_CAP_BYTES){
+    return {key:'wav',ext:'.wav',mime:'audio/wav',args:['-c:a','pcm_s16le'],label:'WAV (Lossless)'};
+  }
+  if(outDurSec*FLAC_BYTES_PER_SEC <= RBX_SAFE_CAP_BYTES){
+    return {key:'flac',ext:'.flac',mime:'audio/flac',args:['-c:a','flac','-compression_level','8'],label:'FLAC (Lossless)'};
+  }
+  // OGG dengan bitrate dihitung dinamis dari sisa budget 19MB, dibatasi 96-500kbps
+  var kbps = Math.floor((RBX_SAFE_CAP_BYTES*8)/(outDurSec*1000));
+  kbps = Math.max(96, Math.min(500, kbps));
+  return {key:'ogg',ext:'.ogg',mime:'audio/ogg',args:['-c:a','libvorbis','-b:a',kbps+'k'],label:'OGG '+kbps+'kbps'};
+}
+/* Urutan turun kualitas kalau hasil encode ternyata meleset & masih >20MB
+   (misal source ternyata jauh lebih "berat" dari estimasi). */
+function downgradeFormat(fmtKey, outDurSec){
+  if(fmtKey==='wav'){
+    if(outDurSec*FLAC_BYTES_PER_SEC <= RBX_SAFE_CAP_BYTES) return {key:'flac',ext:'.flac',mime:'audio/flac',args:['-c:a','flac','-compression_level','8'],label:'FLAC (Lossless)'};
+    var kbps=Math.max(96,Math.min(500,Math.floor((RBX_SAFE_CAP_BYTES*8)/(outDurSec*1000))));
+    return {key:'ogg',ext:'.ogg',mime:'audio/ogg',args:['-c:a','libvorbis','-b:a',kbps+'k'],label:'OGG '+kbps+'kbps'};
+  }
+  if(fmtKey==='flac'){
+    var kbps2=Math.max(96,Math.min(500,Math.floor((RBX_SAFE_CAP_BYTES*8)/(outDurSec*1000))));
+    return {key:'ogg',ext:'.ogg',mime:'audio/ogg',args:['-c:a','libvorbis','-b:a',kbps2+'k'],label:'OGG '+kbps2+'kbps'};
+  }
+  // sudah OGG, turunkan bitrate lagi ~30% (masih di atas 64kbps sbg batas bawah wajar)
+  var kbps3=Math.max(64,Math.floor((RBX_SAFE_CAP_BYTES*8)/(outDurSec*1000)*0.7));
+  return {key:'ogg',ext:'.ogg',mime:'audio/ogg',args:['-c:a','libvorbis','-b:a',kbps3+'k'],label:'OGG '+kbps3+'kbps'};
+}
 async function uploadToRoblox(idx){
   var it=items[idx];if(!it||!it.blobData)return;
   if(!isPremium()){openUpgradeModal();return;}
@@ -1004,7 +1046,6 @@ document.querySelectorAll('.preset-btn').forEach(function(b){
     document.querySelectorAll('.preset-btn').forEach(function(x){x.classList.remove('active');});
     b.classList.add('active');
     activePreset=parseInt(b.getAttribute('data-i'),10);
-    if(activePreset===4){$customSpeedWrap.classList.remove('hidden');$customSpeedWrap.classList.add('fade-in');}else{$customSpeedWrap.classList.add('hidden');}
   });
 });
 
@@ -1450,7 +1491,7 @@ function renderList(){
     if(it.status==='processing'){icon='<i class="fa-solid fa-circle-notch fa-spin text-indigo-400" style="font-size:9px"></i>';st='Mengedit...';sc='text-indigo-400';}
     if(it.status==='done'){
         icon='<input type="checkbox" '+(it.checked?'checked':'')+' onchange="toggleCheck('+i+')">';
-        st=FORMATS[state.chosenFmt].label+' — '+formatSize(it.size);sc='text-emerald-500/70';
+        st=(it.fmtLabel||'')+' — '+formatSize(it.size);sc='text-emerald-500/70';
         extra+='<a class="rbx-btn done" href="'+it.url+'" download="'+it.dlName+'" title="Download"><i class="fa-solid fa-download" style="font-size:10px"></i> Download</a>';
         extra+='<button id="rbx_'+i+'" class="rbx-btn '+(isPremium()?'idle':'locked')+'" onclick="uploadToRoblox('+i+')" title="Upload Roblox">'+(isPremium()?'<i class="fa-solid fa-cloud-arrow-up" style="font-size:10px"></i> Upload':'<i class="fa-solid fa-lock" style="font-size:10px"></i> Upload')+'</button>';
     }
@@ -1491,12 +1532,20 @@ function copyText(t) {
   startProcess();
 });
 
+async function encodeWithFormat(it,inp,filter,fmt){
+  var out='out_'+it.id+fmt.ext;
+  var ff=['-i',inp,'-filter:a',filter].concat(fmt.args).concat([out]);
+  await withTimeout(ffmpeg.exec(ff),90000,"Encode "+fmt.label);
+  var data=await ffmpeg.readFile(out);
+  var blob=new Blob([data.buffer],{type:fmt.mime});
+  await ffmpeg.deleteFile(out).catch(function(){});
+  return blob;
+}
+
 async function startProcess(){
-  state.chosenFmt='ogg';
   var targets = items.filter(x => x.checked && x.status === 'pending');
   if(targets.length === 0) { toast('Centang file dulu','info'); return; }
   
-  var fmt=FORMATS[state.chosenFmt];
   $btn.disabled=true;$progWrap.classList.remove('hidden');
   var total=targets.length;
   
@@ -1510,13 +1559,16 @@ async function startProcess(){
     renderList();
     
     try {
-      var cspeed,cresample,cdb;
-      if(activePreset===4){cspeed=parseFloat($customSpeedInput.value)||2.5;cresample=48000;cdb=0;}
-      else{var pr=presets[activePreset];cspeed=pr.speed;cresample=pr.resample;cdb=pr.db;}
+      var pr=presets[activePreset];
+      var cspeed=pr.speed,cresample=pr.resample,cdb=pr.db;
       
       it.speedUsed = cspeed;
-      var ext=it.file.name.substring(it.file.name.lastIndexOf('.')),inp='in_'+it.id+ext,out='out_'+it.id+fmt.ext;
-      var srcRate=await getAudioSampleRate(it.file);
+      var ext=it.file.name.substring(it.file.name.lastIndexOf('.')),inp='in_'+it.id+ext;
+      var srcInfo=await getAudioInfo(it.file);
+      var srcRate=srcInfo.sampleRate;
+      // durasi hasil = durasi asli / speed (makin cepat, makin pendek hasilnya)
+      var outDurEstimate = srcInfo.duration ? (srcInfo.duration/cspeed) : 0;
+      var fmt = pickBestFormatForDuration(outDurEstimate);
       
       /* aresample dulu default-nya pakai filter pendek — pas rasio speed
          ekstrim (misal >2x atau <0.5x, kayak proses "reverse" 2.3 -> 0.43)
@@ -1539,12 +1591,21 @@ async function startProcess(){
          jaring pengaman terakhir supaya puncak sinyal tidak pernah pecah. */
       filter += ',loudnorm=I=-14:TP=-1.5:LRA=11,alimiter=limit=0.95:attack=5:release=50';
       
-      var ff=['-i',inp,'-filter:a',filter].concat(fmt.args).concat([out]);
       await ffmpeg.writeFile(inp, await fetchFile(it.file));
-      await withTimeout(ffmpeg.exec(ff),90000,"Encode "+fmt.label);
-      var data=await ffmpeg.readFile(out);
-      var blob=new Blob([data.buffer],{type:fmt.mime});
+      var blob=await encodeWithFormat(it,inp,filter,fmt);
+      
+      /* Jaring pengaman: kalau estimasi meleset & hasil masih >20MB (limit
+         keras Roblox), turun kualitas otomatis & encode ulang, maks 2x coba. */
+      var safetyTries=0;
+      while(blob.size>RBX_MAX_SIZE_BYTES && safetyTries<2){
+        logLine('info',it.file.name+': hasil '+fmt.label+' ('+formatSize(blob.size)+') masih >20MB, turun ke format lebih kecil...');
+        fmt=downgradeFormat(fmt.key, outDurEstimate||RBX_MAX_DURATION_SEC);
+        blob=await encodeWithFormat(it,inp,filter,fmt);
+        safetyTries++;
+      }
+      
       it.url=URL.createObjectURL(blob);it.blobData=blob;it.size=blob.size;
+      it.fmtLabel=fmt.label;it.fmtExt=fmt.ext;
       
       var baseName = it.customName || it.file.name.replace(/\.[^/.]+$/, "");
       baseName = baseName.replace(/\.[^/.]+$/, "");
@@ -1554,8 +1615,8 @@ async function startProcess(){
       it.dlName = baseName + suffix + fmt.ext;
       
       it.status='done';useQuota(c.src);updateQuotaDisplay();
-      logLine('success',it.file.name+' berhasil dikonversi');
-      await ffmpeg.deleteFile(inp).catch(function(){});await ffmpeg.deleteFile(out).catch(function(){});
+      logLine('success',it.file.name+' berhasil dikonversi ('+fmt.label+', '+formatSize(blob.size)+')');
+      await ffmpeg.deleteFile(inp).catch(function(){});
     }catch(err){
       it.status='pending';refundQuota(c.src);updateQuotaDisplay();
       logLine('error',it.file.name+' gagal: '+describeError(err));
