@@ -599,7 +599,7 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
 <script>
 var CONFIG_MODE='demo',API_BASE='https://backend-kamu.contoh.workers.dev',MAX_FILES=10;
 var ROBLOX_PROXY_URL='https://convertyaall-proxy.binomo2b.workers.dev';
-var FORMATS={ogg:{ext:'.ogg',mime:'audio/ogg',args:['-c:a','libvorbis'],label:'OGG'},mp3:{ext:'.mp3',mime:'audio/mpeg',args:['-c:a','libmp3lame'],label:'MP3'},wav:{ext:'.wav',mime:'audio/wav',args:['-c:a','pcm_s16le'],label:'WAV'},flac:{ext:'.flac',mime:'audio/flac',args:['-c:a','flac'],label:'FLAC'}};
+var FORMATS={ogg:{ext:'.ogg',mime:'audio/ogg',args:['-c:a','libvorbis','-q:a','8'],label:'OGG'},mp3:{ext:'.mp3',mime:'audio/mpeg',args:['-c:a','libmp3lame','-q:a','0'],label:'MP3'},wav:{ext:'.wav',mime:'audio/wav',args:['-c:a','pcm_s16le'],label:'WAV'},flac:{ext:'.flac',mime:'audio/flac',args:['-c:a','flac'],label:'FLAC'}};
 var $=function(id){return document.getElementById(id)};
 function escapeHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 var $box=$('box'),$boxTitle=$('boxTitle'),$boxSub=$('boxSub'),$fileInput=$('audioFile'),$fileList=$('fileList'),$btn=$('btn'),$status=$('status'),$progWrap=$('progWrap'),$progFill=$('progFill'),$progTxt=$('progTxt'),$warnBanner=$('warnBanner'),$loginArea=$('loginArea'),$mainCard=$('mainCard'),$userChip=$('userChip'),$userAvatar=$('userAvatar'),$userName=$('userName'),$creditChip=$('creditChip'),$creditText=$('creditText'),$quotaText=$('quotaText'),$quotaDot=$('quotaDot'),$planBadge=$('planBadge'),$payModal=$('payModal'),$payBtn=$('payBtn'),$successModal=$('successModal'),$successMsg=$('successMsg'),$customSpeedWrap=$('customSpeedWrap'),$customSpeedInput=$('customSpeedInput'),$rbxModal=$('rbxModal'),$rbxKeyInput=$('rbxKeyInput'),$rbxUserIdInput=$('rbxUserIdInput'),$upgradeModal=$('upgradeModal'),$sidebar=$('sidebar'),$sidebarOverlay=$('sidebarOverlay'),$logConsole=$('logConsole'),$historyConsole=$('historyConsole'),$fileCountBadge=$('fileCountBadge'),$loggedOutHero=$('loggedOutHero');
@@ -1518,7 +1518,12 @@ async function startProcess(){
       var ext=it.file.name.substring(it.file.name.lastIndexOf('.')),inp='in_'+it.id+ext,out='out_'+it.id+fmt.ext;
       var srcRate=await getAudioSampleRate(it.file);
       
-      var filter = 'asetrate='+srcRate+'*'+cspeed+',aresample='+cresample+',volume='+cdb+'dB';
+      /* aresample dulu default-nya pakai filter pendek — pas rasio speed
+         ekstrim (misal >2x atau <0.5x, kayak proses "reverse" 2.3 -> 0.43)
+         itu bikin artefak resampling yang kedengaran kayak noise/desis.
+         filter_size & cutoff yang lebih tinggi bikin hasil interpolasi jauh
+         lebih bersih, terutama di rasio ekstrim begitu. */
+      var filter = 'asetrate='+srcRate+'*'+cspeed+',aresample=sample_rate='+cresample+':filter_size=64:cutoff=0.98,volume='+cdb+'dB';
       if(it.eq) {
         filter += ',bass=g='+it.eq.low+':f=320,equalizer=g='+it.eq.mid+':f=1000:width_type=q:w=1,treble=g='+it.eq.high+':f=3200,equalizer=g='+it.eq.dens+':f=8000:width_type=q:w=1';
         if(it.eq.wet>0) {
@@ -1527,11 +1532,12 @@ async function startProcess(){
           filter += ',aecho=0.9:'+(it.eq.wet/100).toFixed(2)+':'+wDelayMs+':'+wDecayVal;
         }
       }
-      /* Limiter di paling akhir chain — EQ (bass/mid/treble) + echo yang
-         ditumpuk bisa gampang bikin sinyal lewat 0dBFS dan suara jadi
-         pecah/kasar. alimiter menjaga puncak tetap aman tanpa mengubah
-         karakter suara secara terdengar. */
-      filter += ',alimiter=limit=0.95:attack=5:release=50';
+      /* loudnorm menormalkan volume ke target loudness standar (-14 LUFS,
+         setara Spotify/YouTube) — ini yang benerin keluhan "suara kecil",
+         soalnya sebelumnya file yang aslinya pelan ya tetap kedengaran
+         pelan setelah convert. alimiter tetap dipasang paling akhir sebagai
+         jaring pengaman terakhir supaya puncak sinyal tidak pernah pecah. */
+      filter += ',loudnorm=I=-14:TP=-1.5:LRA=11,alimiter=limit=0.95:attack=5:release=50';
       
       var ff=['-i',inp,'-filter:a',filter].concat(fmt.args).concat([out]);
       await ffmpeg.writeFile(inp, await fetchFile(it.file));
