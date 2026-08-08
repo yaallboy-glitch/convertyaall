@@ -601,6 +601,7 @@ var CONFIG_MODE='demo',API_BASE='https://backend-kamu.contoh.workers.dev',MAX_FI
 var ROBLOX_PROXY_URL='https://convertyaall-proxy.binomo2b.workers.dev';
 var FORMATS={ogg:{ext:'.ogg',mime:'audio/ogg',args:['-c:a','libvorbis'],label:'OGG'},mp3:{ext:'.mp3',mime:'audio/mpeg',args:['-c:a','libmp3lame'],label:'MP3'},wav:{ext:'.wav',mime:'audio/wav',args:['-c:a','pcm_s16le'],label:'WAV'},flac:{ext:'.flac',mime:'audio/flac',args:['-c:a','flac'],label:'FLAC'}};
 var $=function(id){return document.getElementById(id)};
+function escapeHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 var $box=$('box'),$boxTitle=$('boxTitle'),$boxSub=$('boxSub'),$fileInput=$('audioFile'),$fileList=$('fileList'),$btn=$('btn'),$status=$('status'),$progWrap=$('progWrap'),$progFill=$('progFill'),$progTxt=$('progTxt'),$warnBanner=$('warnBanner'),$loginArea=$('loginArea'),$mainCard=$('mainCard'),$userChip=$('userChip'),$userAvatar=$('userAvatar'),$userName=$('userName'),$creditChip=$('creditChip'),$creditText=$('creditText'),$quotaText=$('quotaText'),$quotaDot=$('quotaDot'),$planBadge=$('planBadge'),$payModal=$('payModal'),$payBtn=$('payBtn'),$successModal=$('successModal'),$successMsg=$('successMsg'),$customSpeedWrap=$('customSpeedWrap'),$customSpeedInput=$('customSpeedInput'),$rbxModal=$('rbxModal'),$rbxKeyInput=$('rbxKeyInput'),$rbxUserIdInput=$('rbxUserIdInput'),$upgradeModal=$('upgradeModal'),$sidebar=$('sidebar'),$sidebarOverlay=$('sidebarOverlay'),$logConsole=$('logConsole'),$historyConsole=$('historyConsole'),$fileCountBadge=$('fileCountBadge'),$loggedOutHero=$('loggedOutHero');
 
 var rbxAssets=[];
@@ -660,7 +661,7 @@ function toast(m,t){
   var c=t==='ok'?'toast-ok':t==='err'?'toast-err':'toast-info';
   var i=t==='ok'?'fa-check':t==='err'?'fa-xmark':'fa-info';
   e.className='toast-item '+c;
-  e.innerHTML='<i class="fa-solid '+i+'" style="font-size:11px"></i><span>'+m+'</span>';
+  e.innerHTML='<i class="fa-solid '+i+'" style="font-size:11px"></i><span>'+escapeHtml(m)+'</span>';
   w.appendChild(e);
   setTimeout(function(){if(e.parentNode)e.remove();},3400);
 }
@@ -686,8 +687,8 @@ function updateQuotaDisplay(){
   }
 }
 
-function saveLocal(){if(CONFIG_MODE!=='demo')return;try{localStorage.setItem('convyl_pay',JSON.stringify({email:state.email,credits:state.credits,isSubscribed:state.isSubscribed,subExpiry:state.subExpiry}));}catch(e){}}
-function loadLocal(em){if(CONFIG_MODE!=='demo')return;try{var d=JSON.parse(localStorage.getItem('convyl_pay'));if(d&&d.email===em){state.credits=d.credits||0;state.isSubscribed=d.isSubscribed||false;state.subExpiry=d.subExpiry||null;}}catch(e){}}
+function saveLocal(){if(CONFIG_MODE!=='demo')return;try{localStorage.setItem('convyl_pay',JSON.stringify({email:state.email,credits:state.credits,isSubscribed:state.isSubscribed,subExpiry:state.subExpiry,freeUsed:state.freeUsed}));}catch(e){}}
+function loadLocal(em){if(CONFIG_MODE!=='demo')return;try{var d=JSON.parse(localStorage.getItem('convyl_pay'));if(d&&d.email===em){state.credits=d.credits||0;state.isSubscribed=d.isSubscribed||false;state.subExpiry=d.subExpiry||null;state.freeUsed=d.freeUsed||false;}else{state.freeUsed=false;}}catch(e){}}
 function saveRbxLocal(){try{localStorage.setItem('convyl_rbx_'+state.email,JSON.stringify({key:state.rbxKey,uid:state.rbxUserId}));}catch(e){}}
 function loadRbxLocal(){try{var d=JSON.parse(localStorage.getItem('convyl_rbx_'+state.email));if(d){state.rbxKey=d.key||null;state.rbxUserId=d.uid||null;}}catch(e){}}
 function openRbxModal(){$rbxKeyInput.value=state.rbxKey||'';$rbxUserIdInput.value=state.rbxUserId||'';$rbxModal.classList.add('show');document.body.style.overflow='hidden';}
@@ -709,6 +710,27 @@ function getAudioDuration(blob){
     a.onloadedmetadata=function(){ URL.revokeObjectURL(url); resolve(a.duration||0); };
     a.onerror=function(){ URL.revokeObjectURL(url); resolve(0); };
     a.src=url;
+  });
+}
+/* Deteksi sample rate ASLI file audio. Sebelumnya kode selalu mengasumsikan
+   44100Hz utk basis asetrate — kalau file aslinya 48000Hz (umum utk audio
+   hasil extract video) atau 32000/22050Hz (mp3 kualitas rendah), asumsi itu
+   bikin speed & pitch hasil convert meleset dari preset yang dipilih, dan
+   suara jadi kedengaran aneh/kurang jernih. Sekarang basisnya dibaca dari
+   file aslinya lewat Web Audio API, dengan fallback 44100 kalau gagal decode. */
+function getAudioSampleRate(file){
+  return new Promise(function(resolve){
+    var ctx;
+    try{ ctx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ resolve(44100); return; }
+    file.arrayBuffer().then(function(buf){
+      ctx.decodeAudioData(buf, function(audioBuffer){
+        resolve(audioBuffer.sampleRate||44100);
+        try{ctx.close();}catch(e){}
+      }, function(){
+        resolve(44100);
+        try{ctx.close();}catch(e){}
+      });
+    }).catch(function(){ resolve(44100); try{ctx.close();}catch(e){} });
   });
 }
 var RBX_MAX_SIZE_BYTES=20*1024*1024, RBX_MAX_DURATION_SEC=7*60;
@@ -817,14 +839,14 @@ function renderRbxHistoryRow(assetEntry){
   var row=assetEntry.el;
   var time=new Date().toLocaleTimeString('id-ID',{hour12:false});
   if(assetEntry.status==='pending'){
-    row.innerHTML='<span class="log-tag upload"><span class="spinner" style="width:9px;height:9px"></span></span><span class="log-time">'+time+'</span><span class="log-msg">'+assetEntry.name+' — menunggu moderasi Roblox...</span>';
+    row.innerHTML='<span class="log-tag upload"><span class="spinner" style="width:9px;height:9px"></span></span><span class="log-time">'+time+'</span><span class="log-msg">'+escapeHtml(assetEntry.name)+' — menunggu moderasi Roblox...</span>';
     row.style.cursor='default';row.onclick=null;row.title='';
   }else if(assetEntry.status==='error'){
-    row.innerHTML='<span class="log-tag error">[GAGAL]</span><span class="log-time">'+time+'</span><span class="log-msg">'+assetEntry.name+' — gagal/timeout moderasi</span>';
+    row.innerHTML='<span class="log-tag error">[GAGAL]</span><span class="log-time">'+time+'</span><span class="log-msg">'+escapeHtml(assetEntry.name)+' — gagal/timeout moderasi</span>';
     row.style.cursor='default';row.onclick=null;row.title='';
   }else{
     var u='rbxassetid://'+assetEntry.assetId;
-    row.innerHTML='<span class="log-tag success">[OK]</span><span class="log-time">'+time+'</span><span class="log-msg">'+assetEntry.name+' — <b style="color:#4ade80">'+u+'</b> <i class="fa-solid fa-copy" style="font-size:9px;opacity:.6;margin-left:4px"></i></span>';
+    row.innerHTML='<span class="log-tag success">[OK]</span><span class="log-time">'+time+'</span><span class="log-msg">'+escapeHtml(assetEntry.name)+' — <b style="color:#4ade80">'+u+'</b> <i class="fa-solid fa-copy" style="font-size:9px;opacity:.6;margin-left:4px"></i></span>';
     row.style.cursor='pointer';row.title='Klik untuk copy Asset ID';
     row.onclick=function(){navigator.clipboard.writeText(u).then(function(){toast('Disalin: '+u,'ok');});};
   }
@@ -843,8 +865,22 @@ function canEdit(){
   if(!state.freeUsed)return{ok:true,src:'free'};
   return{ok:false,src:null};
 }
-function useQuota(s){if(s==='free'){state.freeUsed=true;return;}if(s==='credit'){state.credits--;saveLocal();}}
-function refundQuota(s){if(s==='free'){state.freeUsed=false;return;}if(s==='credit'){state.credits++;saveLocal();}}
+function useQuota(s){
+  if(s==='free'){
+    state.freeUsed=true;
+    if(state.email){saveLocal();}else{try{localStorage.setItem('convyl_anon_free_used','1');}catch(e){}}
+    return;
+  }
+  if(s==='credit'){state.credits--;saveLocal();}
+}
+function refundQuota(s){
+  if(s==='free'){
+    state.freeUsed=false;
+    if(state.email){saveLocal();}else{try{localStorage.removeItem('convyl_anon_free_used');}catch(e){}}
+    return;
+  }
+  if(s==='credit'){state.credits++;saveLocal();}
+}
 
 
 function openPayModal(){state.chosenPlan=null;document.querySelectorAll('.pay-card').forEach(function(c){c.classList.remove('chosen');});$payBtn.disabled=true;$payBtn.textContent='Pilih paket';$payModal.classList.add('show');document.body.style.overflow='hidden';}
@@ -896,18 +932,33 @@ var isInApp=(function(){
   var u=navigator.userAgent||'';
   return['WhatsApp','Instagram','FBAN','FBAV','Line/','MicroMessenger','TikTok','Discord'].some(function(p){return u.indexOf(p)!==-1;});
 })();
-if(isInApp){$warnBanner.classList.remove('hidden');$loginArea.classList.add('hidden');$mainCard.classList.remove('hidden');if($loggedOutHero)$loggedOutHero.classList.add('hidden');updateQuotaDisplay();}
+if(isInApp){
+  $warnBanner.classList.remove('hidden');$loginArea.classList.add('hidden');$mainCard.classList.remove('hidden');if($loggedOutHero)$loggedOutHero.classList.add('hidden');
+  /* Login Google & pembayaran sering tidak jalan di in-app browser (WA/IG/dll),
+     jadi user dibiarkan pakai tanpa akun — tapi jatah gratisnya tetap harus
+     dikunci per-perangkat lewat localStorage, bukan cuma variabel di memori,
+     supaya refresh halaman tidak memberi jatah gratis baru berulang-ulang. */
+  try{state.freeUsed=localStorage.getItem('convyl_anon_free_used')==='1';}catch(e){}
+  updateQuotaDisplay();
+}
 
 var GOOGLE_CLIENT_ID="554107557548-o2q25dcsqj07r3hupdkvtes2tujfri9l.apps.googleusercontent.com";
 function decodeJwt(t){try{var p=t.split('.')[1];return JSON.parse(decodeURIComponent(atob(p).split('').map(function(c){return'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2);}).join('')));}catch(e){return null;}}
-function handleCredentialResponse(r){
-  var p=decodeJwt(r.credential);if(!p)return;
-  state.email=p.email;state.name=p.name||p.email;state.freeUsed=false;
+/* Satu fungsi dipakai baik untuk login baru (klik tombol Google) maupun
+   saat sesi dipulihkan otomatis dari localStorage, supaya UI & data kuota
+   selalu konsisten di kedua jalur. */
+function applySession(p){
+  state.email=p.email;state.name=p.name||p.email;
   if(p.picture){$userAvatar.style.backgroundImage="url('"+p.picture+"')";var fb1=$('userAvatarFallback');if(fb1)fb1.style.display='none';}
   $userName.textContent=state.name;var uet=$('userEmailText');if(uet)uet.textContent=state.email||'';
+  loadLocal(state.email);loadRbxLocal();
   $loginArea.classList.add('hidden');$userChip.classList.remove('hidden');$mainCard.classList.remove('hidden');if($loggedOutHero)$loggedOutHero.classList.add('hidden');
-  loadLocal(state.email);loadRbxLocal();updateQuotaDisplay();
-  try{localStorage.setItem('convyl_user',JSON.stringify(p));}catch(e){}
+  updateQuotaDisplay();
+  try{localStorage.setItem('convyl_user',JSON.stringify({email:p.email,name:state.name,picture:p.picture||null}));}catch(e){}
+}
+function handleCredentialResponse(r){
+  var p=decodeJwt(r.credential);if(!p)return;
+  applySession(p);
   toast('Selamat datang, '+(p.name||p.email.split('@')[0])+'!','ok');
 }
 function handleLogout(){
@@ -940,11 +991,7 @@ function initGoogleLogin(){
     var s=localStorage.getItem('convyl_user');
     if(s){
       var p=JSON.parse(s);
-      state.email=p.email;state.name=p.name||p.email;
-      if(p.picture){$userAvatar.style.backgroundImage="url('"+p.picture+"')";var fb2=$('userAvatarFallback');if(fb2)fb2.style.display='none';}
-      $userName.textContent=state.name;var uet=$('userEmailText');if(uet)uet.textContent=state.email||'';
-      $loginArea.classList.add('hidden');$userChip.classList.remove('hidden');$mainCard.classList.remove('hidden');if($loggedOutHero)$loggedOutHero.classList.add('hidden');
-      loadLocal(state.email);loadRbxLocal();updateQuotaDisplay();
+      if(p&&p.email)applySession(p);
     }
   }catch(e){}
 }
@@ -983,23 +1030,37 @@ function describeError(e){try{if(!e)return'kosong';if(typeof e==='string')return
 window.addEventListener('error',function(e){console.error(e);});
 window.addEventListener('unhandledrejection',function(e){console.error(e.reason);});
 
+/* PENTING: FFMPEG_CORE_VERSION & FFMPEG_VERSION di sini HARUS selalu sama
+   dengan versi di <script src="https://unpkg.com/@ffmpeg/ffmpeg@X.X.X/..."> di
+   bagian <head>. Nama chunk '814.ffmpeg.js' unik per-versi paket @ffmpeg/ffmpeg,
+   jadi kalau versi di head diganti tapi baris ini tidak, FFmpeg akan gagal load. */
+var FFMPEG_CORE_VERSION='0.12.6', FFMPEG_VERSION='0.12.10';
+var FFMPEG_CDNS=[
+  {name:'CDN utama',core:'https://unpkg.com/@ffmpeg/core@'+FFMPEG_CORE_VERSION+'/dist/esm',worker:'https://unpkg.com/@ffmpeg/ffmpeg@'+FFMPEG_VERSION+'/dist/umd/814.ffmpeg.js'},
+  {name:'CDN cadangan',core:'https://cdn.jsdelivr.net/npm/@ffmpeg/core@'+FFMPEG_CORE_VERSION+'/dist/esm',worker:'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@'+FFMPEG_VERSION+'/dist/umd/814.ffmpeg.js'}
+];
 async function boot(){
   if(envError)return;
-  try{
-    $status.innerText="Memuat editor...";
-    logLine('info','Menginisialisasi ConverterYL...');
-    logLine('info','Memuat FFmpeg engine...');
-    var b="https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm";
-    await withTimeout(ffmpeg.load({
-      coreURL:await toBlobURL(b+'/ffmpeg-core.js',"text/javascript"),
-      wasmURL:await toBlobURL(b+'/ffmpeg-core.wasm',"application/wasm"),
-      classWorkerURL:await toBlobURL("https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js","text/javascript")
-    }),25000,"Load FFmpeg");
-    loaded=true;$status.innerText=items.length?"Siap diedit.":"Editor siap.";
-    logLine('info','FFmpeg berhasil dimuat');
-  }catch(e){
-    $status.innerText="Gagal — "+describeError(e);$warnBanner.classList.remove('hidden');
-    logLine('error','Gagal memuat editor: '+describeError(e));
+  $status.innerText="Memuat editor...";
+  logLine('info','Menginisialisasi ConverterYL...');
+  for(var i=0;i<FFMPEG_CDNS.length;i++){
+    var cdn=FFMPEG_CDNS[i];
+    try{
+      logLine('info','Memuat FFmpeg engine dari '+cdn.name+'...');
+      await withTimeout(ffmpeg.load({
+        coreURL:await toBlobURL(cdn.core+'/ffmpeg-core.js',"text/javascript"),
+        wasmURL:await toBlobURL(cdn.core+'/ffmpeg-core.wasm',"application/wasm"),
+        classWorkerURL:await toBlobURL(cdn.worker,"text/javascript")
+      }),25000,"Load FFmpeg");
+      loaded=true;$status.innerText=items.length?"Siap diedit.":"Editor siap.";
+      logLine('info','FFmpeg berhasil dimuat ('+cdn.name+')');
+      return;
+    }catch(e){
+      logLine('error','Gagal memuat dari '+cdn.name+': '+describeError(e));
+      if(i===FFMPEG_CDNS.length-1){
+        $status.innerText="Gagal — "+describeError(e);$warnBanner.classList.remove('hidden');
+      }
+    }
   }
 }
 boot();
@@ -1049,7 +1110,7 @@ function renderQueueList(){
   $q.innerHTML=queueItems.map(function(q,i){
     return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row fade-up" style="cursor:pointer" onclick="openAskEditForQueue('+i+')">'+
       '<div class="row-index">'+(i+1)+'</div>'+
-      '<div class="flex-1 min-w-0"><div class="text-xs font-medium text-zinc-300 truncate">'+q.name+'</div></div>'+
+      '<div class="flex-1 min-w-0"><div class="text-xs font-medium text-zinc-300 truncate">'+escapeHtml(q.name)+'</div></div>'+
       '<i class="fa-solid fa-chevron-right text-zinc-600" style="font-size:10px"></i>'+
     '</div>';
   }).join('');
@@ -1094,7 +1155,7 @@ function closeAskEdit(editFirst) {
 }
 
 // ===== PLAYMODE (EQ) =====
-var pmAudioCtx, pmSource, pmLow, pmMid, pmHigh, pmDens, pmDelay, pmFeedback, pmWetGain, pmDryGain;
+var pmAudioCtx, pmSource, pmLow, pmMid, pmHigh, pmDens, pmDelay, pmFeedback, pmWetGain, pmDryGain, pmLimiter;
 var pmEq = { low: 0, mid: 0, high: 0, dens: 0, wet: 0, decay: 0 };
 var pmCurrentIdx = -1;
 
@@ -1127,9 +1188,16 @@ function initPmAudioGraph() {
   pmFeedback = pmAudioCtx.createGain(); pmFeedback.gain.value = 0;
   pmWetGain = pmAudioCtx.createGain(); pmWetGain.gain.value = 0;
   pmDryGain = pmAudioCtx.createGain(); pmDryGain.gain.value = 1;
+  /* Limiter (compressor rasio tinggi) sebelum speaker, supaya saat user naikkan
+     bass/mid/treble/echo bareng-bareng, preview tidak clipping/pecah — jadi
+     yang didengar lebih dekat dengan hasil convert final yang juga dilimit. */
+  pmLimiter = pmAudioCtx.createDynamicsCompressor();
+  pmLimiter.threshold.value = -3; pmLimiter.knee.value = 0; pmLimiter.ratio.value = 20;
+  pmLimiter.attack.value = 0.003; pmLimiter.release.value = 0.15;
   pmSource.connect(pmLow); pmLow.connect(pmMid); pmMid.connect(pmHigh); pmHigh.connect(pmDens);
-  pmDens.connect(pmDryGain); pmDryGain.connect(pmAudioCtx.destination);
-  pmDens.connect(pmDelay); pmDelay.connect(pmFeedback); pmFeedback.connect(pmDelay); pmDelay.connect(pmWetGain); pmWetGain.connect(pmAudioCtx.destination);
+  pmDens.connect(pmDryGain); pmDryGain.connect(pmLimiter);
+  pmDens.connect(pmDelay); pmDelay.connect(pmFeedback); pmFeedback.connect(pmDelay); pmDelay.connect(pmWetGain); pmWetGain.connect(pmLimiter);
+  pmLimiter.connect(pmAudioCtx.destination);
   updatePmEQ();
 }
 function pmFormatTime(sec) {
@@ -1394,7 +1462,7 @@ function renderList(){
     
     extra+='</div>';
     
-    return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row fade-up"><div class="row-index w-6">'+icon+'</div><div class="flex-1 min-w-0"><div class="text-xs font-medium text-zinc-300 truncate flex items-center gap-2"><i class="fa-solid fa-music text-zinc-500" style="font-size:10px"></i> '+displayName+'</div><div class="text-[10px] '+sc+' mt-0.5 flex items-center gap-1.5">'+st+'</div></div>'+extra+'</div>';
+    return '<div class="flex items-center gap-3 px-3 py-2.5 upload-row fade-up"><div class="row-index w-6">'+icon+'</div><div class="flex-1 min-w-0"><div class="text-xs font-medium text-zinc-300 truncate flex items-center gap-2"><i class="fa-solid fa-music text-zinc-500" style="font-size:10px"></i> '+escapeHtml(displayName)+'</div><div class="text-[10px] '+sc+' mt-0.5 flex items-center gap-1.5">'+st+'</div></div>'+extra+'</div>';
   }).join('');
 }
 function formatSize(b){if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB';}
@@ -1448,16 +1516,22 @@ async function startProcess(){
       
       it.speedUsed = cspeed;
       var ext=it.file.name.substring(it.file.name.lastIndexOf('.')),inp='in_'+it.id+ext,out='out_'+it.id+fmt.ext;
+      var srcRate=await getAudioSampleRate(it.file);
       
-      var filter = 'asetrate=44100*'+cspeed+',aresample='+cresample+',volume='+cdb+'dB';
+      var filter = 'asetrate='+srcRate+'*'+cspeed+',aresample='+cresample+',volume='+cdb+'dB';
       if(it.eq) {
         filter += ',bass=g='+it.eq.low+':f=320,equalizer=g='+it.eq.mid+':f=1000:width_type=q:w=1,treble=g='+it.eq.high+':f=3200,equalizer=g='+it.eq.dens+':f=8000:width_type=q:w=1';
         if(it.eq.wet>0) {
           var wDelayMs=Math.round(50+(it.eq.decay||0)/100*250);
           var wDecayVal=Math.min(0.6,((it.eq.decay||0)/100)*0.6).toFixed(2);
-          filter += ',aecho=1.0:'+(it.eq.wet/100).toFixed(2)+':'+wDelayMs+':'+wDecayVal;
+          filter += ',aecho=0.9:'+(it.eq.wet/100).toFixed(2)+':'+wDelayMs+':'+wDecayVal;
         }
       }
+      /* Limiter di paling akhir chain — EQ (bass/mid/treble) + echo yang
+         ditumpuk bisa gampang bikin sinyal lewat 0dBFS dan suara jadi
+         pecah/kasar. alimiter menjaga puncak tetap aman tanpa mengubah
+         karakter suara secara terdengar. */
+      filter += ',alimiter=limit=0.95:attack=5:release=50';
       
       var ff=['-i',inp,'-filter:a',filter].concat(fmt.args).concat([out]);
       await ffmpeg.writeFile(inp, await fetchFile(it.file));
