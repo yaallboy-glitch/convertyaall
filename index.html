@@ -905,6 +905,9 @@ function handleCredentialResponse(r){
   state.email=p.email;state.name=p.name||p.email;state.freeUsed=false;
   if(p.picture){$userAvatar.style.backgroundImage="url('"+p.picture+"')";var fb1=$('userAvatarFallback');if(fb1)fb1.style.display='none';}
   $userName.textContent=state.name;var uet=$('userEmailText');if(uet)uet.textContent=state.email||'';
+  $loginArea.classList.add('hidden');$userChip.classList.remove('hidden');$mainCard.classList.remove('hidden');if($loggedOutHero)$loggedOutHero.classList.add('hidden');
+  loadLocal(state.email);loadRbxLocal();updateQuotaDisplay();
+  try{localStorage.setItem('convyl_user',JSON.stringify(p));}catch(e){}
   toast('Selamat datang, '+(p.name||p.email.split('@')[0])+'!','ok');
 }
 function handleLogout(){
