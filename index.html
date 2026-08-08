@@ -701,11 +701,33 @@ function closeUpgradeModal(){$upgradeModal.classList.remove('show');document.bod
 
 function isPremium(){return state.isSubscribed&&state.subExpiry&&Date.now()<state.subExpiry;}
 
+function getAudioDuration(blob){
+  return new Promise(function(resolve){
+    var url=URL.createObjectURL(blob);
+    var a=new Audio();
+    a.preload='metadata';
+    a.onloadedmetadata=function(){ URL.revokeObjectURL(url); resolve(a.duration||0); };
+    a.onerror=function(){ URL.revokeObjectURL(url); resolve(0); };
+    a.src=url;
+  });
+}
+var RBX_MAX_SIZE_BYTES=20*1024*1024, RBX_MAX_DURATION_SEC=7*60;
 async function uploadToRoblox(idx){
   var it=items[idx];if(!it||!it.blobData)return;
   if(!isPremium()){openUpgradeModal();return;}
   if(!state.rbxKey||!state.rbxUserId){openRbxModal();toast('Lengkapi API Key & User ID dulu','info');return;}
   var b=document.getElementById('rbx_'+idx);if(!b||b.disabled)return;
+
+  if(it.blobData.size>RBX_MAX_SIZE_BYTES){
+    toast('File terlalu besar untuk Roblox (maks 20MB, ini '+formatSize(it.blobData.size)+')','err');
+    return;
+  }
+  var dur=await getAudioDuration(it.blobData);
+  if(dur>RBX_MAX_DURATION_SEC){
+    toast('Durasi terlalu panjang untuk Roblox (maks 7 menit, ini '+Math.ceil(dur/60)+' menit)','err');
+    return;
+  }
+
   b.disabled=true;b.className='rbx-btn loading';b.innerHTML='<span class="spinner"></span> Upload...';
   var rawName = it.customName || it.file.name.replace(/\.[^/.]+$/,'');
   var safeName = truncateName(rawName, 50);
@@ -925,7 +947,7 @@ function initGoogleLogin(){
 }
 initGoogleLogin();
 
-var presets=[{speed:2.3,db:0,resample:96000},{speed:2.5,db:0,resample:96000},{speed:2.7,db:0,resample:96000},{speed:4.7,db:0,resample:96000}];
+var presets=[{speed:2.3,db:0,resample:48000},{speed:2.5,db:0,resample:48000},{speed:2.7,db:0,resample:48000},{speed:4.7,db:0,resample:48000}];
 var activePreset=0;
 document.querySelectorAll('.preset-btn').forEach(function(b){
   b.addEventListener('click',function(){
@@ -1418,7 +1440,7 @@ async function startProcess(){
     
     try {
       var cspeed,cresample,cdb;
-      if(activePreset===4){cspeed=parseFloat($customSpeedInput.value)||2.5;cresample=96000;cdb=0;}
+      if(activePreset===4){cspeed=parseFloat($customSpeedInput.value)||2.5;cresample=48000;cdb=0;}
       else{var pr=presets[activePreset];cspeed=pr.speed;cresample=pr.resample;cdb=pr.db;}
       
       it.speedUsed = cspeed;
