@@ -307,11 +307,20 @@ input[type="checkbox"]{width:16px;height:16px;accent-color:#818cf8;cursor:pointe
     <div class="dash-col">
       <div class="panel">
         <div class="section-label">Speed Preset</div>
-        <div class="grid grid-cols-4 gap-1.5" id="presetPicker">
-          <button class="preset-btn active text-xs font-semibold py-2 rounded-lg" data-i="0">2.3x</button>
-          <button class="preset-btn text-xs font-semibold py-2 rounded-lg" data-i="1">2.5x</button>
-          <button class="preset-btn text-xs font-semibold py-2 rounded-lg" data-i="2">2.7x</button>
-          <button class="preset-btn text-xs font-semibold py-2 rounded-lg" data-i="3">4.7x</button>
+        <div class="mb-2.5 p-2.5 rounded-lg text-[10px] leading-relaxed text-zinc-500" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05)">
+          <b class="text-zinc-400">Panjang lagu maksimal per preset</b> (supaya hasil ≤7:00 &amp; otomatis ≤20MB):<br>
+          Normal 1x: <b class="text-zinc-300">6:59</b> &nbsp;·&nbsp;
+          2.3x: <b class="text-zinc-300">16:03</b> &nbsp;·&nbsp;
+          2.5x: <b class="text-zinc-300">17:27</b> &nbsp;·&nbsp;
+          2.7x: <b class="text-zinc-300">18:51</b> &nbsp;·&nbsp;
+          4.7x: <b class="text-zinc-300">32:49</b>
+        </div>
+        <div class="grid grid-cols-5 gap-1.5" id="presetPicker">
+          <button class="preset-btn text-xs font-semibold py-2 rounded-lg" data-i="0">Normal</button>
+          <button class="preset-btn active text-xs font-semibold py-2 rounded-lg" data-i="1">2.3x</button>
+          <button class="preset-btn text-xs font-semibold py-2 rounded-lg" data-i="2">2.5x</button>
+          <button class="preset-btn text-xs font-semibold py-2 rounded-lg" data-i="3">2.7x</button>
+          <button class="preset-btn text-xs font-semibold py-2 rounded-lg" data-i="4">4.7x</button>
         </div>
       </div>
 
@@ -834,7 +843,7 @@ function extractRbxAssetId(data){
   if(data.done===true && data.response && data.response.assetId)return data.response.assetId;
   return null;
 }
-var RBX_POLL_INTERVAL_MS=4000, RBX_POLL_MAX_ATTEMPTS=45; /* ~3 menit */
+var RBX_POLL_INTERVAL_MS=4000, RBX_POLL_MAX_ATTEMPTS=90; /* ~6 menit — moderasi Roblox kadang butuh lebih dari 3 menit */
 function pollRobloxOperation(assetEntry,b,opPath,attempt){
   if(attempt>=RBX_POLL_MAX_ATTEMPTS){
     assetEntry.status='error';renderRbxHistoryRow(assetEntry);
@@ -1039,8 +1048,8 @@ function initGoogleLogin(){
 }
 initGoogleLogin();
 
-var presets=[{speed:2.3,db:0,resample:48000},{speed:2.5,db:0,resample:48000},{speed:2.7,db:0,resample:48000},{speed:4.7,db:0,resample:48000}];
-var activePreset=0;
+var presets=[{speed:1,db:0,resample:48000},{speed:2.3,db:0,resample:48000},{speed:2.5,db:0,resample:48000},{speed:2.7,db:0,resample:48000},{speed:4.7,db:0,resample:48000}];
+var activePreset=1; // default tetap 2.3x, sekarang di index 1 karena "Normal" ditambah di index 0
 document.querySelectorAll('.preset-btn').forEach(function(b){
   b.addEventListener('click',function(){
     document.querySelectorAll('.preset-btn').forEach(function(x){x.classList.remove('active');});
@@ -1537,8 +1546,17 @@ async function encodeWithFormat(it,inp,filter,fmt){
   var ff=['-i',inp,'-filter:a',filter].concat(fmt.args).concat([out]);
   await withTimeout(ffmpeg.exec(ff),90000,"Encode "+fmt.label);
   var data=await ffmpeg.readFile(out);
-  var blob=new Blob([data.buffer],{type:fmt.mime});
   await ffmpeg.deleteFile(out).catch(function(){});
+  /* Sebelumnya di sini tidak pernah dicek apakah hasil encode-nya beneran
+     ada isinya. Kalau filter chain gagal di tengah jalan (kombinasi filter
+     tertentu, input aneh, dll), FFmpeg bisa saja "selesai" tanpa error tapi
+     nulis file kosong (0 byte) — dan sebelumnya itu tetap dilaporkan sukses.
+     Sekarang kalau hasilnya kosong, dianggap gagal secara eksplisit supaya
+     retry-nya benar dan tidak ada file 0B yang lolos ke pengguna. */
+  if(!data || data.byteLength===0){
+    throw new Error('Hasil encode kosong (0 byte) — kemungkinan filter chain gagal, coba lagi');
+  }
+  var blob=new Blob([data.buffer],{type:fmt.mime});
   return blob;
 }
 
@@ -1589,7 +1607,12 @@ async function startProcess(){
          soalnya sebelumnya file yang aslinya pelan ya tetap kedengaran
          pelan setelah convert. alimiter tetap dipasang paling akhir sebagai
          jaring pengaman terakhir supaya puncak sinyal tidak pernah pecah. */
-      filter += ',loudnorm=I=-14:TP=-1.5:LRA=11,alimiter=limit=0.95:attack=5:release=50';
+      /* LRA dinaikkan dari 11 -> 20: LRA kecil memaksa loudnorm menekan
+         rentang dinamika lebih keras, yang kedengaran seperti efek
+         "pumping"/naik-turun di lagu dengan transient cepat (breakbeat,
+         EDM drop, dll). LRA lebih besar = loudnorm lebih longgar, dinamika
+         asli lebih terjaga, hasil kedengaran lebih jernih & stabil. */
+      filter += ',loudnorm=I=-14:TP=-1.5:LRA=20,alimiter=limit=0.95:attack=5:release=50';
       
       await ffmpeg.writeFile(inp, await fetchFile(it.file));
       var blob=await encodeWithFormat(it,inp,filter,fmt);
